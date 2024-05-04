@@ -1,0 +1,3 @@
+int32 current_person_index
+---
+string identified_item_name

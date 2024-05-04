@@ -1,0 +1,7 @@
+# 发送的请求是要说的话
+std_msgs/Header header
+string sentence
+---
+# 返回的响应是说话的时间，-1表示说话失败
+std_msgs/Header header
+int16 duration

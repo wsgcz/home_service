@@ -1,0 +1,8 @@
+prefix=/home/zxy/general_service/install
+
+Name: xf_voice
+Description: Description of xf_voice
+Version: 0.0.0
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib 
+Requires: roscpp rospy std_msgs message_runtime

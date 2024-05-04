@@ -1,0 +1,6 @@
+
+---
+float64 front_distance
+float64 behind_distance
+float64 right_distance
+float64 left_distance

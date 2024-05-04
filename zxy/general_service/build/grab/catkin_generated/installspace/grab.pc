@@ -1,0 +1,8 @@
+prefix=/home/zxy/general_service/install
+
+Name: grab
+Description: Description of grab
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

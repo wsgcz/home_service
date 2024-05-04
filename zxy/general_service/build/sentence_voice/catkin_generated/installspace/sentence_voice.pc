@@ -1,0 +1,8 @@
+prefix=/home/zxy/general_service/install
+
+Name: sentence_voice
+Description: Description of sentence_voice
+Version: 0.0.0
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib 
+Requires: message_generation message_runtime roscpp rospy sensor_msgs std_msgs

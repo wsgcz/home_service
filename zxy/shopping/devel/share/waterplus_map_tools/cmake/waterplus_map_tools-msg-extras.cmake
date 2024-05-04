@@ -1,0 +1,2 @@
+set(waterplus_map_tools_MESSAGE_FILES "/home/zxy/shopping/src/waterplus_map_tools/msg/Waypoint.msg")
+set(waterplus_map_tools_SERVICE_FILES "/home/zxy/shopping/src/waterplus_map_tools/srv/SaveWaypoints.srv;/home/zxy/shopping/src/waterplus_map_tools/srv/AddNewWaypoint.srv;/home/zxy/shopping/src/waterplus_map_tools/srv/GetNumOfWaypoints.srv;/home/zxy/shopping/src/waterplus_map_tools/srv/GetWaypointByIndex.srv;/home/zxy/shopping/src/waterplus_map_tools/srv/GetWaypointByName.srv;/home/zxy/shopping/src/waterplus_map_tools/srv/GetChargerByName.srv")

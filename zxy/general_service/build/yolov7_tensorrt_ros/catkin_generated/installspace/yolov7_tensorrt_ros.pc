@@ -1,0 +1,8 @@
+prefix=/home/zxy/general_service/install
+
+Name: yolov7_tensorrt_ros
+Description: Description of yolov7_tensorrt_ros
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

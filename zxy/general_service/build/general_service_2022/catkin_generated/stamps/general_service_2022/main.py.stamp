@@ -1,0 +1,605 @@
+# from re import T
+# from grab.scripts.t import A
+from ast import Sub
+from multiprocessing.connection import wait
+import rospy
+import actionlib.simple_action_client 
+import actionlib 
+from std_msgs.msg import String
+from move_base_msgs.msg import MoveBaseAction
+from move_base_msgs.msg import MoveBaseGoal
+from geometry_msgs.msg import PoseWithCovarianceStamped as Pose
+from waterplus_map_tools.srv import GetWaypointByName,GetWaypointByNameRequest,GetWaypointByNameResponse
+from general_service_2022.msg import Goals_name
+import pandas as pd
+import numpy as np
+###################################################################
+# 通常情况下我定义了结构体的变量都是为了状态机逻辑服务的如：Face_det.msg--- #
+# 节点的消息操作封装在大类中：pub sub client。状态机类型定义为结构体Status #
+# PDW:PreDefinedWaypoints 是初始预设的位置信息:厨房/客厅的信息--------- #
+###################################################################
+
+#！！！！！！！！！！！！！！！！！！！！！！！！！test=1为测试状态！！！！！！！！！！！！！！！！！！！！！！！！！！！
+
+################
+# 状态机类型定义 #
+################
+class Statu:
+  def __init__(self) -> None:
+        self.Enter = 0,
+        self.WaitRoom = 2,
+        self.Explore = 4,
+        self.Collect = 8,
+        self.Grab = 16,
+        self.Return = 32,
+        self.Put = 64,
+        self.Stop = 128,
+        self.CallBack = 256,
+        self.Error = 512,
+################
+# 初始的一些参数 #
+################
+class Params:
+   def __init__(self) -> None:
+        self.wait_position=""
+        self.wait_time=0
+        self.gate_name=""
+        self.duration=rospy.Duration(2.0)
+        self.msg_cache=""
+#####################
+# # 用于前往人的一些参数 #
+# #####################
+class ahead:
+   def __init__(self) -> None:
+        self.goal=MoveBaseGoal()
+        self.goal_renew_flag={}
+        self.goals_dit={}
+        self.goals_list=[]
+        self.index=0
+        self.goals_finish=False
+        self.current_goals_index=0
+        self.srv_rqs=GetWaypointByNameRequest()
+        self.srv_rsp=GetWaypointByNameResponse()
+        self.new_position={}
+        self.msg=String()
+#################
+# 人体注册的参数 #
+#################  
+class human_det:
+   def __init__(self) -> None:
+        self.max_n=0
+        self.msg=String()
+        self.reg_flag=False
+
+#################
+# 人脸注册的参数 #
+#################
+class face_det:
+   def __init__(self) -> None:  
+        self.msg=str()
+        self.recog_msg="None"
+        self.recog_index=0
+        self.is_done=[]
+
+#################
+# 抓取物品的参数 #
+#################
+class grab:
+   def __init__(self) -> None:
+        self.only_once=0
+        self.count=0
+        self.object_msg=String()
+        self.position="targets"
+#    count_to_name={0:"Alice",1:"Bob",2:"Carol"}
+        self.get_msg="0"
+
+#################
+# 放置物品的参数 #
+#################
+class put:
+   def __init__(self) -> None: 
+        self.count=0
+        self.done_msg="0"
+        self.down_msg=String()
+        self.down_msg.data="1"  
+        self.Choose=3
+
+########################
+# 预设点 厨房、客厅的信息 #
+########################
+class PreDefinedWaypoints :
+    def __init__(self,gate_name):
+        self.is_defined=bool()
+        self.persons_waypoint=""
+        self.targets_waypoint=""
+        self.exit_waypoint=""
+        if (gate_name== "B"):
+            self.persons_waypoint = "persons_living"
+            self.targets_waypoint = "null"
+            self.is_defined = False
+            self.exit_waypoint = "A"
+        elif(gate_name=="A"):
+            self.persons_waypoint = "persons_dining"
+            self.targets_waypoint = "null"
+            self.is_defined = False
+            self.exit_waypoint = "B"
+
+######################
+# 发布信息的大类 Puber #
+######################
+class pub:
+    def __init__(self):
+        self.choose=rospy.Publisher("/general_service_choose_face_or_pose",String,queue_size=10)#pose.py
+        self.init_pose=rospy.Publisher("initialpose",Pose,queue_size=10)#amcl_node.cpp
+        self.human_det=rospy.Publisher("general_service_human_detection_switch",String,queue_size=100)#test_human_detection.py
+        self.words_det=rospy.Publisher("/general_service_xfsaywords",String,queue_size=100)#robot
+        self.face_det=rospy.Publisher("general_service_now_goals",String,queue_size=10)#pose2.py
+        self.grab_need=rospy.Publisher("general_service_need",String,queue_size=1)#grab.py
+        self.putting=rospy.Publisher("genenal_service_put_down",String,queue_size=10)#grab.py
+        self.goto_Thing=rospy.Publisher("/general_service_go_to_things",String,queue_size=10)#grab.py
+
+    def Init_Pose(self,gate_name):
+        #amcl_node.cpp
+        msg=Pose()
+        msg.header.stamp=rospy.Time.now()
+        msg.header.frame_id="map"
+        msg.pose.covariance[0]= 0.25
+        msg.pose.covariance[7]= 0.25
+        msg.pose.covariance[35]= 0.06853892326654787
+        name=gate_name
+        data=pd.read_xml('/home/linxi/ServiceRobot-General/src/general_service_2022/maps/waypoints.xml')
+        Name=data['Name']
+
+        index= np.where(Name==name)
+        index=int(index[0])
+        Pos_x=data["Pos_x"][index]
+        Pos_y=data["Pos_y"][index]
+        Ori_z=data["Ori_z"][index]
+        Ori_w=data["Ori_w"][index]
+        msg.pose.pose.position.x=Pos_x
+        msg.pose.pose.position.y=Pos_y
+        msg.pose.pose.orientation.z=Ori_z
+        msg.pose.pose.orientation.w=Ori_w
+        if (gate_name== "B"):
+            rospy.loginfo("选择了B门")
+            wait_position = "B_wait"
+        elif (gate_name=="A"):
+            rospy.loginfo("选择了A门")
+            wait_position="A_wait"
+        else :
+            wait_position=gate_name
+        rospy.loginfo("选择了Explore作为开始")
+        self.init_pose.publish(msg)
+        return wait_position
+    
+
+    def Words_det(self,msg:str="",index:int=-1):
+        #word.py
+        msg_new=String()
+        msg_new.data=msg
+        states=["one","two","three"]
+        if index !=-1:
+            msg_new.data=msg_new.data+states[index]
+        self.words_det.publish(msg_new)
+
+
+    def Renew_goal(self,msg:str=""):
+        #pose2.py
+        msg_new=String()
+        msg_new.data=msg
+        self.face_det.publish(msg_new)
+
+    def Grab(self,msg:str=""):
+        #grab.py
+        msg_new=String()
+        msg_new.data=msg
+        self.grab_need.publish(msg_new)
+    
+    def Choose(self,msg:str=""):
+        #pose.py
+        msg_new=String()
+        msg_new.data=msg
+        self.choose.publish(msg_new)
+        rate=rospy.Rate(0.5)
+        rate.sleep()
+
+    def Put(self,msg:str=""):
+        #grab.py
+        msg_new=String()
+        msg_new.data=msg
+        self.putting.publish(msg_new)
+
+#########################
+# 用于Gotogoal的客户端操作#
+#########################
+class client:
+    def __init__(self) -> None:
+        self.go_to_flag=False
+        self.togetname=rospy.ServiceProxy("/waterplus/get_waypoint_name",GetWaypointByName)#robot
+        self.ac=actionlib.SimpleActionClient("move_base",MoveBaseAction)
+
+def Gotogoal(goal:MoveBaseGoal):
+   rospy.loginfo("等待服务器")
+   Client.ac.wait_for_server()
+   rospy.loginfo('Gotogoal消息发出')
+   Client.ac.send_goal(goal)
+   Client.ac.wait_for_result()
+   if Client.ac.get_state() == actionlib.SimpleGoalState.DONE:
+       Client.go_to_flag=True
+   return True
+
+
+######################
+# 接收信息的大类 Suber #
+######################
+class sub:
+    def __init__(self) -> None:
+     self.object_names=[]
+     self.word_flag=False
+     self.i=0
+     self.goal=MoveBaseGoal()
+     self.init_goals=rospy.Subscriber("/general_service_loc_target",MoveBaseGoal,self.InitPersonFrontCallBack,queue_size=10)#pose1.py
+     self.object_name=rospy.Subscriber("general_service_object_name_return",String,self.ObjectNameCallBack,queue_size=10)#words.py
+     self.wait_time=rospy.Subscriber("/wpb_home/entrance_detect",String,self.EntranceCallBack,queue_size=10)#entrance_detect.cpp
+     self.renew_goals=rospy.Subscriber("/person/waypoint",Goals_name,self.Renew_goals,queue_size=100)#pose2.py
+     self.explore_msg=rospy.Subscriber("general_service_recognition",String,self.RecognitionCallBack,queue_size=10 )#pose1.py
+     self.down_msg=rospy.Subscriber("genenal_service_put_down_result",String,self.PutDownResultCallBack,queue_size=10)#grab.py
+     self.get_msg=rospy.Subscriber("genenal_service_get_it",String,self.GetItCallBack,queue_size=10)#grab.py
+    def Renew_goals(self,msg:Goals_name):
+        global Ahead,current_name
+        if msg.goal.target_pose.header.frame_id=="None" and Put.Choose==3:
+            rospy.loginfo("point is not avaliable , seek closer ")
+        elif msg.goal.target_pose.header.frame_id=="None" and Put.Choose==4:
+            rospy.loginfo("exchange msg.name %s with current_name %s",msg.name,current_name)
+            t=Ahead.goals_dit[msg.name]
+            Ahead.goals_dit[msg.name]=Ahead.goals_dit[current_name]
+            Ahead.goals_dit[current_name]=t
+            Ahead.goal_renew_flag[msg.name]=1    
+        else:
+            rospy.loginfo("Renew the goal:%s",msg.name)
+            Ahead.goal_renew_flag[msg.name]=1
+            Ahead.goals_dit[msg.name]=msg.goal
+     
+   
+    def ObjectNameCallBack(self,msg:String):
+        global PDW,test_i
+        # rospy.loginfo("收到房间名称%s::ObjectNameCallBack: ",msg.data)
+        if msg.data in ["bedroom","kitchen","living","dining"]:
+            PDW.targets_waypoint="targets_"+msg.data
+            PDW.is_defined=True
+            rospy.loginfo("收到物品所在房间: %s",msg.data)
+        elif msg.data!="false" and test_i==1:
+            rospy.loginfo("收到物品的名称为%s",msg.data)
+            self.word_flag=True
+            self.object_names.append(msg.data)
+            rospy.loginfo("Ahead.current_index=%d,len(object_name)=%d",Ahead.current_goals_index,len(self.object_names))
+   
+    def EntranceCallBack(self,msg:String):
+        global params
+        # self.i+=1
+        # rospy.loginfo("wait_time %d 消息收到",params.wait_time)
+        if params.wait_time>100:
+            return
+        elif params.wait_time<0:
+            rospy.logwarn("wait_time数值明显错误")
+        if msg.data=="door open":
+            params.wait_time+=1
+        else:
+            params.wait_time=0
+
+    def InitPersonFrontCallBack(self,goal:MoveBaseGoal):
+        global Ahead
+        self.i+=1
+        self.goal=goal
+        Ahead.goals_list.append(goal)
+        rospy.loginfo("收到了第%d个goal<---pose1.py",self.i)
+
+
+    def PutDownResultCallBack(self,msg:String):
+        global Put
+        if Put.done_msg=="0":
+            Put.done_msg=msg.data
+            rospy.loginfo("收到的Put.done_msg==1,fsm转为stop或者grab")
+        else:
+            rospy.loginfo("接受Put.done.msg话题错误,发过来的时候Put.done_msg不是0")
+
+    def RecognitionCallBack(self,msg:String):
+         global Ahead
+         if msg.data!="None":
+            rospy.loginfo("第%d个人注册成功",Ahead.current_goals_index+1) 
+            Ahead.goals_dit[msg.data]=Ahead.goals_list[Ahead.index]
+            Ahead.index+=1
+            Face_det.recog_msg=msg.data
+         else:
+            Face_det.recog_msg=msg.data
+         rospy.loginfo("main:收到的第%d个人的rocognition=%s",Ahead.current_goals_index+1,Face_det.recog_msg)
+
+    def GetItCallBack(self,msg:String):
+        global Grab
+        if Grab.get_msg=="0":
+            rospy.loginfo("收到 get_it 为 1, 状态转为 put")
+            Grab.get_msg=msg.data
+        else:
+            rospy.loginfo("接受get_it话题错误,发过来的时候get_msg不是0")
+        pass
+
+#####################################
+# 操控机器移动的函数，简单理解为前往某个点 #
+#####################################
+def Gotopoint(position):
+   global Ahead,Client
+   Ahead.srv_rqs.name=position
+   print(position)
+   if (Client.togetname.call(Ahead.srv_rqs)):
+      if (Client.ac.wait_for_server(rospy.Duration(5.0))==False): 
+            rospy.loginfo("The move_base action server is no running. action abort...")
+            return False
+      else:
+            Ahead.srv_rsp=Client.togetname.call(Ahead.srv_rqs)
+            rospy.loginfo("get_waypoint_name: name = %s (%.2lf,%.2lf),"
+                ,position,
+                Ahead.srv_rsp.pose.position.x,
+                Ahead.srv_rsp.pose.position.y)
+            Ahead.goal.target_pose.header.frame_id = "map"
+            Ahead.goal.target_pose.header.stamp = rospy.Time.now()
+            Ahead.goal.target_pose.pose = Ahead.srv_rsp.pose
+            Client.ac.send_goal(Ahead.goal)
+            Client.ac.wait_for_result()
+            if Client.ac.get_state()==3:
+                rospy.loginfo("Arrived at %s!", position)
+                return True
+            else:
+                print(Client.ac.get_state())
+                rospy.loginfo("Failed to get to %s ...", position)
+                return False
+   else:
+      rospy.logwarn("Failed to call service GetWaypointByName")
+      return False
+
+
+########
+# Main #
+########
+if __name__=="__main__":
+    test=False
+    test_i=0
+############################################  
+# 初始化节点,设置频率名称，fsm初始状态----------#
+# param中得到gate_name,根据gatename选姿态信息 #
+# 并发送姿态信息初始化位置 --------------------#
+############################################
+    rospy.init_node("main_service")
+    Status=Statu()
+    params=Params()
+    Ahead=ahead()
+    Face_det=face_det()
+    Human_det=human_det()
+    Grab=grab()
+    Put=put()
+    Puber=pub()
+    Suber=sub()
+    Client=client()
+    rate=rospy.Rate(40.0)
+    rospy.Rate(1).sleep()    
+    rospy.loginfo("节点main_service启动")
+    params.gate_name=rospy.get_param("gate_name")
+    params.wait_position=Puber.Init_Pose(params.gate_name)
+    PDW=PreDefinedWaypoints(params.gate_name)
+    rospy.loginfo("初始位置设置完毕")
+    fsm=Status.Enter
+    fsm=Status.Explore#Explore 测试用
+    # test_i=1 # Put test
+    # fsm=Status.Grab#Grab test
+    # Suber.object_names=["bottle"]
+    # fsm=Status.CallBack# Put test
+    # Grab.get_msg="1"# Put test
+    # Face_det.recog_msg="end"# Put Grab test
+    rospy.sleep(6)#Exlore Put test
+    while not rospy.is_shutdown():
+       ####################################################
+       # Enter持续检测门20次，进入等待地点，进入下一状态Explore #
+       ####################################################
+        if fsm==Status.Enter:
+            if params.wait_time>20:
+                rospy.loginfo("门已开")
+                if test==False:
+                    success=Gotopoint(params.wait_position)
+                else: 
+                    success=True
+                if success==True:
+                    rospy.loginfo("!!!!!!!!!!!!!!!!!!!!!")
+                    Puber.Words_det(msg="zero")
+                    fsm=Status.CallBack
+        ############################
+        # Waitroom等待2s进入人所在房间 #
+        ############################
+        elif fsm==Status.WaitRoom:
+            rospy.loginfo("当前状态为Waitroom,等待2s")
+            rospy.sleep(params.duration)
+            if test==True:
+                success==True
+            else:
+                success=Gotopoint(PDW.persons_waypoint)
+            if success==True:
+                fsm=Status.Explore
+                rospy.loginfo("start Explore")
+        ######################################         
+        # Explore 准备识别人，到面前进入 Collect #
+        ######################################
+        elif fsm==Status.Explore:
+            if test_i!=1:
+                rospy.loginfo("Choose 1 Already send")
+                Puber.Choose("1")
+                rospy.sleep(3)
+                Puber.Choose("0")
+                test_i=1
+                Human_det.max_n=len(Ahead.goals_list)
+                rospy.loginfo("要人脸检测的数量为man_n=%d",Human_det.max_n)
+            goal_explore=Ahead.goals_list[Ahead.current_goals_index]
+            Gotogoal(goal_explore)
+            fsm=Status.Collect
+        #############################################
+        # Collect 采集信息一旦某人注册成功，进入Callbeck #
+        #############################################
+        elif fsm==Status.Collect:
+                rospy.loginfo("start Collect")
+                rospy.loginfo("目前状态为Collect采集信息,目前执行到第%d位客人",Ahead.current_goals_index+1)
+                if Ahead.current_goals_index==0 or Ahead.current_goals_index==1 or Ahead.current_goals_index==2:
+                    rospy.loginfo("正在前往第%d个目标",Ahead.current_goals_index+1)
+                    Gotogoal(Ahead.goals_list[Ahead.current_goals_index])
+                    Puber.Choose("2")
+                    # Puber.Words_det(index=Ahead.current_goals_index)
+                    # Put test
+                    Suber.word_flag=True 
+                    Suber.object_names.append("bottle")
+                    #
+                    rospy.loginfo("语音 和Choose 2消息已经发出")
+                    rospy.sleep(2)
+                    if Face_det.recog_msg=="None":
+                        rospy.loginfo("%d个人注册没成功,进入回调状态",Ahead.current_goals_index)
+                        fsm=Status.CallBack
+                else:
+                    rospy.loginfo("当前current_person_index是%d",Ahead.current_goals_index)
+                    continue
+                fsm=Status.CallBack
+                continue
+        ##################################
+        # Grab 发布信息，前往抓取count号物品 #
+        ##################################
+        elif fsm==Status.Grab:
+            rospy.loginfo("当前状态为Grab")
+            Gotopoint("targets_kitchen")#门口
+            rospy.Rate(2).sleep()
+            # Puber.Grab(msg=Suber.object_names[Grab.count])
+            print(Suber.object_names)
+            Puber.Grab("bottle") # Grab test
+            # 发布物品信息
+            rospy.loginfo("发送完成第%d个客人的物品:%s",Grab.count+1,Grab.object_msg.data)
+            fsm=Status.CallBack
+        ########
+        # Put  #
+        ########
+        elif fsm==Status.Put:
+            rospy.loginfo("当前状态为Put")
+            params.msg_cache="please take your"+Suber.object_names[Grab.count]
+            rospy.loginfo("Put 的 语言消息发出了")
+            Puber.Words_det(params.msg_cache)
+            rospy.loginfo("%s Put 消息已经发财",current_name)
+            Puber.Put("1")
+            fsm=Status.CallBack
+        ############
+        # Stop 离场 #
+        ############
+        elif fsm==Status.Stop:
+            rospy.loginfo("当前 main_service 状态为 stop")
+            Gotopoint(position="B")
+            rospy.loginfo("机器人出场完成")
+            pass
+        ############
+        # CallBack #
+        ############
+        elif fsm==Status.CallBack:
+          ##############################
+          # 确认房间完毕后开始进场：如“厨房”#
+          # this if is for Enter state.#
+          ##############################
+          if PDW.is_defined==True and test_i==0:
+             PDW.is_defined=False
+             rospy.loginfo("语音确定客人和物品房间完毕，开始进场")
+             fsm=Status.WaitRoom
+             continue
+          #################################
+          # 人体注册成功，停止人脸识别，否则继续#
+          # this if is for Collect state ##
+          #################################
+          if Face_det.recog_msg=="None" and test_i==1:
+             rospy.sleep(2)
+             Puber.Choose("2")
+             rospy.loginfo("再次尝试注册第%d人脸",Ahead.current_goals_index+1)
+          ##########################################################################
+          # 人脸识别成功后，如果走到x个人面前&&语音信息对的上&&人数合理，就抓去，否则继续前往人 #
+          # this will turn state to Grab or Explore ################################
+          # this is the for Collect state  ##########################################
+          ##########################################################################
+          if len(Suber.object_names)==Ahead.current_goals_index+1 and Suber.word_flag==True:
+             Suber.word_flag=False
+             Client.go_to_flag=False
+             rospy.loginfo("收到语音识别结果，第 %d 个客人需要 %s"
+                           ,Ahead.current_goals_index+1,Suber.object_names[Ahead.current_goals_index])
+             Ahead.current_goals_index+=1
+             if Ahead.current_goals_index>=Human_det.max_n:
+                rospy.loginfo("采集完毕进入Grab状态")
+                Face_det.recog_msg="End"
+                Suber.word_flag==False
+                fsm=Status.Grab
+                fsm=Status.CallBack #Put test
+                Grab.get_msg="1"# Put test
+             elif Ahead.current_goals_index<0:
+                rospy.ERROR("current_person_index 的值出现异常，建议立即进行检查")
+             else:
+                rospy.loginfo("进行下一个人的信息采集")
+                Face_det.recog_msg="None"
+                fsm=Status.Explore
+           ############################################     
+           # 放下东西后，如果放完了，准备出场，否则继续去抓取##
+           # this will turn state to Stop or Grab######
+           # this is for Put state ####################
+           ############################################
+          if Put.done_msg=="1":
+                Put.done_msg="0"
+                if Grab.count+1==Human_det.max_n:
+                    rospy.loginfo("全部抓取完毕，准备出场")
+                    fsm=Status.Stop
+                else:
+                    rospy.loginfo("送完了第%d个物品",Grab.count+1)
+                    Grab.count+=1
+                    fsm=Status.Grab
+                    fsm=Status.CallBack #Put test
+                    Grab.get_msg="1"# Put test
+                continue
+        #    ########################################
+        #    # 如果拿到物品，Gotopoint去客人位置放置物品 #
+        #    # this is for Grab state turn to Put####
+        #    ########################################
+          if Grab.get_msg=="1":
+                Grab.get_msg="0"
+                rospy.loginfo("抓取完成，正在去客人所在位置")
+                Gotopoint("persons_dining")
+                rospy.sleep(3)
+                ###Put test
+                # for i in ["01"]:
+                #     Ahead.goals_dit[i]=None
+                # #
+                current_name=list(Ahead.goals_dit.keys())[Grab.count]
+                if Grab.only_once==0:
+                    Grab.only_once+=1
+                    for name in Ahead.goals_dit.keys() :
+                        Ahead.goal_renew_flag[name]=0
+                    rospy.loginfo("当前目标客户是%s",current_name)
+                    Put.Choose=3
+                    Puber.Choose("3")
+                    Puber.Renew_goal("1")
+                    rospy.loginfo("Pose2 启动")
+                    rospy.sleep(6)
+                    Puber.Renew_goal("0")
+                if Ahead.goal_renew_flag[current_name]==1:
+                    rospy.loginfo("Now go to current customer")
+                    Gotogoal(Ahead.goals_dit[current_name])
+                else:
+                    while Ahead.goal_renew_flag[current_name]!=1:
+                        Put.Choose=4
+                        rospy.loginfo("Target haven't refreshed ,Now go to explore the customer")
+                        goal=Ahead.goals_dit[current_name]
+                        Gotogoal(goal) 
+                        Puber.Choose("4")
+                        Puber.Renew_goal("1")
+                        rospy.sleep(6)
+                        Puber.Renew_goal("0")
+                    rospy.loginfo("Now go to current customer after relocated")
+                    Gotogoal(Ahead.goals_dit[current_name])
+                fsm=Status.Put
+                continue
+    rospy.spin()
+    rate.sleep()
+    rospy.loginfo("节点已经退出")
+      
