@@ -95,6 +95,15 @@ class face_det:
         self.is_done=[]
 
 #################
+# body form arg #
+#################
+class body_det:
+    def __init__(self) ->None:
+        self.msg=str()
+        self.recog_msg="None"
+        self.recog_index=0
+        self.is_done=[]
+#################
 # 抓取物品的参数 #
 #################
 class grab:
@@ -456,6 +465,8 @@ if __name__=="__main__":
     Puber=pub()
     Suber=sub()
     Client=client()
+    Body_det=body_det()
+
     rate=rospy.Rate(40.0)
     rospy.Rate(1).sleep()    
     rospy.loginfo("节点main_service启动")
@@ -488,8 +499,16 @@ if __name__=="__main__":
                 if success==True:
                     fsm=Status.WaitRoom
         ############################
+        #shibie#
+        ############################
+        elif fsm==Status.Form:
+            rospy.loginfo("Start recoginze body form")
+            
+                
+        ############################
         # Waitroom等待2s进入人所在房间 #
         ############################
+                
         elif fsm==Status.WaitRoom:
             rospy.loginfo("当前状态为Waitroom,等待2s")
             rospy.sleep(params.duration)
@@ -500,6 +519,7 @@ if __name__=="__main__":
             if success==True:
                 fsm=Status.Explore
                 rospy.loginfo("start Explore")
+
         ######################################         
         # Explore 准备识别人，到面前进入 Collect #
         ######################################
