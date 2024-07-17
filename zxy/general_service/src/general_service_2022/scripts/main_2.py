@@ -503,7 +503,7 @@ if __name__=="__main__":
         ############################
         elif fsm==Status.Form:
             rospy.loginfo("Start recoginze body form")
-            
+            rospy.loginfo("aaaaaaaaa")
                 
         ############################
         # Waitroom等待2s进入人所在房间 #
