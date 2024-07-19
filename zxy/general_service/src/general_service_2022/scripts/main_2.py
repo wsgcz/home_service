@@ -13,7 +13,7 @@ from move_base_msgs.msg import MoveBaseAction
 from move_base_msgs.msg import MoveBaseGoal
 from geometry_msgs.msg import PoseWithCovarianceStamped as Pose
 from waterplus_map_tools.srv import GetWaypointByName,GetWaypointByNameRequest,GetWaypointByNameResponse
-from general_service_2022.msg import Goals_name
+from general_service_2022.msg import Goals_name  # topic msg    contain name/goal
 import pandas as pd
 import numpy as np
 import tf.transformations as transformations
@@ -53,78 +53,78 @@ class Statu:
 ################
 class Params:
    def __init__(self) -> None:
-        self.wait_position=""
-        self.wait_time=0
-        self.targets_waypoint=""
-        self.gate_name=""
+        self.wait_position=""  # enter,wait
+        self.wait_time=0        #maybe time after door open
+        self.targets_waypoint="" #mubiao /default kitchen
+        self.gate_name=""       # /default A
         self.duration=rospy.Duration(2.0)
-        self.msg_cache=""
+        self.msg_cache=""       #useless
 #####################
 # # 用于前往人的一些参数 #
 # #####################
 class ahead:
    def __init__(self) -> None:
-        self.goal=MoveBaseGoal()
-        self.goal_renew_flag={} #unknow
-        self.goals_dit={}
-        self.goals_list=[]
-        self.index=0
-        self.goals_finish=False
-        self.current_goals_index=0
+        self.goal=MoveBaseGoal() #a goal maybe useless?
+        self.goal_renew_flag={} #dictionary name:1/0
+        self.goals_dit={}   #dictionary name:goal
+        self.goals_list=[]  #dic value
+        self.index=0        #dic/list index
+        self.goals_finish=False     #useless
+        self.current_goals_index=0      # whats the difference with index????
         self.srv_rqs=GetWaypointByNameRequest() #unknow
         self.srv_rsp=GetWaypointByNameResponse() #unknow
-        self.new_position={}
-        self.msg=String()
+        self.new_position={}    #useless
+        self.msg=String()       #useless
 #################
 # 人体注册的参数 #
 #################  
 class human_det:
    def __init__(self) -> None:
-        self.max_n=0
-        self.msg=String()
-        self.reg_flag=False
+        self.max_n=0        #max human number
+        self.msg=String()   #useless
+        self.reg_flag=False   #useless
 
 #################
 # 人脸注册的参数 #
 #################
 class face_det:
    def __init__(self) -> None:  
-        self.msg=str()
-        self.recog_msg="None"
-        self.recog_index=0
-        self.is_done=[]
+        self.msg=str()  #useless
+        self.recog_msg="None"   #string recognize result
+        self.recog_index=0     #useless
+        self.is_done=[]     #useless
 
 #################
 # body form arg #
 #################
-class body_det:
+class body_det:     #all useless 
     def __init__(self) ->None:
-        self.msg=str()
-        self.recog_msg="None"
-        self.recog_index=0
-        self.is_done=[]
+        self.msg=str()          #useless
+        self.recog_msg="None"   #useless
+        self.recog_index=0      #useless
+        self.is_done=[]         #useless
 #################
 # 抓取物品的参数 #
 #################
 class grab:
    def __init__(self) -> None:
-        self.only_once=0
-        self.count=0
-        self.object_msg=String()
-        self.position="targets"
+        self.only_once=0            #unknow
+        self.count=0                #now grab index
+        self.object_msg=String()    #useless
+        self.position="targets"     #useless
 #    count_to_name={0:"Alice",1:"Bob",2:"Carol"}
-        self.get_msg="0"
+        self.get_msg="0"            #flag for each success grab 
 
 #################
 # 放置物品的参数 #
 #################
 class put:
    def __init__(self) -> None: 
-        self.count=0
-        self.done_msg="0"
-        self.down_msg=String()
+        self.count=0                #useless
+        self.done_msg="0"           #flag for each success put
+        self.down_msg=String()      #useless
         self.down_msg.data="1"  
-        self.Choose=3
+        self.Choose=3               #all finish grab
 
 ########################
 # 预设点 厨房、客厅的信息 #
@@ -251,9 +251,9 @@ class pub:
 #########################
 class client:
     def __init__(self) -> None:
-        self.go_to_flag=False
-        self.togetname=rospy.ServiceProxy("/waterplus/get_waypoint_name",GetWaypointByName)#robot
-        self.ac=actionlib.SimpleActionClient("move_base",MoveBaseAction)
+        self.go_to_flag=False       #unknow
+        self.togetname=rospy.ServiceProxy("/waterplus/get_waypoint_name",GetWaypointByName)#robot   #unknow
+        self.ac=actionlib.SimpleActionClient("move_base",MoveBaseAction)    #receive bot action status,server is ros itself
 
 def Gotogoal(goal:MoveBaseGoal):
    rospy.loginfo("等待服务器")
@@ -402,7 +402,7 @@ def Dijkstra(goals_list:List[MoveBaseGoal],now_goal:MoveBaseGoal):
 #####################################
 def Gotopoint(position):
    global Ahead,Client
-   Ahead.srv_rqs.name=position
+   Ahead.srv_rqs.name=sposition
    print(position)
    if (Client.togetname.call(Ahead.srv_rqs)):
       if (Client.ac.wait_for_server(rospy.Duration(5.0))==False): 
@@ -704,7 +704,7 @@ if __name__=="__main__":
                 if Grab.only_once==0:
                     Grab.only_once+=1
                     for name in Ahead.goals_dit.keys() :
-                        Ahead.goal_renew_flag[name]=0
+                        Ahead.goal_renew_flag[name]=0        #why reset renew_flag?????
                 rospy.loginfo("当前目标客户是%s",current_name)
                 while Ahead.goal_renew_flag[current_name]!=1:
                     rospy.loginfo("Target haven't refreshed ,Now go to explore the customer")
