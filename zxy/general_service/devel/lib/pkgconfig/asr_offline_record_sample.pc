@@ -1,8 +1,0 @@
-prefix=/home/zxy/general_service/devel
-
-Name: asr_offline_record_sample
-Description: Description of asr_offline_record_sample
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

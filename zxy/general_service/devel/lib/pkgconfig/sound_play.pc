@@ -1,8 +1,0 @@
-prefix=/home/zxy/general_service/devel
-
-Name: sound_play
-Description: Description of sound_play
-Version: 0.3.12
-Cflags: -I/home/zxy/general_service/devel/include -I/home/zxy/general_service/src/Dependency/sound_play/include
-Libs: -L${prefix}/lib 
-Requires: message_runtime actionlib_msgs

@@ -65,14 +65,14 @@ class Params:
 class ahead:
    def __init__(self) -> None:
         self.goal=MoveBaseGoal()
-        self.goal_renew_flag={}
+        self.goal_renew_flag={} #unknow
         self.goals_dit={}
         self.goals_list=[]
         self.index=0
         self.goals_finish=False
         self.current_goals_index=0
-        self.srv_rqs=GetWaypointByNameRequest()
-        self.srv_rsp=GetWaypointByNameResponse()
+        self.srv_rqs=GetWaypointByNameRequest() #unknow
+        self.srv_rsp=GetWaypointByNameResponse() #unknow
         self.new_position={}
         self.msg=String()
 #################
@@ -152,15 +152,15 @@ class pub:
         self.choose=rospy.Publisher("/general_service_choose_face_or_pose",String,queue_size=10)#pose.py
         self.init_pose=rospy.Publisher("initialpose",Pose,queue_size=10)#amcl_node.cpp
         self.human_det=rospy.Publisher("general_service_human_detection_switch",String,queue_size=100)#test_human_detection.py
-        self.words_det=rospy.Publisher("/general_service_xfsaywords",String,queue_size=100)#robot
+        self.words_det=rospy.Publisher("/general_service_xfsaywords",String,queue_size=100)#robot #unknow suber
         self.face_det=rospy.Publisher("general_service_now_goals",String,queue_size=10)#pose2.py
         self.grab_need=rospy.Publisher("general_service_need",String,queue_size=1)#grab.py
         self.putting=rospy.Publisher("genenal_service_put_down",String,queue_size=10)#grab.py
         self.goto_Thing=rospy.Publisher("/general_service_go_to_things",String,queue_size=10)#grab.py
         self.grab_room=rospy.Publisher("grab_room",String,queue_size=10)#grab.py
         self.guidence=rospy.Publisher("all_name",String,queue_size=10)#guidence
-        self.over_speak=rospy.Publisher("over_speak",String,queue_size=10)
-        self.refresh_speak=rospy.Publisher("refresh",String,queue_size=10)
+        self.over_speak=rospy.Publisher("over_speak",String,queue_size=10)#unknow suber
+        self.refresh_speak=rospy.Publisher("refresh",String,queue_size=10)#unknow suber
         # self.urgency=rospy.Publisher("")
     def Init_Pose(self,gate_name):
         #amcl_node.cpp
@@ -548,8 +548,8 @@ if __name__=="__main__":
                     rospy.loginfo("正在前往第%d个目标",Ahead.current_goals_index+1)
                     Gotogoal(Ahead.goals_list[Ahead.current_goals_index])
                     Puber.Choose("2")
-                    
                     Puber.Words_det(index=Ahead.current_goals_index)
+                    #shang2 hang unknow suber
                     rospy.loginfo("语音 和Choose 2消息已经发出")
                     rospy.sleep(2)
                     if Face_det.recog_msg=="None":

@@ -1,8 +1,0 @@
-prefix=/home/zxy/general_service/devel
-
-Name: image_publisher
-Description: Description of image_publisher
-Version: 1.16.0
-Cflags: -I/home/zxy/general_service/devel/include
-Libs: -L${prefix}/lib 
-Requires: 

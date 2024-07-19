@@ -1,8 +1,0 @@
-prefix=/home/zxy/general_service/devel
-
-Name: clear_costmap_recovery
-Description: Description of clear_costmap_recovery
-Version: 1.17.1
-Cflags: -I/home/zxy/general_service/src/Dependency/navigation/clear_costmap_recovery/include
-Libs: -L${prefix}/lib -lclear_costmap_recovery
-Requires: costmap_2d nav_core pluginlib roscpp tf2_ros
