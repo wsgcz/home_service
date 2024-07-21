@@ -162,18 +162,23 @@ class pub:
         self.over_speak=rospy.Publisher("over_speak",String,queue_size=10)#unknow suber
         self.refresh_speak=rospy.Publisher("refresh",String,queue_size=10)#unknow suber
         # self.urgency=rospy.Publisher("")
-    def Init_Pose(self,gate_name):
+###################################
+#### lzh delete gate name because there is only one wait position
+#### wait position in data file is named wait_pos
+###################################
+    def Init_Pose(self):
         #amcl_node.cpp
         msg=Pose()
         msg.header.stamp=rospy.Time.now()
         msg.header.frame_id="map"
+        #??? unchanged yet
         msg.pose.covariance[0]= 0.25
         msg.pose.covariance[7]= 0.25
         msg.pose.covariance[35]= 0.06853892326654787
-        name=gate_name
+        #???
         data=pd.read_xml('/home/linxi/ServiceRobot-General/src/general_service_2022/maps/waypoints.xml')
         Name=data['Name']
-        index= np.where(Name==name)
+        index= np.where(Name=='wait_pos')
         index=int(index[0])
         Pos_x=data["Pos_x"][index]
         Pos_y=data["Pos_y"][index]
@@ -183,6 +188,7 @@ class pub:
         msg.pose.pose.position.y=Pos_y
         msg.pose.pose.orientation.z=Ori_z
         msg.pose.pose.orientation.w=Ori_w
+        '''
         if (gate_name== "B"):
             rospy.loginfo("选择了B门")
             wait_position = "B_wait"
@@ -191,13 +197,13 @@ class pub:
             wait_position="A_wait"
         else :
             wait_position=gate_name
-        rospy.loginfo("选择了Explore作为开始")
+        rospy.loginfo("选择了Explore作为开始")'''
         # refresh_data=String()
         # refresh_data.data='onno'
         # self.refresh_speak.publish(refresh_data)
         time.sleep(1)
         self.init_pose.publish(msg)
-        return wait_position
+        # return wait_position
     
 
     def Words_det(self,msg:str="",index:int=-1):
@@ -402,7 +408,7 @@ def Dijkstra(goals_list:List[MoveBaseGoal],now_goal:MoveBaseGoal):
 #####################################
 def Gotopoint(position):
    global Ahead,Client
-   Ahead.srv_rqs.name=sposition
+   Ahead.srv_rqs.name=position
    print(position)
    if (Client.togetname.call(Ahead.srv_rqs)):
       if (Client.ac.wait_for_server(rospy.Duration(5.0))==False): 
@@ -445,6 +451,7 @@ def get_odom_message(odom:Odometry):
     odom_ow=odom.pose.pose.orientation.w 
     _,_,mathince_theta=transformations.euler_from_quaternion([odom_ox,odom_oy,odom_oz,odom_ow])
     
+
 if __name__=="__main__":
     # global delete_flag
     test=False
@@ -723,3 +730,55 @@ if __name__=="__main__":
     rate.sleep()
     rospy.loginfo("节点已经退出")
       
+
+
+
+#############
+## LZH main #
+#############
+if __name__ =="__main__":
+    #??
+    test=False
+    test_i=0
+    #??
+    rospy.init_node("main_service")
+    Status=Statu()
+    params=Params()
+    Ahead=ahead()
+    Face_det=face_det()
+    Human_det=human_det()
+    Grab=grab()
+    Put=put()
+    Puber=pub()
+    Suber=sub()
+    Client=client()
+    Body_det=body_det()
+
+    rate=rospy.Rate(40.0)
+    rospy.Rate(1).sleep()    
+    rospy.loginfo("节点main_service启动")
+    params.gate_name=rospy.get_param("gate_name")
+    params.targets_waypoint=rospy.get_param("targets_waypoint")
+    params.wait_position=Puber.Init_Pose()
+    PDW=PreDefinedWaypoints(params.gate_name,params.targets_waypoint)
+    rospy.loginfo("初始位置设置完毕")
+    fsm=Status.Enter
+    # test_i=1 # Put test
+    # fsm=Status.Grab#Grab test
+    # Suber.object_names=["bottle"]
+    # fsm=Status.CallBack# Put test
+    # Grab.get_msg="1"# Put test
+    # Face_det.recog_msg="end"# Put Grab test
+    # fsm=Status.Explore#Explore 测试用
+    # rospy.sleep(9)#Exlore Put test
+    while not rospy.is_shutdown():
+        if fsm==Status.Enter:
+            if params.wait_time>20: #unknow
+                rospy.loginfo("ENTER!")
+                # rospy.loginfo("person_waypoint={1} \n targets_waypoint={0}".format(PDW.targets_waypoint,PDW.persons_waypoint))
+                if test==False:
+                    success=Gotopoint(params.wait_position)
+                else: 
+                    success=True
+                if success==True:
+                    fsm=Status.WaitRoom
