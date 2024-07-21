@@ -48,6 +48,7 @@ class Statu:
         self.Stop = 128,
         self.CallBack = 256,
         self.Error = 512,
+        self.Find=1028,
 ################
 # 初始的一些参数 #
 ################
@@ -59,6 +60,8 @@ class Params:
         self.gate_name=""       # /default A
         self.duration=rospy.Duration(2.0)
         self.msg_cache=""       #useless
+        self.finish=0           #lzh add,for each time recognize finish ,this is 1
+        self.people_exist=0      #lzh add,for each time recognize finish ,if exist people,this is 1
 #####################
 # # 用于前往人的一些参数 #
 # #####################
@@ -161,6 +164,8 @@ class pub:
         self.guidence=rospy.Publisher("all_name",String,queue_size=10)#guidence
         self.over_speak=rospy.Publisher("over_speak",String,queue_size=10)#unknow suber
         self.refresh_speak=rospy.Publisher("refresh",String,queue_size=10)#unknow suber
+        # the following is added by lzh
+        self.start_recognize=rospy.Publisher("start_recognize",String,queue_size=10)  # not writing suber yet
         # self.urgency=rospy.Publisher("")
 ###################################
 #### lzh delete gate name because there is only one wait position
@@ -251,6 +256,11 @@ class pub:
         msg_new=String()
         msg_new.data=msg
         self.putting.publish(msg_new)
+
+    #########################
+    #added by lzh
+    def start_recognizing(self):
+        self.start_recognize.publish("OK")
 
 #########################
 # 用于Gotogoal的客户端操作#
@@ -753,14 +763,20 @@ if __name__ =="__main__":
     Suber=sub()
     Client=client()
     Body_det=body_det()
-
+    waypoints=pd.read_xml('/home/linxi/ServiceRobot-General/src/general_service_2022/maps/waypoints.xml')
+    waypoints_name=data['Name']
+    #index= np.where(waypoins_name=='wait_pos')
+    waypoints_index=0
+    Collect_index=0
     rate=rospy.Rate(40.0)
     rospy.Rate(1).sleep()    
     rospy.loginfo("节点main_service启动")
+    '''
     params.gate_name=rospy.get_param("gate_name")
     params.targets_waypoint=rospy.get_param("targets_waypoint")
+    '''
     params.wait_position=Puber.Init_Pose()
-    PDW=PreDefinedWaypoints(params.gate_name,params.targets_waypoint)
+    #PDW=PreDefinedWaypoints(params.gate_name,params.targets_waypoint)
     rospy.loginfo("初始位置设置完毕")
     fsm=Status.Enter
     # test_i=1 # Put test
@@ -781,4 +797,69 @@ if __name__ =="__main__":
                 else: 
                     success=True
                 if success==True:
-                    fsm=Status.WaitRoom
+                    fsm=Status.Explore
+
+        elif fsm==Status.Explore:
+            rospy.loginfo("EXPORE!")
+            msg=Pose()
+            msg.header.stamp=rospy.Time.now()
+            msg.header.frame_id="map"
+            #??? unchanged yet
+            # msg.pose.covariance[0]= 0.25
+            # msg.pose.covariance[7]= 0.25
+            # msg.pose.covariance[35]= 0.06853892326654787
+            #???
+            #data=pd.read_xml('/home/linxi/ServiceRobot-General/src/general_service_2022/maps/waypoints.xml')
+            # Name=data['Name']
+            index=waypoints_index
+            success=Gotopoint(waypoints_name(index))
+            rospy.loginfo(f"going {waypoints_name(index)}")
+            if success==True:
+                fsm=Status.Find
+                waypoints_index+=1
+
+        elif fsm==Status.Find:
+            #rospy.loginfo("目前状态为Collect采集信息,目前执行到第%d位客人",Collect_index+1)
+            # rotate
+            have_people=0 # useless
+            goal_rotate=MoveBaseGoal()
+            for i in range(1,20):
+                goal_rotate.target_pose.header.frame_id = "odom"
+                goal_rotate.target_pose.header.stamp =rospy.Time.now()
+                goal_rotate.target_pose.pose.position.x = 0
+                goal_rotate.target_pose.pose.position.y = 0
+                goal_rotate.target_pose.pose.position.z = 0.0
+                # bu hui suan
+                goal_rotate.target_pose.pose.orientation.x = ?
+                goal_rotate.target_pose.pose.orientation.y = ?
+                goal_rotate.target_pose.pose.orientation.z = ?
+                goal_rotate.target_pose.pose.orientation.w = ?
+                Client.ac.wait_for_server()
+                Client.ac.send_goal(goal_rotate)
+                Client.ac.wait_for_result()
+                if Client.ac.get_state() == actionlib.SimpleGoalState.DONE:
+                    Puber.start_recognizing()
+                    rospy.loginfo("start_recognizing...")
+                    while params.finish==0:  #waiting for recognize
+                        pass
+                    params.finish=0
+                    if params.people_exist==1:#exist people , exter Collect
+                        fsm=Status.Collect
+                        params.people_exist=0
+                        rospy.loginfo(f"Find people {Collect_index+1}")
+                        Collect_index+=1
+                        have_people=1
+                        break
+                    elif params.people_exist==0:
+                        continue
+                else:
+                    rospy.loginfo("error occer! cannot rotate!")
+            if have_people==0:
+                rospy.loginfo("No people here!")
+                fsm==Status.Explore
+        elif fsm==Status.Collect:
+
+
+    
+            
+
