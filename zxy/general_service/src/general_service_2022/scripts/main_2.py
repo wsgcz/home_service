@@ -53,6 +53,8 @@ class Statu:
         self.Find_Robbish=4112,
         self.Collect_Robbish=8224,
         self.Robbish_grab=16448,
+        self.Send=32896,
+        self.Quit=65792,
 ################
 # 初始的一些参数 #
 ################
@@ -183,6 +185,7 @@ class pub:
         self.pose_det=rospy.Publisher("pose_det",String,queue_size=10)  # not writing suber yet
         self.start_recognize_robbish=rospy.Publisher("start_recognize_robbish",String,queue_size=10)  # not writing suber yet
         self.collect_robbish=rospy.Publisher("collect_robbish",String,queue_size=10)  # not writing suber yet
+        self.drop_robbish=rospy.Publisher("drop_robbish",String,queue_size=10)  # not writing suber yet
         # self.urgency=rospy.Publisher("")
 ###################################
 #### lzh delete gate name because there is only one wait position
@@ -290,6 +293,9 @@ class pub:
 
     def collect_robbishing(self):
         self.collect_robbish.publish("OK")
+
+    def drop_robbishing(self):
+        self.drop_robbish.publish("OK")
 
 #########################
 # 用于Gotogoal的客户端操作#
@@ -796,7 +802,8 @@ if __name__ =="__main__":
     waypoints=pd.read_xml('/home/linxi/ServiceRobot-General/src/general_service_2022/maps/waypoints.xml')
     waypoints_name=data['Name']
     #index= np.where(waypoins_name=='wait_pos')
-    waypoints_index=0
+    #error here
+    waypoints_index=0        ###error here, unknow the first waypoint index
     Collect_index=0
     Collect_robbish_index=0
     Robbish_waypoints_index=0
@@ -916,9 +923,9 @@ if __name__ =="__main__":
         #robbish, similiar to face and pose recog
         elif fsm==Status.Robbish_Explore:
             rospy.loginfo("Robbish_Explore!")
-            msg=Pose()
-            msg.header.stamp=rospy.Time.now()
-            msg.header.frame_id="map"
+            # msg=Pose()
+            # msg.header.stamp=rospy.Time.now()
+            # msg.header.frame_id="map"
             #??? unchanged yet
             # msg.pose.covariance[0]= 0.25
             # msg.pose.covariance[7]= 0.25
@@ -979,8 +986,25 @@ if __name__ =="__main__":
             rospy.loginfo("Please help me grabbing the robbish")
             rospy.sleep(5)
             rospy.loginfo("start sending")
-            fsm==
+            fsm==Status.Send
+        elif fsm==Status.Send:
+            index=Robbish_waypoints_index
+            success=Gotopoint(waypoints_name(index+4))
+            rospy.loginfo(f"going {waypoints_name(index+4)}")
+            Puber.drop_robbishing()
+            while Params.finish ==0: pass
+            Params.finish=1
+            if Robbish_waypoints_index==3:
+                rospy.loginfo("Finished grab all robbish,now quit")
+                fsm=Status.Quit
+            else :
+                fsm=Status.Robbish_Explore
+        elif fsm==Status.Quit:
+            rospy.loginfo("ALL FINISH!")
+            break
+    rospy.loginfo("node has quit")
         
+
 
 
 
