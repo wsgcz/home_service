@@ -49,6 +49,10 @@ class Statu:
         self.CallBack = 256,
         self.Error = 512,
         self.Find=1028,
+        self.Robbish_Explore=2056,
+        self.Find_Robbish=4112,
+        self.Collect_Robbish=8224,
+        self.Robbish_grab=16448,
 ################
 # 初始的一些参数 #
 ################
@@ -60,8 +64,10 @@ class Params:
         self.gate_name=""       # /default A
         self.duration=rospy.Duration(2.0)
         self.msg_cache=""       #useless
+        # the following is added by lzh
         self.finish=0           #lzh add,for each time recognize finish ,this is 1
-        self.people_exist=0      #lzh add,for each time recognize finish ,if exist people,this is 1
+        self.people_exist=0      #lzh add,for each time recognize finish ,if exist people or robbish,this is 1
+        self.people_sum=0       #now we have recog * people
 #####################
 # # 用于前往人的一些参数 #
 # #####################
@@ -78,6 +84,13 @@ class ahead:
         self.srv_rsp=GetWaypointByNameResponse() #unknow
         self.new_position={}    #useless
         self.msg=String()       #useless
+#################
+# robbish注册的参数 add by lzh#
+#################  
+class robbish_det:
+    def __init__(self) -> None:
+        self.recog_msg="None"       #result for robbish recog
+
 #################
 # 人体注册的参数 #
 #################  
@@ -166,6 +179,10 @@ class pub:
         self.refresh_speak=rospy.Publisher("refresh",String,queue_size=10)#unknow suber
         # the following is added by lzh
         self.start_recognize=rospy.Publisher("start_recognize",String,queue_size=10)  # not writing suber yet
+        self.facial_det=rospy.Publisher("facial_det",String,queue_size=10)  # not writing suber yet
+        self.pose_det=rospy.Publisher("pose_det",String,queue_size=10)  # not writing suber yet
+        self.start_recognize_robbish=rospy.Publisher("start_recognize_robbish",String,queue_size=10)  # not writing suber yet
+        self.collect_robbish=rospy.Publisher("collect_robbish",String,queue_size=10)  # not writing suber yet
         # self.urgency=rospy.Publisher("")
 ###################################
 #### lzh delete gate name because there is only one wait position
@@ -261,6 +278,18 @@ class pub:
     #added by lzh
     def start_recognizing(self):
         self.start_recognize.publish("OK")
+
+    def facial_deting(self):
+        self.facial_det.publish("OK")
+
+    def pose_deting(self):
+        self.pose_det.publish("OK")
+    
+    def start_recognize_robbishing(self):
+        self.start_recognize_robbish.publish("OK")
+
+    def collect_robbishing(self):
+        self.collect_robbish.publish("OK")
 
 #########################
 # 用于Gotogoal的客户端操作#
@@ -763,11 +792,14 @@ if __name__ =="__main__":
     Suber=sub()
     Client=client()
     Body_det=body_det()
+    Robbish_det=robbish_det()
     waypoints=pd.read_xml('/home/linxi/ServiceRobot-General/src/general_service_2022/maps/waypoints.xml')
     waypoints_name=data['Name']
     #index= np.where(waypoins_name=='wait_pos')
     waypoints_index=0
     Collect_index=0
+    Collect_robbish_index=0
+    Robbish_waypoints_index=0
     rate=rospy.Rate(40.0)
     rospy.Rate(1).sleep()    
     rospy.loginfo("节点main_service启动")
@@ -817,6 +849,8 @@ if __name__ =="__main__":
             if success==True:
                 fsm=Status.Find
                 waypoints_index+=1
+            else:
+                rospy.ERROR(f"Cannot goto {waypoints_name(index)}")
 
         elif fsm==Status.Find:
             #rospy.loginfo("目前状态为Collect采集信息,目前执行到第%d位客人",Collect_index+1)
@@ -858,6 +892,99 @@ if __name__ =="__main__":
                 rospy.loginfo("No people here!")
                 fsm==Status.Explore
         elif fsm==Status.Collect:
+            # face
+            Puber.facial_deting()
+            face_data=String()
+            face_data.data=f"this people is {Face_det.recog_msg}"
+            Puber.over_speak(face_data)
+            # pose ,error here, unknow the puber for starting pose recognize
+            Puber.pose_deting()
+            pose_data=String()
+            pose_data.data=f"he is {Body_det.recog_msg}"
+            Puber.over_speak(pose_data)
+            next_data=String()
+            next_data.data="you can do your next pose"
+            Puber.pose_deting()
+            pose_data.data=f"he is {Body_det.recog_msg}"
+            Puber.over_speak(pose_data)
+            params.people_sum+=1
+            if params.people_sum==3 or waypoints_index==4:
+                rospy.loginfo("Finished recognizing people, enter Robbish_Explore")
+                fsm=Status.Robbish_Explore
+            else:
+                fsm=Status.Explore
+        #robbish, similiar to face and pose recog
+        elif fsm==Status.Robbish_Explore:
+            rospy.loginfo("Robbish_Explore!")
+            msg=Pose()
+            msg.header.stamp=rospy.Time.now()
+            msg.header.frame_id="map"
+            #??? unchanged yet
+            # msg.pose.covariance[0]= 0.25
+            # msg.pose.covariance[7]= 0.25
+            # msg.pose.covariance[35]= 0.06853892326654787
+            #???
+            #data=pd.read_xml('/home/linxi/ServiceRobot-General/src/general_service_2022/maps/waypoints.xml')
+            # Name=data['Name']
+            index=Robbish_waypoints_index
+            success=Gotopoint(waypoints_name(index))
+            rospy.loginfo(f"going {waypoints_name(index)}")
+            if success==True:
+                fsm=Status.Find_Robbish
+                Robbish_waypoints_index+=1
+            else:
+                rospy.ERROR(f"Cannot goto {waypoints_name(Robbish_waypoints_index)}")
+        elif fsm==Status.Find_Robbish:
+            have_robbish=0 # useless
+            goal_rotate=MoveBaseGoal()
+            for i in range(1,20):
+                goal_rotate.target_pose.header.frame_id = "odom"
+                goal_rotate.target_pose.header.stamp =rospy.Time.now()
+                goal_rotate.target_pose.pose.position.x = 0
+                goal_rotate.target_pose.pose.position.y = 0
+                goal_rotate.target_pose.pose.position.z = 0.0
+                # bu hui suan
+                goal_rotate.target_pose.pose.orientation.x = ?
+                goal_rotate.target_pose.pose.orientation.y = ?
+                goal_rotate.target_pose.pose.orientation.z = ?
+                goal_rotate.target_pose.pose.orientation.w = ?
+                Client.ac.wait_for_server()
+                Client.ac.send_goal(goal_rotate)
+                Client.ac.wait_for_result()
+                if Client.ac.get_state() == actionlib.SimpleGoalState.DONE:
+                    Puber.start_recognize_robbishing()
+                    rospy.loginfo("start_recognizing_robbish...")
+                    while params.finish==0:  #waiting for recognize
+                        pass
+                    params.finish=0
+                    if params.people_exist==1:#exist robbish , exter Collect
+                        fsm=Status.Collect_Robbish
+                        params.people_exist=0
+                        rospy.loginfo(f"Find robbish {Collect_index+1}")
+                        Collect_robbish_index+=1
+                        have_robbish=1
+                        break
+                    elif params.people_exist==0:
+                        continue
+                else:
+                    rospy.loginfo("error occer! cannot rotate!")
+            if have_robbish==0:
+                rospy.ERROR("Have not find robbish in this room, rocognize again")
+        elif fsm==Status.Collect_Robbish:
+            Puber.collect_robbishing()
+            robbish_data=String()
+            robbish_data.data=f"this robbish is {Robbish_det.recog_msg}"
+            Puber.over_speak(robbish_data)
+            fsm==Status.Robbish_grab
+            rospy.loginfo("Please help me grabbing the robbish")
+            rospy.sleep(5)
+            rospy.loginfo("start sending")
+            fsm==
+        
+
+
+
+
 
 
     
