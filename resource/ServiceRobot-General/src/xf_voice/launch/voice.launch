@@ -1,0 +1,9 @@
+<launch>
+    <node pkg="xf_voice"  name="xf_tts" type="xf_tts" output="screen">
+    </node>
+    <node pkg="asr_offline_record_sample" name="asr_offline_record_sample12" type="asr_offline_record_sample12" output="screen">
+    </node>
+
+    <node pkg="xf_voice" name="word" type="word.py" output="screen">
+    </node>
+</launch>

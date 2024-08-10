@@ -1,0 +1,7 @@
+# 发送的请求为持续听的时间
+std_msgs/Header header
+int16 duration
+---
+# 返回的响应为听写的结果
+std_msgs/Header header
+string sentence

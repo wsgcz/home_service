@@ -1,0 +1,11 @@
+#BNF+IAT 1.0;
+!grammar call;
+!slot <project>;
+
+!slot <object>;
+!start <commands>;
+<commands>:<project>|<object>;
+
+<project>: "orange juice"|biscuit|chip|lays|bread|sprite|cola|handwash|dishsoap|shampoo|water|cookie|"对"|no;
+<object>:"卧室"|"厨房"|"餐厅"|"客厅";
+

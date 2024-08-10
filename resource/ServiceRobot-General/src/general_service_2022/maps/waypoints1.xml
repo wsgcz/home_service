@@ -1,0 +1,141 @@
+<Waterplus>
+<!-- <Waypoint>
+<Name>A_0</Name>
+<Pos_x>-0.010065078735351562</Pos_x>
+<Pos_y>0.020709991455078125</Pos_y>
+<Pos_z>0.0</Pos_z>
+<Ori_x>0.0</Ori_x>
+<Ori_y>0.0</Ori_y>
+<Ori_z>0.03638973091504346</Ori_z>
+<Ori_w>0.999337674404368</Ori_w>
+</Waypoint> -->
+
+<Waypoint>
+<!-- <Name>persons_living</Name> -->
+<Name>A</Name>
+<Pos_x>0.9610557556152344</Pos_x>
+<Pos_y>-1.9706306457519531</Pos_y>
+<Pos_z>0.0</Pos_z>
+<Ori_x>0.0</Ori_x>
+<Ori_y>0.0</Ori_y>
+<Ori_z>0.061474878685561826</Ori_z>
+<Ori_w>0.9981086310069638</Ori_w>
+</Waypoint>
+<!-- <Waypoint>
+<Name>persons_living</Name>
+
+<!-- <Name>A_wait</Name> -->
+<Pos_x>5.0524139404296875</Pos_x>
+<Pos_y>-2.37908935546875</Pos_y>
+<Pos_z>0.0</Pos_z>
+<Ori_x>0.0</Ori_x>
+<Ori_y>0.0</Ori_y>
+<Ori_z>0.7183744282457392</Ori_z>
+<Ori_w>0.6956566544227168</Ori_w>
+</Waypoint>
+<Waypoint>
+<!-- <Name>B_wait</Name> -->
+<Name>A_wait</Name>
+
+<Pos_x>8.011207580566406</Pos_x>
+<Pos_y>1.390350341796875</Pos_y>
+<Pos_z>0.0</Pos_z>
+<Ori_x>0.0</Ori_x>
+<Ori_y>0.0</Ori_y>
+<Ori_z>0.34761207515935943</Ori_z>
+<Ori_w>0.9376384405533957</Ori_w>
+</Waypoint>
+<Waypoint>
+<Name>B_wait</Name>
+
+<!-- <Name>targets_kitchen</Name> -->
+<Pos_x>8.020309448242188</Pos_x>
+<Pos_y>1.3660392761230469</Pos_y>
+<Pos_z>0.0</Pos_z>
+<Ori_x>0.0</Ori_x>
+<Ori_y>0.0</Ori_y>
+<Ori_z>0.8745068878086435</Ori_z>
+<Ori_w>-0.4850130958801428</Ori_w>
+</Waypoint>
+<Waypoint>
+<Name>targets_kitchen</Name>
+
+<!-- <Name>grab_out_kitchen_0</Name> -->
+<Pos_x>8.123760223388672</Pos_x>
+<Pos_y>-0.40757179260253906</Pos_y>
+<Pos_z>0.0</Pos_z>
+<Ori_x>0.0</Ori_x>
+<Ori_y>0.0</Ori_y>
+<Ori_z>-0.019593805261474608</Ori_z>
+<Ori_w>0.9998080229700977</Ori_w>
+</Waypoint>
+<Waypoint>
+<!-- <Name>grab_out_kitchen_1</Name> -->
+<Name>grab_out_kitchen_0</Name>
+
+<Pos_x>9.961063385009766</Pos_x>
+<Pos_y>-0.3919353485107422</Pos_y>
+<Pos_z>0.0</Pos_z>
+<Ori_x>0.0</Ori_x>
+<Ori_y>0.0</Ori_y>
+<Ori_z>0.9989230980314409</Ori_z>
+<Ori_w>-0.046396597065607996</Ori_w>
+</Waypoint>
+<Waypoint>
+<!-- <Name>targets_bedroom</Name> -->
+<Name>grab_out_kitchen_1</Name>
+
+<Pos_x>7.7354888916015625</Pos_x>
+<Pos_y>-0.41634368896484375</Pos_y>
+<Pos_z>0.0</Pos_z>
+<Ori_x>0.0</Ori_x>
+<Ori_y>0.0</Ori_y>
+<Ori_z>0.9999666260253164</Ori_z>
+<Ori_w>0.008169873655387763</Ori_w>
+</Waypoint><Waypoint>
+<!-- <Name>grab_out_bedroom_0</Name> -->
+<Name>targets_bedroom</Name>
+
+<Pos_x>5.402202606201172</Pos_x>
+<Pos_y>3.3885345458984375</Pos_y>
+<Pos_z>0.0</Pos_z>
+<Ori_x>0.0</Ori_x>
+<Ori_y>0.0</Ori_y>
+<Ori_z>0.7306955876287113</Ori_z>
+<Ori_w>0.6827034189308944</Ori_w>
+</Waypoint><Waypoint>
+<!-- <Name>grab_out_bedroom_1</Name> -->
+<Name>grab_out_bedroom_0</Name>
+
+<Pos_x>6.0913238525390625</Pos_x>
+<Pos_y>3.196258544921875</Pos_y>
+<Pos_z>0.0</Pos_z>
+<Ori_x>0.0</Ori_x>
+<Ori_y>0.0</Ori_y>
+<Ori_z>0.027282398115038915</Ori_z>
+<Ori_w>0.9996277660975071</Ori_w>
+</Waypoint><Waypoint>
+<Name>grab_out_bedroom_1</Name>
+
+<!-- <Name>persons_dining</Name> -->
+<Pos_x>8.217777252197266</Pos_x>
+<Pos_y>3.296487808227539</Pos_y>
+<Pos_z>0.0</Pos_z>
+<Ori_x>0.0</Ori_x>
+<Ori_y>0.0</Ori_y>
+<Ori_z>0.01682260804214875</Ori_z>
+<Ori_w>0.9998584899167783</Ori_w>
+</Waypoint><Waypoint>
+<!-- <Name>B</Name> -->
+<Name>persons_dining</Name>
+
+<Pos_x>8.505622863769531</Pos_x>
+<Pos_y>4.030420303344727</Pos_y>
+<Pos_z>0.0</Pos_z>
+<Ori_x>0.0</Ori_x>
+<Ori_y>0.0</Ori_y>
+<Ori_z>-0.2367214359565157</Ori_z>
+<Ori_w>0.9715775634290271</Ori_w>
+</Waypoint> -->
+
+</Waterplus>
