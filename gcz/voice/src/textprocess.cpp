@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
 	ros::init(argc,argv,"textprocess");
 	ros::NodeHandle nh;
     ros::Subscriber sub=nh.subscribe<std_msgs::String>("/get_listen_res",10,domsg);
-    pub_res=nh.advertise<std_msgs::String>("general_service_object_name_return",10);
+    pub_res=nh.advertise<std_msgs::String>("/home_service_object_name_return",10);
     pub_speak=nh.advertise<std_msgs::String>("/xf_tts",10);
     pub_listen=nh.advertise<std_msgs::String>("/start_listen",10);
 	ros::spin();
