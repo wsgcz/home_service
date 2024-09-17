@@ -1,0 +1,17 @@
+# 大路径
+path: /home/shanhe/yolo_rubbish_train
+train: # 训练数据路径
+  - images/train
+val: # 验证数据路径
+  - images/val
+# test: # 测试数据路径（可选）
+#   - images/test
+
+# Classes
+names:
+  # 0: a
+  # 1: b
+  0: recyclable waste
+  1: hazardous waste
+  2: kitchen waste
+  3: other waste
