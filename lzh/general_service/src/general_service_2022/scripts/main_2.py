@@ -871,10 +871,10 @@ if __name__ =="__main__":
                 goal_rotate.target_pose.pose.position.y = 0
                 goal_rotate.target_pose.pose.position.z = 0.0
                 # bu hui suan
-                goal_rotate.target_pose.pose.orientation.x = ?
-                goal_rotate.target_pose.pose.orientation.y = ?
-                goal_rotate.target_pose.pose.orientation.z = ?
-                goal_rotate.target_pose.pose.orientation.w = ?
+                goal_rotate.target_pose.pose.orientation.x =  0.995
+                goal_rotate.target_pose.pose.orientation.y =  0.000
+                goal_rotate.target_pose.pose.orientation.z = 0.000
+                goal_rotate.target_pose.pose.orientation.w =  0.105
                 Client.ac.wait_for_server()
                 Client.ac.send_goal(goal_rotate)
                 Client.ac.wait_for_result()
@@ -951,10 +951,10 @@ if __name__ =="__main__":
                 goal_rotate.target_pose.pose.position.y = 0
                 goal_rotate.target_pose.pose.position.z = 0.0
                 # bu hui suan
-                goal_rotate.target_pose.pose.orientation.x = ?
-                goal_rotate.target_pose.pose.orientation.y = ?
-                goal_rotate.target_pose.pose.orientation.z = ?
-                goal_rotate.target_pose.pose.orientation.w = ?
+                goal_rotate.target_pose.pose.orientation.x =  0.995
+                goal_rotate.target_pose.pose.orientation.y =  0.000
+                goal_rotate.target_pose.pose.orientation.z = 0.000
+                goal_rotate.target_pose.pose.orientation.w =  0.105
                 Client.ac.wait_for_server()
                 Client.ac.send_goal(goal_rotate)
                 Client.ac.wait_for_result()
