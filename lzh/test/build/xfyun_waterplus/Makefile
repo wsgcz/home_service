@@ -213,21 +213,6 @@ tts_node/fast:
 .PHONY : tts_node/fast
 
 # Convenience name for target.
-xfyun_waterplus/CMakeFiles/iat_new2.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 xfyun_waterplus/CMakeFiles/iat_new2.dir/rule
-.PHONY : xfyun_waterplus/CMakeFiles/iat_new2.dir/rule
-
-# Convenience name for target.
-iat_new2: xfyun_waterplus/CMakeFiles/iat_new2.dir/rule
-
-.PHONY : iat_new2
-
-# fast build rule for target.
-iat_new2/fast:
-	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_new2.dir/build.make xfyun_waterplus/CMakeFiles/iat_new2.dir/build
-.PHONY : iat_new2/fast
-
-# Convenience name for target.
 xfyun_waterplus/CMakeFiles/xfyun_waterplus_geneus.dir/rule:
 	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 xfyun_waterplus/CMakeFiles/xfyun_waterplus_geneus.dir/rule
 .PHONY : xfyun_waterplus/CMakeFiles/xfyun_waterplus_geneus.dir/rule
@@ -361,21 +346,6 @@ iat_file: xfyun_waterplus/CMakeFiles/iat_file.dir/rule
 iat_file/fast:
 	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_file.dir/build.make xfyun_waterplus/CMakeFiles/iat_file.dir/build
 .PHONY : iat_file/fast
-
-# Convenience name for target.
-xfyun_waterplus/CMakeFiles/iat_new.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 xfyun_waterplus/CMakeFiles/iat_new.dir/rule
-.PHONY : xfyun_waterplus/CMakeFiles/iat_new.dir/rule
-
-# Convenience name for target.
-iat_new: xfyun_waterplus/CMakeFiles/iat_new.dir/rule
-
-.PHONY : iat_new
-
-# fast build rule for target.
-iat_new/fast:
-	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_new.dir/build.make xfyun_waterplus/CMakeFiles/iat_new.dir/build
-.PHONY : iat_new/fast
 
 # Convenience name for target.
 xfyun_waterplus/CMakeFiles/xfyun_waterplus_gencpp.dir/rule:
@@ -536,60 +506,6 @@ src/iat_file.cpp.s:
 	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_file.dir/build.make xfyun_waterplus/CMakeFiles/iat_file.dir/src/iat_file.cpp.s
 .PHONY : src/iat_file.cpp.s
 
-src/iat_new.o: src/iat_new.cpp.o
-
-.PHONY : src/iat_new.o
-
-# target to build an object file
-src/iat_new.cpp.o:
-	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_new.dir/build.make xfyun_waterplus/CMakeFiles/iat_new.dir/src/iat_new.cpp.o
-.PHONY : src/iat_new.cpp.o
-
-src/iat_new.i: src/iat_new.cpp.i
-
-.PHONY : src/iat_new.i
-
-# target to preprocess a source file
-src/iat_new.cpp.i:
-	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_new.dir/build.make xfyun_waterplus/CMakeFiles/iat_new.dir/src/iat_new.cpp.i
-.PHONY : src/iat_new.cpp.i
-
-src/iat_new.s: src/iat_new.cpp.s
-
-.PHONY : src/iat_new.s
-
-# target to generate assembly for a file
-src/iat_new.cpp.s:
-	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_new.dir/build.make xfyun_waterplus/CMakeFiles/iat_new.dir/src/iat_new.cpp.s
-.PHONY : src/iat_new.cpp.s
-
-src/iat_new2.o: src/iat_new2.cpp.o
-
-.PHONY : src/iat_new2.o
-
-# target to build an object file
-src/iat_new2.cpp.o:
-	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_new2.dir/build.make xfyun_waterplus/CMakeFiles/iat_new2.dir/src/iat_new2.cpp.o
-.PHONY : src/iat_new2.cpp.o
-
-src/iat_new2.i: src/iat_new2.cpp.i
-
-.PHONY : src/iat_new2.i
-
-# target to preprocess a source file
-src/iat_new2.cpp.i:
-	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_new2.dir/build.make xfyun_waterplus/CMakeFiles/iat_new2.dir/src/iat_new2.cpp.i
-.PHONY : src/iat_new2.cpp.i
-
-src/iat_new2.s: src/iat_new2.cpp.s
-
-.PHONY : src/iat_new2.s
-
-# target to generate assembly for a file
-src/iat_new2.cpp.s:
-	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_new2.dir/build.make xfyun_waterplus/CMakeFiles/iat_new2.dir/src/iat_new2.cpp.s
-.PHONY : src/iat_new2.cpp.s
-
 src/iat_node.o: src/iat_node.cpp.o
 
 .PHONY : src/iat_node.o
@@ -731,10 +647,8 @@ src/xfyun/linuxrec.o: src/xfyun/linuxrec.c.o
 
 # target to build an object file
 src/xfyun/linuxrec.c.o:
-	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_new2.dir/build.make xfyun_waterplus/CMakeFiles/iat_new2.dir/src/xfyun/linuxrec.c.o
 	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/asr_node.dir/build.make xfyun_waterplus/CMakeFiles/asr_node.dir/src/xfyun/linuxrec.c.o
 	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_file.dir/build.make xfyun_waterplus/CMakeFiles/iat_file.dir/src/xfyun/linuxrec.c.o
-	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_new.dir/build.make xfyun_waterplus/CMakeFiles/iat_new.dir/src/xfyun/linuxrec.c.o
 	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_node.dir/build.make xfyun_waterplus/CMakeFiles/iat_node.dir/src/xfyun/linuxrec.c.o
 .PHONY : src/xfyun/linuxrec.c.o
 
@@ -744,10 +658,8 @@ src/xfyun/linuxrec.i: src/xfyun/linuxrec.c.i
 
 # target to preprocess a source file
 src/xfyun/linuxrec.c.i:
-	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_new2.dir/build.make xfyun_waterplus/CMakeFiles/iat_new2.dir/src/xfyun/linuxrec.c.i
 	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/asr_node.dir/build.make xfyun_waterplus/CMakeFiles/asr_node.dir/src/xfyun/linuxrec.c.i
 	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_file.dir/build.make xfyun_waterplus/CMakeFiles/iat_file.dir/src/xfyun/linuxrec.c.i
-	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_new.dir/build.make xfyun_waterplus/CMakeFiles/iat_new.dir/src/xfyun/linuxrec.c.i
 	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_node.dir/build.make xfyun_waterplus/CMakeFiles/iat_node.dir/src/xfyun/linuxrec.c.i
 .PHONY : src/xfyun/linuxrec.c.i
 
@@ -757,10 +669,8 @@ src/xfyun/linuxrec.s: src/xfyun/linuxrec.c.s
 
 # target to generate assembly for a file
 src/xfyun/linuxrec.c.s:
-	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_new2.dir/build.make xfyun_waterplus/CMakeFiles/iat_new2.dir/src/xfyun/linuxrec.c.s
 	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/asr_node.dir/build.make xfyun_waterplus/CMakeFiles/asr_node.dir/src/xfyun/linuxrec.c.s
 	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_file.dir/build.make xfyun_waterplus/CMakeFiles/iat_file.dir/src/xfyun/linuxrec.c.s
-	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_new.dir/build.make xfyun_waterplus/CMakeFiles/iat_new.dir/src/xfyun/linuxrec.c.s
 	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_node.dir/build.make xfyun_waterplus/CMakeFiles/iat_node.dir/src/xfyun/linuxrec.c.s
 .PHONY : src/xfyun/linuxrec.c.s
 
@@ -770,10 +680,8 @@ src/xfyun/speech_recognizer.o: src/xfyun/speech_recognizer.c.o
 
 # target to build an object file
 src/xfyun/speech_recognizer.c.o:
-	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_new2.dir/build.make xfyun_waterplus/CMakeFiles/iat_new2.dir/src/xfyun/speech_recognizer.c.o
 	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/asr_node.dir/build.make xfyun_waterplus/CMakeFiles/asr_node.dir/src/xfyun/speech_recognizer.c.o
 	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_file.dir/build.make xfyun_waterplus/CMakeFiles/iat_file.dir/src/xfyun/speech_recognizer.c.o
-	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_new.dir/build.make xfyun_waterplus/CMakeFiles/iat_new.dir/src/xfyun/speech_recognizer.c.o
 	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_node.dir/build.make xfyun_waterplus/CMakeFiles/iat_node.dir/src/xfyun/speech_recognizer.c.o
 .PHONY : src/xfyun/speech_recognizer.c.o
 
@@ -783,10 +691,8 @@ src/xfyun/speech_recognizer.i: src/xfyun/speech_recognizer.c.i
 
 # target to preprocess a source file
 src/xfyun/speech_recognizer.c.i:
-	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_new2.dir/build.make xfyun_waterplus/CMakeFiles/iat_new2.dir/src/xfyun/speech_recognizer.c.i
 	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/asr_node.dir/build.make xfyun_waterplus/CMakeFiles/asr_node.dir/src/xfyun/speech_recognizer.c.i
 	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_file.dir/build.make xfyun_waterplus/CMakeFiles/iat_file.dir/src/xfyun/speech_recognizer.c.i
-	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_new.dir/build.make xfyun_waterplus/CMakeFiles/iat_new.dir/src/xfyun/speech_recognizer.c.i
 	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_node.dir/build.make xfyun_waterplus/CMakeFiles/iat_node.dir/src/xfyun/speech_recognizer.c.i
 .PHONY : src/xfyun/speech_recognizer.c.i
 
@@ -796,10 +702,8 @@ src/xfyun/speech_recognizer.s: src/xfyun/speech_recognizer.c.s
 
 # target to generate assembly for a file
 src/xfyun/speech_recognizer.c.s:
-	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_new2.dir/build.make xfyun_waterplus/CMakeFiles/iat_new2.dir/src/xfyun/speech_recognizer.c.s
 	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/asr_node.dir/build.make xfyun_waterplus/CMakeFiles/asr_node.dir/src/xfyun/speech_recognizer.c.s
 	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_file.dir/build.make xfyun_waterplus/CMakeFiles/iat_file.dir/src/xfyun/speech_recognizer.c.s
-	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_new.dir/build.make xfyun_waterplus/CMakeFiles/iat_new.dir/src/xfyun/speech_recognizer.c.s
 	cd /home/lzh/test/build && $(MAKE) -f xfyun_waterplus/CMakeFiles/iat_node.dir/build.make xfyun_waterplus/CMakeFiles/iat_node.dir/src/xfyun/speech_recognizer.c.s
 .PHONY : src/xfyun/speech_recognizer.c.s
 
@@ -818,7 +722,6 @@ help:
 	@echo "... wp_voice_cmd_cn"
 	@echo "... install/local"
 	@echo "... tts_node"
-	@echo "... iat_new2"
 	@echo "... xfyun_waterplus_geneus"
 	@echo "... _xfyun_waterplus_generate_messages_check_deps_IATSwitch"
 	@echo "... xfyun_waterplus_generate_messages_cpp"
@@ -829,7 +732,6 @@ help:
 	@echo "... xfyun_waterplus_generate_messages_nodejs"
 	@echo "... xfyun_waterplus_generate_messages_lisp"
 	@echo "... iat_file"
-	@echo "... iat_new"
 	@echo "... xfyun_waterplus_gencpp"
 	@echo "... xfyun_waterplus_gennodejs"
 	@echo "... xfyun_waterplus_genpy"
@@ -843,12 +745,6 @@ help:
 	@echo "... src/iat_file.o"
 	@echo "... src/iat_file.i"
 	@echo "... src/iat_file.s"
-	@echo "... src/iat_new.o"
-	@echo "... src/iat_new.i"
-	@echo "... src/iat_new.s"
-	@echo "... src/iat_new2.o"
-	@echo "... src/iat_new2.i"
-	@echo "... src/iat_new2.s"
 	@echo "... src/iat_node.o"
 	@echo "... src/iat_node.i"
 	@echo "... src/iat_node.s"

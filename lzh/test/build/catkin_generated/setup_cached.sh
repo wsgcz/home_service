@@ -9,7 +9,6 @@
 # modified environment variables
 export CMAKE_PREFIX_PATH="/home/lzh/test/devel:$CMAKE_PREFIX_PATH"
 export LD_LIBRARY_PATH="/home/lzh/test/devel/lib:$LD_LIBRARY_PATH"
-export PATH='/opt/ros/noetic/bin:/home/lzh/.local/bin:/home/lzh/anaconda3/install/bin:/home/lzh/anaconda3/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'
 export PKG_CONFIG_PATH="/home/lzh/test/devel/lib/pkgconfig:$PKG_CONFIG_PATH"
 export PWD='/home/lzh/test/build'
 export PYTHONPATH="/home/lzh/test/devel/lib/python3/dist-packages:$PYTHONPATH"

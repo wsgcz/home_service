@@ -1,21 +1,21 @@
 Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
 Change Dir: /home/lzh/test/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_3aee5/fast && /usr/bin/make -f CMakeFiles/cmTC_3aee5.dir/build.make CMakeFiles/cmTC_3aee5.dir/build
-make[1]: 进入目录“/home/lzh/test/build/CMakeFiles/CMakeTmp”
-Building C object CMakeFiles/cmTC_3aee5.dir/src.c.o
-/usr/bin/cc   -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_3aee5.dir/src.c.o   -c /home/lzh/test/build/CMakeFiles/CMakeTmp/src.c
-Linking C executable cmTC_3aee5
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_3aee5.dir/link.txt --verbose=1
-/usr/bin/cc  -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_3aee5.dir/src.c.o  -o cmTC_3aee5 
-/usr/bin/ld: CMakeFiles/cmTC_3aee5.dir/src.c.o: in function `main':
+Run Build Command(s):/usr/bin/make cmTC_e6581/fast && /usr/bin/make -f CMakeFiles/cmTC_e6581.dir/build.make CMakeFiles/cmTC_e6581.dir/build
+make[1]: Entering directory '/home/lzh/test/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_e6581.dir/src.c.o
+/usr/bin/cc   -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_e6581.dir/src.c.o   -c /home/lzh/test/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_e6581
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e6581.dir/link.txt --verbose=1
+/usr/bin/cc  -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_e6581.dir/src.c.o  -o cmTC_e6581 
+/usr/bin/ld: CMakeFiles/cmTC_e6581.dir/src.c.o: in function `main':
 src.c:(.text+0x46): undefined reference to `pthread_create'
 /usr/bin/ld: src.c:(.text+0x52): undefined reference to `pthread_detach'
 /usr/bin/ld: src.c:(.text+0x63): undefined reference to `pthread_join'
 collect2: error: ld returned 1 exit status
-make[1]: *** [CMakeFiles/cmTC_3aee5.dir/build.make:87：cmTC_3aee5] 错误 1
-make[1]: 离开目录“/home/lzh/test/build/CMakeFiles/CMakeTmp”
-make: *** [Makefile:121：cmTC_3aee5/fast] 错误 2
+make[1]: *** [CMakeFiles/cmTC_e6581.dir/build.make:87: cmTC_e6581] Error 1
+make[1]: Leaving directory '/home/lzh/test/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_e6581/fast] Error 2
 
 
 Source file was:
@@ -41,35 +41,35 @@ int main(void)
 Determining if the function pthread_create exists in the pthreads failed with the following output:
 Change Dir: /home/lzh/test/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_fe8c6/fast && /usr/bin/make -f CMakeFiles/cmTC_fe8c6.dir/build.make CMakeFiles/cmTC_fe8c6.dir/build
-make[1]: 进入目录“/home/lzh/test/build/CMakeFiles/CMakeTmp”
-Building C object CMakeFiles/cmTC_fe8c6.dir/CheckFunctionExists.c.o
-/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_fe8c6.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.16/Modules/CheckFunctionExists.c
-Linking C executable cmTC_fe8c6
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_fe8c6.dir/link.txt --verbose=1
-/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=pthread_create    -rdynamic CMakeFiles/cmTC_fe8c6.dir/CheckFunctionExists.c.o  -o cmTC_fe8c6  -lpthreads 
-/usr/bin/ld: 找不到 -lpthreads
+Run Build Command(s):/usr/bin/make cmTC_e375f/fast && /usr/bin/make -f CMakeFiles/cmTC_e375f.dir/build.make CMakeFiles/cmTC_e375f.dir/build
+make[1]: Entering directory '/home/lzh/test/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_e375f.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_e375f.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.16/Modules/CheckFunctionExists.c
+Linking C executable cmTC_e375f
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e375f.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=pthread_create    -rdynamic CMakeFiles/cmTC_e375f.dir/CheckFunctionExists.c.o  -o cmTC_e375f  -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
 collect2: error: ld returned 1 exit status
-make[1]: *** [CMakeFiles/cmTC_fe8c6.dir/build.make:87：cmTC_fe8c6] 错误 1
-make[1]: 离开目录“/home/lzh/test/build/CMakeFiles/CMakeTmp”
-make: *** [Makefile:121：cmTC_fe8c6/fast] 错误 2
+make[1]: *** [CMakeFiles/cmTC_e375f.dir/build.make:87: cmTC_e375f] Error 1
+make[1]: Leaving directory '/home/lzh/test/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_e375f/fast] Error 2
 
 
 
 Performing C++ SOURCE FILE Test OpenCL_CXX_WORKS failed with the following output:
 Change Dir: /home/lzh/test/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_9c9eb/fast && /usr/bin/make -f CMakeFiles/cmTC_9c9eb.dir/build.make CMakeFiles/cmTC_9c9eb.dir/build
-make[1]: 进入目录“/home/lzh/test/build/CMakeFiles/CMakeTmp”
-Building CXX object CMakeFiles/cmTC_9c9eb.dir/src.cxx.o
-/usr/bin/c++   -I/include/internal  -DBT_USE_DOUBLE_PRECISION -Wall -Wuninitialized -Winit-self -Wunused-function -Wunused-label -Wunused-variable -Wunused-but-set-variable -Wunused-but-set-parameter -Warray-bounds -Wtype-limits -Wreturn-type -Wsequence-point -Wparentheses -Wmissing-braces -Wchar-subscripts -Wswitch -Wwrite-strings -Wenum-compare -Wempty-body -std=c++11 -fopenmp -DOpenCL_CXX_WORKS   -o CMakeFiles/cmTC_9c9eb.dir/src.cxx.o -c /home/lzh/test/build/CMakeFiles/CMakeTmp/src.cxx
-/home/lzh/test/build/CMakeFiles/CMakeTmp/src.cxx:2:10: fatal error: CL/cl.hpp: 没有那个文件或目录
+Run Build Command(s):/usr/bin/make cmTC_972cc/fast && /usr/bin/make -f CMakeFiles/cmTC_972cc.dir/build.make CMakeFiles/cmTC_972cc.dir/build
+make[1]: Entering directory '/home/lzh/test/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_972cc.dir/src.cxx.o
+/usr/bin/c++   -I/include/internal  -DBT_USE_DOUBLE_PRECISION -Wall -Wuninitialized -Winit-self -Wunused-function -Wunused-label -Wunused-variable -Wunused-but-set-variable -Wunused-but-set-parameter -Warray-bounds -Wtype-limits -Wreturn-type -Wsequence-point -Wparentheses -Wmissing-braces -Wchar-subscripts -Wswitch -Wwrite-strings -Wenum-compare -Wempty-body -std=c++11 -fopenmp -DOpenCL_CXX_WORKS   -o CMakeFiles/cmTC_972cc.dir/src.cxx.o -c /home/lzh/test/build/CMakeFiles/CMakeTmp/src.cxx
+/home/lzh/test/build/CMakeFiles/CMakeTmp/src.cxx:2:10: fatal error: CL/cl.hpp: No such file or directory
     2 | #include <CL/cl.hpp>
       |          ^~~~~~~~~~~
 compilation terminated.
-make[1]: *** [CMakeFiles/cmTC_9c9eb.dir/build.make:66：CMakeFiles/cmTC_9c9eb.dir/src.cxx.o] 错误 1
-make[1]: 离开目录“/home/lzh/test/build/CMakeFiles/CMakeTmp”
-make: *** [Makefile:121：cmTC_9c9eb/fast] 错误 2
+make[1]: *** [CMakeFiles/cmTC_972cc.dir/build.make:66: CMakeFiles/cmTC_972cc.dir/src.cxx.o] Error 1
+make[1]: Leaving directory '/home/lzh/test/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_972cc/fast] Error 2
 
 
 Source file was:

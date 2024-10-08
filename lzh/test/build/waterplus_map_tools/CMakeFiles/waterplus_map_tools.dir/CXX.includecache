@@ -525,7 +525,7 @@ ros/message_event.h
 -
 ros/parameter_adapter.h
 -
-boost/bind.hpp
+boost/bind/bind.hpp
 -
 boost/thread/mutex.hpp
 -
@@ -541,7 +541,7 @@ ros/message_event.h
 -
 ros/subscription_callback_helper.h
 -
-boost/bind.hpp
+boost/bind/bind.hpp
 -
 string
 -
@@ -855,8 +855,6 @@ ros/init.h
 /opt/ros/noetic/include/ros/ros/init.h
 common.h
 /opt/ros/noetic/include/ros/common.h
-boost/bind.hpp
--
 xmlrpcpp/XmlRpcValue.h
 -
 
@@ -901,7 +899,7 @@ ros/message.h
 /opt/ros/noetic/include/ros/ros/message.h
 ros/serialization.h
 /opt/ros/noetic/include/ros/ros/serialization.h
-boost/bind.hpp
+boost/bind/bind.hpp
 -
 boost/thread/mutex.hpp
 -

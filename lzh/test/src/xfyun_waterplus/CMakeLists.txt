@@ -215,26 +215,6 @@ target_link_libraries(iat_node
    ${LIBS} 
 )
 
-add_executable(iat_new
-  src/iat_new.cpp
-  src/xfyun/linuxrec.c
-  src/xfyun/speech_recognizer.c
-)
-add_dependencies(iat_new ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(iat_new
-   ${LIBS} 
-)
-
-add_executable(iat_new2
-  src/iat_new2.cpp
-  src/xfyun/linuxrec.c
-  src/xfyun/speech_recognizer.c
-)
-add_dependencies(iat_new2 ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(iat_new2
-   ${LIBS} 
-)
-
 add_executable(tts_node
   src/tts_node.cpp
 )

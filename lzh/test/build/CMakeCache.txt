@@ -914,6 +914,12 @@ main_function_BINARY_DIR:STATIC=/home/lzh/test/build/main_function
 //Value Computed by CMake
 main_function_SOURCE_DIR:STATIC=/home/lzh/test/src/main_function
 
+//Value Computed by CMake
+map_build_BINARY_DIR:STATIC=/home/lzh/test/build/map_build
+
+//Value Computed by CMake
+map_build_SOURCE_DIR:STATIC=/home/lzh/test/src/map_build
+
 //The directory containing a CMake configuration file for map_msgs.
 map_msgs_DIR:PATH=/opt/ros/noetic/share/map_msgs/cmake
 
@@ -1019,6 +1025,12 @@ rospy_DIR:PATH=/opt/ros/noetic/share/rospy/cmake
 //The directory containing a CMake configuration file for rostime.
 rostime_DIR:PATH=/opt/ros/noetic/share/rostime/cmake
 
+//Value Computed by CMake
+rplidar_ros_BINARY_DIR:STATIC=/home/lzh/test/build/rplidar_ros
+
+//Value Computed by CMake
+rplidar_ros_SOURCE_DIR:STATIC=/home/lzh/test/src/rplidar_ros
+
 //The directory containing a CMake configuration file for rviz.
 rviz_DIR:PATH=/opt/ros/noetic/share/rviz/cmake
 
@@ -1027,6 +1039,12 @@ sensor_msgs_DIR:PATH=/opt/ros/noetic/share/sensor_msgs/cmake
 
 //The directory containing a CMake configuration file for smclib.
 smclib_DIR:PATH=/opt/ros/noetic/share/smclib/cmake
+
+//Value Computed by CMake
+sound_play_BINARY_DIR:STATIC=/home/lzh/test/build/sound_play
+
+//Value Computed by CMake
+sound_play_SOURCE_DIR:STATIC=/home/lzh/test/src/sound_play
 
 //The directory containing a CMake configuration file for std_msgs.
 std_msgs_DIR:PATH=/opt/ros/noetic/share/std_msgs/cmake
@@ -1060,6 +1078,12 @@ urdf_DIR:PATH=/opt/ros/noetic/share/urdf/cmake
 
 //The directory containing a CMake configuration file for visualization_msgs.
 visualization_msgs_DIR:PATH=/opt/ros/noetic/share/visualization_msgs/cmake
+
+//Value Computed by CMake
+voice_BINARY_DIR:STATIC=/home/lzh/test/build/voice
+
+//Value Computed by CMake
+voice_SOURCE_DIR:STATIC=/home/lzh/test/src/voice
 
 //The directory containing a CMake configuration file for voxel_grid.
 voxel_grid_DIR:PATH=/opt/ros/noetic/share/voxel_grid/cmake
@@ -1322,7 +1346,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=20
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=24
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP

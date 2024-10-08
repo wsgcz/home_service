@@ -14,7 +14,7 @@ robbish_explore：同explore，但是索引不同，进入find_robbish
 
 find_robbish：同find，找到垃圾进入collect_robbish，找不到就重来
 
-collect_robbish：开始识别垃圾种类，然后让别人捡拾垃圾，进入send模式
+collect_robbish：开始识别垃圾种类，after find robbish,start getting pos,movebase to robbish pos,speaking "give me robbish",and open the robot arm,waiting 20s(unsure),close robot arm,进入send模式
 
 send：
 
@@ -35,12 +35,18 @@ people_exist 每次识别结束后，如果有人返回1
 
 puber说明
 
-start_recognize 发布OK开始识别，识别结束将Params.finish改为1，发现人将Params.people_exist改为1
+start_recognize 发布OK开始识别，识别结束将Params.finish改为1，发现人将Params.people_exist改为1 (return String finish+people_exist)
 
-facial_det 发布OK识别人脸，将结果保存到Face_det.recog_msg
+facial_det 发布OK识别人脸，将结果保存到Face_det.recog_msg (return String,which contains people's name)
 
-pose_det 与上述同，保存到Body_det.recog_msg
+pose_det 与上述同，保存到Body_det.recog_msg (return String,which contains pose msg)
 
-start_recognize_robbish 发布OK开始识别，识别结束将Params.finish改为1，发现垃圾将Params.people_exist改为1（这里跟人脸用了同一个参数）
+start_recognize_robbish 发布OK开始识别，识别结束将Params.finish改为1，发现垃圾将Params.people_exist改为1（这里跟人脸用了同一个参数）similiar to start_recognize
 
-collect_robbish 发布OK开始识别，垃圾种类结果保存到Robbish_det.recog_msg
+collect_robbish 发布OK开始识别，垃圾种类结果保存到Robbish_det.recog_msg (return String,which contains robbish msg)
+
+get_robbish_pos publish OK to start (return MoveBaseGoal,which contains robbish pos)
+
+move_robot_arm publish 1 to open,0 to close,after finish change Params.finish to 1,0 means error(return int)
+
+other pkg only need to write puber to send msg,for example, to reply "start_recognize",the puber's theme is "start_recognize_reply"

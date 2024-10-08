@@ -24,8 +24,9 @@
 #include <thread>
 #include <mutex>
 #include <chrono>
-#include <sys/stat.h>                                                           
+#include <sys/stat.h>
 #include <opencv2/imgproc/types_c.h>
+
 #if defined(__linux__)
 #include <sys/prctl.h>
 #elif defined(__APPLE__)

@@ -21,11 +21,12 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include<opencv2/imgproc/imgproc_c.h>
 #include <cmath>
 #include <mutex>
 #include <thread>
 #include <chrono>
+
+#include <opencv2/imgproc/imgproc_c.h>
 
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>

@@ -93,6 +93,7 @@ class ahead:
 class robbish_det:
     def __init__(self) -> None:
         self.recog_msg="None"       #result for robbish recog
+        self.pos=MoveBaseGoal()
 
 #################
 # 人体注册的参数 #
@@ -112,6 +113,8 @@ class face_det:
         self.recog_msg="None"   #string recognize result
         self.recog_index=0     #useless
         self.is_done=[]     #useless
+
+
 
 #################
 # body form arg #
@@ -187,6 +190,8 @@ class pub:
         self.start_recognize_robbish=rospy.Publisher("start_recognize_robbish",String,queue_size=10)  # not writing suber yet
         self.collect_robbish=rospy.Publisher("collect_robbish",String,queue_size=10)  # not writing suber yet
         self.drop_robbish=rospy.Publisher("drop_robbish",String,queue_size=10)  # not writing suber yet
+        self.get_robbish_pos=rospy.Publisher("get_robbish_pos",String,queue_size=10)  # not writing suber yet
+        self.move_robot_arm=rospy.Publisher("move_robot_arm",int,queue_size=10)  # not writing suber yet
         # self.urgency=rospy.Publisher("")
 ###################################
 #### lzh delete gate name because there is only one wait position
@@ -298,6 +303,15 @@ class pub:
     def drop_robbishing(self):
         self.drop_robbish.publish("OK")
 
+    def get_robbish_posing(self):
+        self.get_robbish_pos.publish("OK")
+
+    def open_robot_arm(self):
+        self.move_robot_arm.publish(1)
+
+    def close_robot_arming(self):
+        self.move_robot_arm.publish(0)
+
 #########################
 # 用于Gotogoal的客户端操作#
 #########################
@@ -336,6 +350,13 @@ class sub:
      self.down_msg=rospy.Subscriber("genenal_service_put_down_result",String,self.PutDownResultCallBack,queue_size=10)#grab.py
      self.get_msg=rospy.Subscriber("genenal_service_get_it",String,self.GetItCallBack,queue_size=10)#grab.py
      self.now_position=rospy.Subscriber("/general_service_now_position",MoveBaseGoal,self.Now_position_callback,queue_size=10)
+     self.start_recognize_reply=rospy.Subscriber("start_recognize_reply",String,self.start_recognize_reply_callback,queue_size=10)
+     self.facial_det_reply=rospy.Subscriber("facial_det_reply",String,self.facial_det_reply_callback,queue_size=10)
+     self.pose_det_reply=rospy.Subscriber("pose_det_reply",String,self.pose_det_reply_callback,queue_size=10)
+     self.start_recognize_robbish_reply=rospy.Subscriber("start_recognize_robbish_reply",String,self.start_recognize_robbish_reply_callback,queue_size=10)
+     self.collect_robbish_reply=rospy.Subscriber("collect_robbish_reply",String,self.collect_robbish_reply_callback,queue_size=10)
+     self.get_robbish_pos_reply=rospy.Subscriber("get_robbish_pos_reply",MoveBaseGoal,self.get_robbish_pos_reply_callback,queue_size=10)
+     self.move_robot_arm_reply=rospy.Subscriber("move_robot_arm_reply",int,self.move_robot_arm_reply_callback,queue_size=10)
 
     def Renew_goals(self,msg:Goals_name):
         global Ahead,current_name
@@ -423,6 +444,40 @@ class sub:
             rospy.loginfo("接受get_it话题错误,发过来的时候get_msg不是0")
         pass
 
+    def start_recognize_reply_callback(self,msg:String):
+        global params
+        params.finish=int(msg[0])
+        params.people_exist=int(msg[-1])
+
+    def facial_det_reply_callback(self,msg:String):
+        global Face_det
+        Face_det.recog_msg=msg
+
+    def pose_det_reply_callback(self,msg:String):
+        global Body_det
+        Body_det.recog_msg=msg
+
+    def start_recognize_robbish_reply_callback(self,msg:String):
+        global params
+        params.finish=int(msg[0])
+        params.people_exist=int(msg[-1])
+
+    def collect_robbish_reply_callback(self,msg:String):
+        global Robbish_det
+        Robbish_det.recog_msg=msg
+    
+    def get_robbish_pos_reply_callback(self,msg:MoveBaseGoal):
+        global Robbish_det
+        Robbish_det.pos=msg
+        
+    def move_robot_arm_reply_callback(self,msg:int):
+        global params
+        if msg==1:
+            params.finish=1
+        else:
+            rospy.ERROR("cannot move robot arm")
+    
+
 
 def Dijkstra(goals_list:List[MoveBaseGoal],now_goal:MoveBaseGoal):
     temp_list=goals_list
@@ -497,7 +552,7 @@ def get_odom_message(odom:Odometry):
     odom_ow=odom.pose.pose.orientation.w 
     _,_,mathince_theta=transformations.euler_from_quaternion([odom_ox,odom_oy,odom_oz,odom_ow])
     
-
+'''
 if __name__=="__main__":
     # global delete_flag
     test=False
@@ -775,7 +830,7 @@ if __name__=="__main__":
     rospy.spin()
     rate.sleep()
     rospy.loginfo("节点已经退出")
-      
+      '''
 
 
 
@@ -800,8 +855,8 @@ if __name__ =="__main__":
     Client=client()
     Body_det=body_det()
     Robbish_det=robbish_det()
-    waypoints=pd.read_xml('/home/linxi/ServiceRobot-General/src/general_service_2022/maps/waypoints.xml')
-    waypoints_name=data['Name']
+    waypoints=pd.read_xml('/home/linxi/ServiceRobot-General/src/general_service_2022/maps/waypoints.xml') ###unchanged
+    waypoints_name=waypoints['Name']
     #index= np.where(waypoins_name=='wait_pos')
     #error here
     waypoints_index=0        ###error here, unknow the first waypoint index
@@ -978,28 +1033,47 @@ if __name__ =="__main__":
                     rospy.loginfo("error occer! cannot rotate!")
             if have_robbish==0:
                 rospy.ERROR("Have not find robbish in this room, rocognize again")
+        
         elif fsm==Status.Collect_Robbish:
             Puber.collect_robbishing()
             robbish_data=String()
             robbish_data.data=f"this robbish is {Robbish_det.recog_msg}"
             Puber.over_speak(robbish_data)
-            fsm==Status.Robbish_grab
-            rospy.loginfo("Please help me grabbing the robbish")
+            Puber.get_robbish_posing()
+            Client.ac.wait_for_server()
+            Client.ac.send_goal(Robbish_det.pos)
+            Client.ac.wait_for_result()
+            if Client.ac.get_state() == actionlib.SimpleGoalState.DONE:
+                rospy.loginfo("Please help me grabbing the robbish")
+                pose_data=String()
+                pose_data.data=f"give me the robbish please"
+                Puber.over_speak(pose_data)
+                Puber.open_robot_arm()
+                rospy.sleep(20)
+                Puber.close_robot_arming()
+            else:
+                rospy.ERROR("cannot rotate!")
             rospy.sleep(5)
             rospy.loginfo("start sending")
-            fsm==Status.Send
+            fsm=Status.Send
+
+
+
+
         elif fsm==Status.Send:
             index=Robbish_waypoints_index
             success=Gotopoint(waypoints_name(index+4))
             rospy.loginfo(f"going {waypoints_name(index+4)}")
-            Puber.drop_robbishing()
-            while Params.finish ==0: pass
-            Params.finish=1
+            Puber.open_robot_arm()
+            while params.finish ==0: pass
+            params.finish=0
             if Robbish_waypoints_index==3:
                 rospy.loginfo("Finished grab all robbish,now quit")
                 fsm=Status.Quit
             else :
                 fsm=Status.Robbish_Explore
+
+
         elif fsm==Status.Quit:
             rospy.loginfo("ALL FINISH!")
             break

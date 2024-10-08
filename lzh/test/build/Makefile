@@ -987,6 +987,19 @@ wpb_home_motor_encoder/fast:
 .PHONY : wpb_home_motor_encoder/fast
 
 #=============================================================================
+# Target rules for targets named velocity_control
+
+# Build rule for target.
+velocity_control: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 velocity_control
+.PHONY : velocity_control
+
+# fast build rule for target.
+velocity_control/fast:
+	$(MAKE) -f map_build/CMakeFiles/velocity_control.dir/build.make map_build/CMakeFiles/velocity_control.dir/build
+.PHONY : velocity_control/fast
+
+#=============================================================================
 # Target rules for targets named kinect2_registration
 
 # Build rule for target.
@@ -1011,6 +1024,279 @@ additional_files_kinect2_registration: cmake_check_build_system
 additional_files_kinect2_registration/fast:
 	$(MAKE) -f iai_kinect2/kinect2_registration/CMakeFiles/additional_files_kinect2_registration.dir/build.make iai_kinect2/kinect2_registration/CMakeFiles/additional_files_kinect2_registration.dir/build
 .PHONY : additional_files_kinect2_registration/fast
+
+#=============================================================================
+# Target rules for targets named rplidarNodeClient
+
+# Build rule for target.
+rplidarNodeClient: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 rplidarNodeClient
+.PHONY : rplidarNodeClient
+
+# fast build rule for target.
+rplidarNodeClient/fast:
+	$(MAKE) -f rplidar_ros/CMakeFiles/rplidarNodeClient.dir/build.make rplidar_ros/CMakeFiles/rplidarNodeClient.dir/build
+.PHONY : rplidarNodeClient/fast
+
+#=============================================================================
+# Target rules for targets named rplidarNode
+
+# Build rule for target.
+rplidarNode: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 rplidarNode
+.PHONY : rplidarNode
+
+# fast build rule for target.
+rplidarNode/fast:
+	$(MAKE) -f rplidar_ros/CMakeFiles/rplidarNode.dir/build.make rplidar_ros/CMakeFiles/rplidarNode.dir/build
+.PHONY : rplidarNode/fast
+
+#=============================================================================
+# Target rules for targets named sound_play_generate_messages_py
+
+# Build rule for target.
+sound_play_generate_messages_py: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 sound_play_generate_messages_py
+.PHONY : sound_play_generate_messages_py
+
+# fast build rule for target.
+sound_play_generate_messages_py/fast:
+	$(MAKE) -f sound_play/CMakeFiles/sound_play_generate_messages_py.dir/build.make sound_play/CMakeFiles/sound_play_generate_messages_py.dir/build
+.PHONY : sound_play_generate_messages_py/fast
+
+#=============================================================================
+# Target rules for targets named sound_play_gennodejs
+
+# Build rule for target.
+sound_play_gennodejs: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 sound_play_gennodejs
+.PHONY : sound_play_gennodejs
+
+# fast build rule for target.
+sound_play_gennodejs/fast:
+	$(MAKE) -f sound_play/CMakeFiles/sound_play_gennodejs.dir/build.make sound_play/CMakeFiles/sound_play_gennodejs.dir/build
+.PHONY : sound_play_gennodejs/fast
+
+#=============================================================================
+# Target rules for targets named sound_play_generate_messages_nodejs
+
+# Build rule for target.
+sound_play_generate_messages_nodejs: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 sound_play_generate_messages_nodejs
+.PHONY : sound_play_generate_messages_nodejs
+
+# fast build rule for target.
+sound_play_generate_messages_nodejs/fast:
+	$(MAKE) -f sound_play/CMakeFiles/sound_play_generate_messages_nodejs.dir/build.make sound_play/CMakeFiles/sound_play_generate_messages_nodejs.dir/build
+.PHONY : sound_play_generate_messages_nodejs/fast
+
+#=============================================================================
+# Target rules for targets named sound_play_generate_messages_eus
+
+# Build rule for target.
+sound_play_generate_messages_eus: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 sound_play_generate_messages_eus
+.PHONY : sound_play_generate_messages_eus
+
+# fast build rule for target.
+sound_play_generate_messages_eus/fast:
+	$(MAKE) -f sound_play/CMakeFiles/sound_play_generate_messages_eus.dir/build.make sound_play/CMakeFiles/sound_play_generate_messages_eus.dir/build
+.PHONY : sound_play_generate_messages_eus/fast
+
+#=============================================================================
+# Target rules for targets named _sound_play_generate_messages_check_deps_SoundRequestAction
+
+# Build rule for target.
+_sound_play_generate_messages_check_deps_SoundRequestAction: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 _sound_play_generate_messages_check_deps_SoundRequestAction
+.PHONY : _sound_play_generate_messages_check_deps_SoundRequestAction
+
+# fast build rule for target.
+_sound_play_generate_messages_check_deps_SoundRequestAction/fast:
+	$(MAKE) -f sound_play/CMakeFiles/_sound_play_generate_messages_check_deps_SoundRequestAction.dir/build.make sound_play/CMakeFiles/_sound_play_generate_messages_check_deps_SoundRequestAction.dir/build
+.PHONY : _sound_play_generate_messages_check_deps_SoundRequestAction/fast
+
+#=============================================================================
+# Target rules for targets named sound_play_genpy
+
+# Build rule for target.
+sound_play_genpy: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 sound_play_genpy
+.PHONY : sound_play_genpy
+
+# fast build rule for target.
+sound_play_genpy/fast:
+	$(MAKE) -f sound_play/CMakeFiles/sound_play_genpy.dir/build.make sound_play/CMakeFiles/sound_play_genpy.dir/build
+.PHONY : sound_play_genpy/fast
+
+#=============================================================================
+# Target rules for targets named sound_play_genlisp
+
+# Build rule for target.
+sound_play_genlisp: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 sound_play_genlisp
+.PHONY : sound_play_genlisp
+
+# fast build rule for target.
+sound_play_genlisp/fast:
+	$(MAKE) -f sound_play/CMakeFiles/sound_play_genlisp.dir/build.make sound_play/CMakeFiles/sound_play_genlisp.dir/build
+.PHONY : sound_play_genlisp/fast
+
+#=============================================================================
+# Target rules for targets named _sound_play_generate_messages_check_deps_SoundRequestResult
+
+# Build rule for target.
+_sound_play_generate_messages_check_deps_SoundRequestResult: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 _sound_play_generate_messages_check_deps_SoundRequestResult
+.PHONY : _sound_play_generate_messages_check_deps_SoundRequestResult
+
+# fast build rule for target.
+_sound_play_generate_messages_check_deps_SoundRequestResult/fast:
+	$(MAKE) -f sound_play/CMakeFiles/_sound_play_generate_messages_check_deps_SoundRequestResult.dir/build.make sound_play/CMakeFiles/_sound_play_generate_messages_check_deps_SoundRequestResult.dir/build
+.PHONY : _sound_play_generate_messages_check_deps_SoundRequestResult/fast
+
+#=============================================================================
+# Target rules for targets named _sound_play_generate_messages_check_deps_SoundRequestActionResult
+
+# Build rule for target.
+_sound_play_generate_messages_check_deps_SoundRequestActionResult: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 _sound_play_generate_messages_check_deps_SoundRequestActionResult
+.PHONY : _sound_play_generate_messages_check_deps_SoundRequestActionResult
+
+# fast build rule for target.
+_sound_play_generate_messages_check_deps_SoundRequestActionResult/fast:
+	$(MAKE) -f sound_play/CMakeFiles/_sound_play_generate_messages_check_deps_SoundRequestActionResult.dir/build.make sound_play/CMakeFiles/_sound_play_generate_messages_check_deps_SoundRequestActionResult.dir/build
+.PHONY : _sound_play_generate_messages_check_deps_SoundRequestActionResult/fast
+
+#=============================================================================
+# Target rules for targets named _sound_play_generate_messages_check_deps_SoundRequestActionFeedback
+
+# Build rule for target.
+_sound_play_generate_messages_check_deps_SoundRequestActionFeedback: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 _sound_play_generate_messages_check_deps_SoundRequestActionFeedback
+.PHONY : _sound_play_generate_messages_check_deps_SoundRequestActionFeedback
+
+# fast build rule for target.
+_sound_play_generate_messages_check_deps_SoundRequestActionFeedback/fast:
+	$(MAKE) -f sound_play/CMakeFiles/_sound_play_generate_messages_check_deps_SoundRequestActionFeedback.dir/build.make sound_play/CMakeFiles/_sound_play_generate_messages_check_deps_SoundRequestActionFeedback.dir/build
+.PHONY : _sound_play_generate_messages_check_deps_SoundRequestActionFeedback/fast
+
+#=============================================================================
+# Target rules for targets named sound_play_generate_messages_lisp
+
+# Build rule for target.
+sound_play_generate_messages_lisp: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 sound_play_generate_messages_lisp
+.PHONY : sound_play_generate_messages_lisp
+
+# fast build rule for target.
+sound_play_generate_messages_lisp/fast:
+	$(MAKE) -f sound_play/CMakeFiles/sound_play_generate_messages_lisp.dir/build.make sound_play/CMakeFiles/sound_play_generate_messages_lisp.dir/build
+.PHONY : sound_play_generate_messages_lisp/fast
+
+#=============================================================================
+# Target rules for targets named _sound_play_generate_messages_check_deps_SoundRequestFeedback
+
+# Build rule for target.
+_sound_play_generate_messages_check_deps_SoundRequestFeedback: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 _sound_play_generate_messages_check_deps_SoundRequestFeedback
+.PHONY : _sound_play_generate_messages_check_deps_SoundRequestFeedback
+
+# fast build rule for target.
+_sound_play_generate_messages_check_deps_SoundRequestFeedback/fast:
+	$(MAKE) -f sound_play/CMakeFiles/_sound_play_generate_messages_check_deps_SoundRequestFeedback.dir/build.make sound_play/CMakeFiles/_sound_play_generate_messages_check_deps_SoundRequestFeedback.dir/build
+.PHONY : _sound_play_generate_messages_check_deps_SoundRequestFeedback/fast
+
+#=============================================================================
+# Target rules for targets named _sound_play_generate_messages_check_deps_SoundRequestGoal
+
+# Build rule for target.
+_sound_play_generate_messages_check_deps_SoundRequestGoal: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 _sound_play_generate_messages_check_deps_SoundRequestGoal
+.PHONY : _sound_play_generate_messages_check_deps_SoundRequestGoal
+
+# fast build rule for target.
+_sound_play_generate_messages_check_deps_SoundRequestGoal/fast:
+	$(MAKE) -f sound_play/CMakeFiles/_sound_play_generate_messages_check_deps_SoundRequestGoal.dir/build.make sound_play/CMakeFiles/_sound_play_generate_messages_check_deps_SoundRequestGoal.dir/build
+.PHONY : _sound_play_generate_messages_check_deps_SoundRequestGoal/fast
+
+#=============================================================================
+# Target rules for targets named sound_play_gencpp
+
+# Build rule for target.
+sound_play_gencpp: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 sound_play_gencpp
+.PHONY : sound_play_gencpp
+
+# fast build rule for target.
+sound_play_gencpp/fast:
+	$(MAKE) -f sound_play/CMakeFiles/sound_play_gencpp.dir/build.make sound_play/CMakeFiles/sound_play_gencpp.dir/build
+.PHONY : sound_play_gencpp/fast
+
+#=============================================================================
+# Target rules for targets named sound_play_generate_messages
+
+# Build rule for target.
+sound_play_generate_messages: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 sound_play_generate_messages
+.PHONY : sound_play_generate_messages
+
+# fast build rule for target.
+sound_play_generate_messages/fast:
+	$(MAKE) -f sound_play/CMakeFiles/sound_play_generate_messages.dir/build.make sound_play/CMakeFiles/sound_play_generate_messages.dir/build
+.PHONY : sound_play_generate_messages/fast
+
+#=============================================================================
+# Target rules for targets named _sound_play_generate_messages_check_deps_SoundRequestActionGoal
+
+# Build rule for target.
+_sound_play_generate_messages_check_deps_SoundRequestActionGoal: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 _sound_play_generate_messages_check_deps_SoundRequestActionGoal
+.PHONY : _sound_play_generate_messages_check_deps_SoundRequestActionGoal
+
+# fast build rule for target.
+_sound_play_generate_messages_check_deps_SoundRequestActionGoal/fast:
+	$(MAKE) -f sound_play/CMakeFiles/_sound_play_generate_messages_check_deps_SoundRequestActionGoal.dir/build.make sound_play/CMakeFiles/_sound_play_generate_messages_check_deps_SoundRequestActionGoal.dir/build
+.PHONY : _sound_play_generate_messages_check_deps_SoundRequestActionGoal/fast
+
+#=============================================================================
+# Target rules for targets named sound_play_generate_messages_cpp
+
+# Build rule for target.
+sound_play_generate_messages_cpp: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 sound_play_generate_messages_cpp
+.PHONY : sound_play_generate_messages_cpp
+
+# fast build rule for target.
+sound_play_generate_messages_cpp/fast:
+	$(MAKE) -f sound_play/CMakeFiles/sound_play_generate_messages_cpp.dir/build.make sound_play/CMakeFiles/sound_play_generate_messages_cpp.dir/build
+.PHONY : sound_play_generate_messages_cpp/fast
+
+#=============================================================================
+# Target rules for targets named _sound_play_generate_messages_check_deps_SoundRequest
+
+# Build rule for target.
+_sound_play_generate_messages_check_deps_SoundRequest: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 _sound_play_generate_messages_check_deps_SoundRequest
+.PHONY : _sound_play_generate_messages_check_deps_SoundRequest
+
+# fast build rule for target.
+_sound_play_generate_messages_check_deps_SoundRequest/fast:
+	$(MAKE) -f sound_play/CMakeFiles/_sound_play_generate_messages_check_deps_SoundRequest.dir/build.make sound_play/CMakeFiles/_sound_play_generate_messages_check_deps_SoundRequest.dir/build
+.PHONY : _sound_play_generate_messages_check_deps_SoundRequest/fast
+
+#=============================================================================
+# Target rules for targets named sound_play_geneus
+
+# Build rule for target.
+sound_play_geneus: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 sound_play_geneus
+.PHONY : sound_play_geneus
+
+# fast build rule for target.
+sound_play_geneus/fast:
+	$(MAKE) -f sound_play/CMakeFiles/sound_play_geneus.dir/build.make sound_play/CMakeFiles/sound_play_geneus.dir/build
+.PHONY : sound_play_geneus/fast
 
 #=============================================================================
 # Target rules for targets named kinect2_bridge
@@ -1336,6 +1622,58 @@ additional_files_kinect2_viewer: cmake_check_build_system
 additional_files_kinect2_viewer/fast:
 	$(MAKE) -f iai_kinect2/kinect2_viewer/CMakeFiles/additional_files_kinect2_viewer.dir/build.make iai_kinect2/kinect2_viewer/CMakeFiles/additional_files_kinect2_viewer.dir/build
 .PHONY : additional_files_kinect2_viewer/fast
+
+#=============================================================================
+# Target rules for targets named asr_offline_record
+
+# Build rule for target.
+asr_offline_record: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 asr_offline_record
+.PHONY : asr_offline_record
+
+# fast build rule for target.
+asr_offline_record/fast:
+	$(MAKE) -f voice/CMakeFiles/asr_offline_record.dir/build.make voice/CMakeFiles/asr_offline_record.dir/build
+.PHONY : asr_offline_record/fast
+
+#=============================================================================
+# Target rules for targets named textprocess
+
+# Build rule for target.
+textprocess: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 textprocess
+.PHONY : textprocess
+
+# fast build rule for target.
+textprocess/fast:
+	$(MAKE) -f voice/CMakeFiles/textprocess.dir/build.make voice/CMakeFiles/textprocess.dir/build
+.PHONY : textprocess/fast
+
+#=============================================================================
+# Target rules for targets named xfsaywords_process
+
+# Build rule for target.
+xfsaywords_process: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 xfsaywords_process
+.PHONY : xfsaywords_process
+
+# fast build rule for target.
+xfsaywords_process/fast:
+	$(MAKE) -f voice/CMakeFiles/xfsaywords_process.dir/build.make voice/CMakeFiles/xfsaywords_process.dir/build
+.PHONY : xfsaywords_process/fast
+
+#=============================================================================
+# Target rules for targets named xf_tts
+
+# Build rule for target.
+xf_tts: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 xf_tts
+.PHONY : xf_tts
+
+# fast build rule for target.
+xf_tts/fast:
+	$(MAKE) -f voice/CMakeFiles/xf_tts.dir/build.make voice/CMakeFiles/xf_tts.dir/build
+.PHONY : xf_tts/fast
 
 #=============================================================================
 # Target rules for targets named move_base_msgs_generate_messages_lisp
@@ -3379,19 +3717,6 @@ tts_node/fast:
 .PHONY : tts_node/fast
 
 #=============================================================================
-# Target rules for targets named iat_new2
-
-# Build rule for target.
-iat_new2: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 iat_new2
-.PHONY : iat_new2
-
-# fast build rule for target.
-iat_new2/fast:
-	$(MAKE) -f xfyun_waterplus/CMakeFiles/iat_new2.dir/build.make xfyun_waterplus/CMakeFiles/iat_new2.dir/build
-.PHONY : iat_new2/fast
-
-#=============================================================================
 # Target rules for targets named xfyun_waterplus_geneus
 
 # Build rule for target.
@@ -3507,19 +3832,6 @@ iat_file: cmake_check_build_system
 iat_file/fast:
 	$(MAKE) -f xfyun_waterplus/CMakeFiles/iat_file.dir/build.make xfyun_waterplus/CMakeFiles/iat_file.dir/build
 .PHONY : iat_file/fast
-
-#=============================================================================
-# Target rules for targets named iat_new
-
-# Build rule for target.
-iat_new: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 iat_new
-.PHONY : iat_new
-
-# fast build rule for target.
-iat_new/fast:
-	$(MAKE) -f xfyun_waterplus/CMakeFiles/iat_new.dir/build.make xfyun_waterplus/CMakeFiles/iat_new.dir/build
-.PHONY : iat_new/fast
 
 #=============================================================================
 # Target rules for targets named xfyun_waterplus_gencpp
@@ -3896,8 +4208,30 @@ help:
 	@echo "... wpb_home_js_vel"
 	@echo "... wpb_home_lidar_filter"
 	@echo "... wpb_home_motor_encoder"
+	@echo "... velocity_control"
 	@echo "... kinect2_registration"
 	@echo "... additional_files_kinect2_registration"
+	@echo "... rplidarNodeClient"
+	@echo "... rplidarNode"
+	@echo "... sound_play_generate_messages_py"
+	@echo "... sound_play_gennodejs"
+	@echo "... sound_play_generate_messages_nodejs"
+	@echo "... sound_play_generate_messages_eus"
+	@echo "... _sound_play_generate_messages_check_deps_SoundRequestAction"
+	@echo "... sound_play_genpy"
+	@echo "... sound_play_genlisp"
+	@echo "... _sound_play_generate_messages_check_deps_SoundRequestResult"
+	@echo "... _sound_play_generate_messages_check_deps_SoundRequestActionResult"
+	@echo "... _sound_play_generate_messages_check_deps_SoundRequestActionFeedback"
+	@echo "... sound_play_generate_messages_lisp"
+	@echo "... _sound_play_generate_messages_check_deps_SoundRequestFeedback"
+	@echo "... _sound_play_generate_messages_check_deps_SoundRequestGoal"
+	@echo "... sound_play_gencpp"
+	@echo "... sound_play_generate_messages"
+	@echo "... _sound_play_generate_messages_check_deps_SoundRequestActionGoal"
+	@echo "... sound_play_generate_messages_cpp"
+	@echo "... _sound_play_generate_messages_check_deps_SoundRequest"
+	@echo "... sound_play_geneus"
 	@echo "... kinect2_bridge"
 	@echo "... kinect2_bridge_nodelet"
 	@echo "... dynamic_reconfigure_gencfg"
@@ -3923,6 +4257,10 @@ help:
 	@echo "... compressed_image_transport_gencfg"
 	@echo "... kinect2_viewer"
 	@echo "... additional_files_kinect2_viewer"
+	@echo "... asr_offline_record"
+	@echo "... textprocess"
+	@echo "... xfsaywords_process"
+	@echo "... xf_tts"
 	@echo "... move_base_msgs_generate_messages_lisp"
 	@echo "... move_base_msgs_generate_messages_eus"
 	@echo "... std_srvs_generate_messages_py"
@@ -4080,7 +4418,6 @@ help:
 	@echo "... recorder_wav_node"
 	@echo "... wp_voice_cmd_cn"
 	@echo "... tts_node"
-	@echo "... iat_new2"
 	@echo "... xfyun_waterplus_geneus"
 	@echo "... _xfyun_waterplus_generate_messages_check_deps_IATSwitch"
 	@echo "... xfyun_waterplus_generate_messages_cpp"
@@ -4090,7 +4427,6 @@ help:
 	@echo "... xfyun_waterplus_generate_messages_nodejs"
 	@echo "... xfyun_waterplus_generate_messages_lisp"
 	@echo "... iat_file"
-	@echo "... iat_new"
 	@echo "... xfyun_waterplus_gencpp"
 	@echo "... xfyun_waterplus_gennodejs"
 	@echo "... xfyun_waterplus_genpy"
