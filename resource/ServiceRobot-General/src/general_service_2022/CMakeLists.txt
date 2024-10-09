@@ -168,10 +168,10 @@ target_link_libraries(main_service
 target_link_libraries(main_service_test
 ${catkin_LIBRARIES}
 )
+
 # ############
 # # Install ##
 # ############
-
 # all install targets should use catkin DESTINATION variables
 # See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html
 
