@@ -152,7 +152,7 @@ begin_everything=0
 over_yolo=0
 not_have_catch_target=1
 sleep_count=0
-def control_angle_speed():# 设定旋转角度
+def control_angle_speed():# 设定旋转角度   ####ke dong tai ping hua gai jin
     global now_angle_speed,now_time_postion_x,d_x,can_not_know_the_deepth,d_pixel_x
     # while not rospy.is_shutdown() :
     if can_not_know_the_deepth:# 拍出来的照片中识别出要抓取的物体没有察觉到深度d
@@ -339,7 +339,7 @@ def set_begin_odom_x_and_y():
     machine_odom_last_x=machine_odom_now_x
     machine_odom_last_y=machine_odom_now_y
     target_position_z=now_time_postion_z # target_position_z指的是距离物体的距离
-def calculate_ahead_speed():
+def calculate_ahead_speed():  ##have_left????
     global now_time_postion_z,now_ahead_speed,have_left,have_known_the_angle
     rospy.loginfo("this is have_left %f",have_left)
     if have_left>0.8:
@@ -416,10 +416,10 @@ def get_the_need_object(msg:String):
     object_need_to_grab=msg.data
     # begin_to_confirm_all_position_data=1
     begin_everything=1
-def intel_real_pose(y,z):
+def intel_real_pose(y,z):   ###20 shi yao jin xing de zhua qu can shu tiao jie
     angle=20/180*math.pi
     real_z=z*math.cos(angle)+y*math.sin(angle)
-    real_y=-z*math.sin(angle)+y*math.cos(angle)+1.3
+    real_y=-z*math.sin(angle)+y*math.cos(angle)+1.3  ##rao x axis xuan zhuan
     return real_y,real_z
 def control_all_the_action_of_machine():
     global begin_to_confirm_all_position_data,have_known_the_angle,have_set_everything,have_set_the_height,begin_ahead_function,begin_back,begin_everything
@@ -584,15 +584,17 @@ def calculate_postion_data(mutex):#存储识别的物体，存储到对应位置
                 use_machine_odom_distance_flag=1    #可以使用物体深度信息
                 real_x,real_y,real_z=rs.rs2_deproject_pixel_to_point(intrin=depth_intrin, pixel=[u_img, v_img], depth=d)
                 # real_y,real_z=intel_real_pose(real_y,real_z)
-                real_x-=0.07
+                #xiang ji zuo biao xi xia
+                real_x-=0.07  ##zuo biao jiao zheng
                 z=real_z
                 y=real_y
-                fuy=-real_y
+                fuy=-real_y   #zuo biao zhou fan zhuan
                 # fuy正轴向上，rs摄像机检测为正轴向下；z轴向前
                 real_z=z*math.cos(angle)+fuy*math.sin(angle)+0.12            # realsence距离机器人雷达点位置为0.12米
                 # rospy.loginfo("this is real_z %f" ,real_z)
                 real_y=-z*math.sin(angle)+fuy*math.cos(angle)+1.18           # realsence相机位置为1.18米                                             
                 # rospy.loginfo ("this is real_y  %f",real_y)
+                #xuan zhuan bian huan gong shi
                 last_time_postion_x=now_time_postion_x                
                 last_time_postion_y=now_time_postion_y
                 now_time_postion_x=real_x #向左(向前)                                  # now_time_position 指的是现在摄像机距离机器人雷达位置
@@ -602,8 +604,8 @@ def calculate_postion_data(mutex):#存储识别的物体，存储到对应位置
                     now_time_postion_z=real_z
                 else:                                                       
                     # 如果已经开始前进
-                    if (real_z<last_time_postion_z):
-                        if abs(now_time_postion_z-real_z)>0.1:
+                    if (real_z<last_time_postion_z): #ji qi ren shi yi dong de zuo biao xi
+                        if abs(now_time_postion_z-real_z)>0.1:  ##shen du cha zhi(zhi jie yong)
                             continue
                         last_time_postion_z=now_time_postion_z
                         now_time_postion_z=real_z
@@ -623,7 +625,7 @@ def calculate_postion_data(mutex):#存储识别的物体，存储到对应位置
                 # time.sleep(0.01)
                 
         if use_machine_odom_distance_flag:
-            if (machine_odom_distance<have_left and begin_ahead_function==1):
+            if (machine_odom_distance<have_left and begin_ahead_function==1):#zai qian jin  # geng jia jing que wen ding
                 rospy.loginfo("use_machine_odom_distance_flag==1 and machine_odom_distance<left")
                 have_left=machine_odom_distance 
     except BaseException as e:
@@ -783,7 +785,7 @@ def show_image():
                     # cv2.imshow("image",draw_image)
                     cv2.imshow("image",draw_image)
                     rospy.logwarn("1")
-def image_process_and_control_arm():
+def image_process_and_control_arm():   ##duo xian cheng(yong yu you hua)
     task1=threading.Thread(target=intel_realsense_image_and_depth)
     # task2=threading.Thread(target=control_all_the_action_of_machine)
     # task3=threading.Thread(target=control_angle_speed)
@@ -869,4 +871,6 @@ if __name__=="__main__":
     # mg.pub_loc.publish(mg.twist_msg)
     # rospy.loginfo("ASdadssadsadad")
     rospy.spin()
+
+
 

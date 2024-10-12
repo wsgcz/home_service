@@ -1,0 +1,29 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/wmy/grab/devel/include/**",
+        "/opt/ros/noetic/include/**",
+        "/home/wmy/grab/src/grab_general/include/**",
+        "/home/wmy/grab/src/grabth/include/**",
+        "/home/wmy/grab/src/waterplus_map_tools/include/**",
+        "/home/wmy/grab/src/wpb_home_apps/include/**",
+        "/home/wmy/grab/src/wpb_home/wpb_home_bringup/include/**",
+        "/home/wmy/grab/src/wpb_home/wpb_home_tutorials/include/**",
+        "/home/wmy/grab/src/wpb_home/wpbh_local_planner/include/**",
+        "/home/wmy/grab/src/xfyun_waterplus/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}
