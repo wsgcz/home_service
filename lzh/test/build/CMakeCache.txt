@@ -1076,6 +1076,12 @@ topic_tools_DIR:PATH=/opt/ros/noetic/share/topic_tools/cmake
 //The directory containing a CMake configuration file for urdf.
 urdf_DIR:PATH=/opt/ros/noetic/share/urdf/cmake
 
+//Value Computed by CMake
+vis_BINARY_DIR:STATIC=/home/lzh/test/build/vis
+
+//Value Computed by CMake
+vis_SOURCE_DIR:STATIC=/home/lzh/test/src/vis
+
 //The directory containing a CMake configuration file for visualization_msgs.
 visualization_msgs_DIR:PATH=/opt/ros/noetic/share/visualization_msgs/cmake
 
@@ -1346,7 +1352,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=24
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=25
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP

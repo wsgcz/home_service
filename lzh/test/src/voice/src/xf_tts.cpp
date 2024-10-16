@@ -141,8 +141,8 @@ int text_to_speech(const char* src_text, const char* des_path, const char* param
 void makeTextToWav(const char* text,const char* filename)
 {
 	int         ret                  = MSP_SUCCESS;
-	const char* login_params         = "appid = a34011d4, work_dir = .";//登录参数,appid与msc库绑定,请勿随意改动
-	const char* session_begin_params = "engine_type = local,voice_name=xiaoyan, text_encoding = UTF8, tts_res_path = fo|/home/gcz/test/src/voice/bin/msc/res/tts/xiaoyan.jet;fo|/home/gcz/test/src/voice/bin/msc/res/tts/common.jet, sample_rate = 16000, speed = 50, volume = 50, pitch = 50, rdn = 2";
+	const char* login_params         = "appid = 2b5afdaa, work_dir = .";//登录参数,appid与msc库绑定,请勿随意改动
+	const char* session_begin_params = "engine_type = local,voice_name=xiaoyan, text_encoding = UTF8, tts_res_path = fo|/home/lzh/test/src/voice/bin/msc/res/tts/xiaoyan.jet;fo|/home/lzh/test/src/voice/bin/msc/res/tts/common.jet, sample_rate = 16000, speed = 50, volume = 50, pitch = 50, rdn = 2";
 	ret = MSPLogin(NULL, NULL, login_params); //第一个参数是用户名，第二个参数是密码，第三个参数是登录参数，用户名和密码可在http://www.xfyun.cn注册获取
 	if (MSP_SUCCESS != ret)
 	{

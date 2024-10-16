@@ -1,7 +1,0 @@
-<launch>
-<!--- this node will listen to your speak and translate it to text-->
-    <node pkg="voice" name="asr_offline_record" type="asr_offline_record" output="screen"/>
-<!--- this node will receive text and say it-->
-    <node pkg="voice" name="xf_tts" type="xf_tts" output="screen"/>
-    <!-- <node pkg="voice" name="textprocess" type="textprocess" output="screen"/> -->
-</launch>

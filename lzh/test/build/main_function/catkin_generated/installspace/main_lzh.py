@@ -14,7 +14,7 @@ from move_base_msgs.msg import MoveBaseAction
 from move_base_msgs.msg import MoveBaseGoal
 from geometry_msgs.msg import PoseWithCovarianceStamped as Pose
 from waterplus_map_tools.srv import GetWaypointByName,GetWaypointByNameRequest,GetWaypointByNameResponse
-from general_service_2022.msg import Goals_name  # topic msg    contain name/goal
+#from general_service_2022.msg import Goals_name  # topic msg    contain name/goal
 import pandas as pd
 import numpy as np
 import tf.transformations as transformations
@@ -191,7 +191,7 @@ class pub:
         self.collect_robbish=rospy.Publisher("collect_robbish",String,queue_size=10)  # not writing suber yet
         self.drop_robbish=rospy.Publisher("drop_robbish",String,queue_size=10)  # not writing suber yet
         self.get_robbish_pos=rospy.Publisher("get_robbish_pos",String,queue_size=10)  # not writing suber yet
-        self.move_robot_arm=rospy.Publisher("move_robot_arm",int,queue_size=10)  # not writing suber yet
+        self.move_robot_arm=rospy.Publisher("move_robot_arm",String,queue_size=10)  # not writing suber yet
         # self.urgency=rospy.Publisher("")
 ###################################
 #### lzh delete gate name because there is only one wait position
@@ -207,7 +207,7 @@ class pub:
         msg.pose.covariance[7]= 0.25
         msg.pose.covariance[35]= 0.06853892326654787
         #???
-        data=pd.read_xml('/home/linxi/ServiceRobot-General/src/general_service_2022/maps/waypoints.xml')
+        data=pd.read_xml('/home/lzh/test/src/main_function/maps/waypoints.xml')
         Name=data['Name']
         index= np.where(Name=='wait_pos')
         index=int(index[0])
@@ -307,10 +307,13 @@ class pub:
         self.get_robbish_pos.publish("OK")
 
     def open_robot_arm(self):
-        self.move_robot_arm.publish(1)
+        self.move_robot_arm.publish('1')
 
     def close_robot_arming(self):
-        self.move_robot_arm.publish(0)
+        self.move_robot_arm.publish('0')
+
+    def over_speaking(self,msg:String):
+        self.over_speak.publish(msg)
 
 #########################
 # 用于Gotogoal的客户端操作#
@@ -345,7 +348,7 @@ class sub:
      self.init_goals=rospy.Subscriber("/general_service_loc_target",MoveBaseGoal,self.InitPersonFrontCallBack,queue_size=10)#pose1.py
      self.object_name=rospy.Subscriber("general_service_object_name_return",String,self.ObjectNameCallBack,queue_size=10)#words.py
      self.wait_time=rospy.Subscriber("/wpb_home/entrance_detect",String,self.EntranceCallBack,queue_size=10)#entrance_detect.cpp
-     self.renew_goals=rospy.Subscriber("/person/waypoint",Goals_name,self.Renew_goals,queue_size=100)#pose2.py
+     #self.renew_goals=rospy.Subscriber("/person/waypoint",Goals_name,self.Renew_goals,queue_size=100)#pose2.py
      self.explore_msg=rospy.Subscriber("general_service_recognition",String,self.RecognitionCallBack,queue_size=10 )#pose1.py
      self.down_msg=rospy.Subscriber("genenal_service_put_down_result",String,self.PutDownResultCallBack,queue_size=10)#grab.py
      self.get_msg=rospy.Subscriber("genenal_service_get_it",String,self.GetItCallBack,queue_size=10)#grab.py
@@ -356,21 +359,8 @@ class sub:
      self.start_recognize_robbish_reply=rospy.Subscriber("start_recognize_robbish_reply",String,self.start_recognize_robbish_reply_callback,queue_size=10)
      self.collect_robbish_reply=rospy.Subscriber("collect_robbish_reply",String,self.collect_robbish_reply_callback,queue_size=10)
      self.get_robbish_pos_reply=rospy.Subscriber("get_robbish_pos_reply",MoveBaseGoal,self.get_robbish_pos_reply_callback,queue_size=10)
-     self.move_robot_arm_reply=rospy.Subscriber("move_robot_arm_reply",int,self.move_robot_arm_reply_callback,queue_size=10)
+     self.move_robot_arm_reply=rospy.Subscriber("move_robot_arm_reply",String,self.move_robot_arm_reply_callback,queue_size=10)
 
-    def Renew_goals(self,msg:Goals_name):
-        global Ahead,current_name
-        if msg.goal.target_pose.header.frame_id=="None" and Put.Choose==4:
-            rospy.loginfo("exchange msg.name %s with current_name %s",msg.name,current_name)
-            t=Ahead.goals_dit[msg.name]
-            Ahead.goals_dit[msg.name]=Ahead.goals_dit[current_name]
-            Ahead.goals_dit[current_name]=t
-            Ahead.goal_renew_flag[msg.name]=1
-        elif msg.goal!=None:
-            rospy.loginfo("Renew the goal:%s",msg.name)
-            Ahead.goal_renew_flag[msg.name]=1
-            Ahead.goals_dit[msg.name]=msg.goal
-            
     def Now_position_callback(self,msg:MoveBaseGoal):
         self.now_goal=msg
    
@@ -470,12 +460,27 @@ class sub:
         global Robbish_det
         Robbish_det.pos=msg
         
-    def move_robot_arm_reply_callback(self,msg:int):
+    def move_robot_arm_reply_callback(self,msg:String):
         global params
-        if msg==1:
+        if msg=='1':
             params.finish=1
         else:
             rospy.ERROR("cannot move robot arm")
+
+'''
+    def Renew_goals(self,msg:Goals_name):
+        global Ahead,current_name
+        if msg.goal.target_pose.header.frame_id=="None" and Put.Choose==4:
+            rospy.loginfo("exchange msg.name %s with current_name %s",msg.name,current_name)
+            t=Ahead.goals_dit[msg.name]
+            Ahead.goals_dit[msg.name]=Ahead.goals_dit[current_name]
+            Ahead.goals_dit[current_name]=t
+            Ahead.goal_renew_flag[msg.name]=1
+        elif msg.goal!=None:
+            rospy.loginfo("Renew the goal:%s",msg.name)
+            Ahead.goal_renew_flag[msg.name]=1
+            Ahead.goals_dit[msg.name]=msg.goal
+'''
     
 
 
@@ -855,7 +860,7 @@ if __name__ =="__main__":
     Client=client()
     Body_det=body_det()
     Robbish_det=robbish_det()
-    waypoints=pd.read_xml('/home/linxi/ServiceRobot-General/src/general_service_2022/maps/waypoints.xml') ###unchanged
+    waypoints=pd.read_xml('/home/lzh/test/src/main_function/maps/waypoints.xml') ###in __main__
     waypoints_name=waypoints['Name']
     #index= np.where(waypoins_name=='wait_pos')
     #error here
@@ -874,6 +879,7 @@ if __name__ =="__main__":
     #PDW=PreDefinedWaypoints(params.gate_name,params.targets_waypoint)
     rospy.loginfo("初始位置设置完毕")
     fsm=Status.Enter
+    Puber.over_speaking("started")
     # test_i=1 # Put test
     # fsm=Status.Grab#Grab test
     # Suber.object_names=["bottle"]

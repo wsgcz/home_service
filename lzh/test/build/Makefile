@@ -1624,45 +1624,6 @@ additional_files_kinect2_viewer/fast:
 .PHONY : additional_files_kinect2_viewer/fast
 
 #=============================================================================
-# Target rules for targets named asr_offline_record
-
-# Build rule for target.
-asr_offline_record: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 asr_offline_record
-.PHONY : asr_offline_record
-
-# fast build rule for target.
-asr_offline_record/fast:
-	$(MAKE) -f voice/CMakeFiles/asr_offline_record.dir/build.make voice/CMakeFiles/asr_offline_record.dir/build
-.PHONY : asr_offline_record/fast
-
-#=============================================================================
-# Target rules for targets named textprocess
-
-# Build rule for target.
-textprocess: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 textprocess
-.PHONY : textprocess
-
-# fast build rule for target.
-textprocess/fast:
-	$(MAKE) -f voice/CMakeFiles/textprocess.dir/build.make voice/CMakeFiles/textprocess.dir/build
-.PHONY : textprocess/fast
-
-#=============================================================================
-# Target rules for targets named xfsaywords_process
-
-# Build rule for target.
-xfsaywords_process: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 xfsaywords_process
-.PHONY : xfsaywords_process
-
-# fast build rule for target.
-xfsaywords_process/fast:
-	$(MAKE) -f voice/CMakeFiles/xfsaywords_process.dir/build.make voice/CMakeFiles/xfsaywords_process.dir/build
-.PHONY : xfsaywords_process/fast
-
-#=============================================================================
 # Target rules for targets named xf_tts
 
 # Build rule for target.
@@ -4257,9 +4218,6 @@ help:
 	@echo "... compressed_image_transport_gencfg"
 	@echo "... kinect2_viewer"
 	@echo "... additional_files_kinect2_viewer"
-	@echo "... asr_offline_record"
-	@echo "... textprocess"
-	@echo "... xfsaywords_process"
 	@echo "... xf_tts"
 	@echo "... move_base_msgs_generate_messages_lisp"
 	@echo "... move_base_msgs_generate_messages_eus"

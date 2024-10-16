@@ -1,4 +1,5 @@
 <launch>
+    <node pkg="main_function" name="main_function" type="main_lzh.py" output="screen"/>
 
   <arg name="map" default="maps"/>  <!-- 地图文件所在目录，需要提前建图在 maps 目录下保存 map.yaml 文件 -->
   这三个是机器人描述文件，控制界面显示标记，rviz设置文件
@@ -18,13 +19,17 @@
     <rosparam file="$(find wpb_home_bringup)/config/wpb_home.yaml" command="load" />
   </node>
 保存和加载二维地图
-<node name="map_server" pkg="map_server" type="map_server" args="$(find general_service_2022)/$(arg map)/map.yaml"/>
+<node name="map_server" pkg="map_server" type="map_server" args="$(find main_function)/$(arg map)/map.yaml"/>
 amcl是蒙特卡洛自适应定位算法，用于确定机器人在地图的位置
   <include file="$(find wpb_home_tutorials)/nav_lidar/amcl_omni.launch" />
 
-  <node pkg="waterplus_map_tools" type="wp_manager" name="wp_manager" output="screen">
-    <param name="load" type="string" value="$(find general_service_2022)/$(arg map)/waypoints.xml"/>
-  </node>
+  <include file="$(find main_function)/launch/vision.launch" />
+  <include file="$(find main_function)/launch/voice.launch" />
+error here
+  <!-- <node pkg="waterplus_map_tools" type="wp_manager" name="wp_manager" output="screen">
+
+    <param name="load" type="string" value="$(find main_function)/$(arg map)/waypoints.xml"/>
+  </node> -->
   <node pkg="wpb_home_bringup" type="wpb_home_core" name="wpb_home_core" output="screen">
     <param name="serial_port" type="string" value="/dev/ftdi"/>
     <rosparam file="$(find wpb_home_bringup)/config/wpb_home.yaml" command="load" />
@@ -138,6 +143,5 @@ amcl是蒙特卡洛自适应定位算法，用于确定机器人在地图的位�
 
     <param name= "controller_frequency" value="20" type="double"/>
   </node>
-
 
 </launch>
