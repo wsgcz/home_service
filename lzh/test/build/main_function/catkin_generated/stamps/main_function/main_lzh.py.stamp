@@ -181,7 +181,7 @@ class pub:
         self.goto_Thing=rospy.Publisher("/general_service_go_to_things",String,queue_size=10)#grab.py
         self.grab_room=rospy.Publisher("grab_room",String,queue_size=10)#grab.py
         self.guidence=rospy.Publisher("all_name",String,queue_size=10)#guidence
-        self.over_speak=rospy.Publisher("over_speak",String,queue_size=10)#unknow suber
+        self.over_speak=rospy.Publisher("xf_tts",String,queue_size=10)#unknow suber
         self.refresh_speak=rospy.Publisher("refresh",String,queue_size=10)#unknow suber
         # the following is added by lzh
         self.start_recognize=rospy.Publisher("start_recognize",String,queue_size=10)  # not writing suber yet
@@ -313,6 +313,9 @@ class pub:
         self.move_robot_arm.publish('0')
 
     def over_speaking(self,msg:String):
+        du = rospy.Duration(4)
+        rospy.sleep(du)
+        rospy.loginfo("---------------lzh is your dad--------------------")
         self.over_speak.publish(msg)
 
 #########################
@@ -441,7 +444,8 @@ class sub:
 
     def facial_det_reply_callback(self,msg:String):
         global Face_det
-        Face_det.recog_msg=msg
+        Face_det.recog_msg=msg.data
+        rospy.loginfo(f"facial_det_reply_callback receive {Face_det.recog_msg}")
 
     def pose_det_reply_callback(self,msg:String):
         global Body_det
@@ -856,12 +860,13 @@ if __name__ =="__main__":
     Grab=grab()
     Put=put()
     Puber=pub()
+    Puber.over_speaking("started")
     Suber=sub()
     Client=client()
     Body_det=body_det()
     Robbish_det=robbish_det()
-    waypoints=pd.read_xml('/home/lzh/test/src/main_function/maps/waypoints.xml') ###in __main__
-    waypoints_name=waypoints['Name']
+    #waypoints=pd.read_xml('/home/lzh/test/src/main_function/maps/waypoints.xml') ###in __main__
+    #waypoints_name=waypoints['Name']
     #index= np.where(waypoins_name=='wait_pos')
     #error here
     waypoints_index=0        ###error here, unknow the first waypoint index
@@ -875,11 +880,11 @@ if __name__ =="__main__":
     params.gate_name=rospy.get_param("gate_name")
     params.targets_waypoint=rospy.get_param("targets_waypoint")
     '''
-    params.wait_position=Puber.Init_Pose()
+    #params.wait_position=Puber.Init_Pose()
     #PDW=PreDefinedWaypoints(params.gate_name,params.targets_waypoint)
     rospy.loginfo("初始位置设置完毕")
-    fsm=Status.Enter
-    Puber.over_speaking("started")
+    fsm=Status.Collect
+
     # test_i=1 # Put test
     # fsm=Status.Grab#Grab test
     # Suber.object_names=["bottle"]
@@ -961,26 +966,45 @@ if __name__ =="__main__":
                 rospy.loginfo("No people here!")
                 fsm==Status.Explore
         elif fsm==Status.Collect:
+            du=rospy.Duration(3)
+            du1=rospy.Duration(1)
+            rospy.loginfo(" Enter Collect!")
+            Puber.over_speaking("Enter Collect!")
             # face
+            rospy.sleep(du1)
             Puber.facial_deting()
+            rospy.sleep(du1)
             face_data=String()
             face_data.data=f"this people is {Face_det.recog_msg}"
-            Puber.over_speak(face_data)
+            Puber.over_speaking(face_data)
+            rospy.sleep(du)
             # pose ,error here, unknow the puber for starting pose recognize
             Puber.pose_deting()
+            rospy.sleep(du1)
             pose_data=String()
             pose_data.data=f"he is {Body_det.recog_msg}"
-            Puber.over_speak(pose_data)
+            Puber.over_speaking(pose_data)
+            rospy.sleep(du)
             next_data=String()
             next_data.data="you can do your next pose"
+            Puber.over_speaking(next_data)
+            rospy.sleep(du)
             Puber.pose_deting()
+            rospy.sleep(du1)
             pose_data.data=f"he is {Body_det.recog_msg}"
-            Puber.over_speak(pose_data)
+            Puber.over_speaking(pose_data)
+            rospy.sleep(du)
             params.people_sum+=1
             if params.people_sum==3 or waypoints_index==4:
                 rospy.loginfo("Finished recognizing people, enter Robbish_Explore")
+                pose_data.data="enter Robbish Explore"
+                Puber.over_speaking(pose_data)
+                rospy.sleep(du)
                 fsm=Status.Robbish_Explore
             else:
+                pose_data.data="enter Explore"
+                Puber.over_speaking(pose_data)
+                rospy.sleep(du)
                 fsm=Status.Explore
         #robbish, similiar to face and pose recog
         elif fsm==Status.Robbish_Explore:
