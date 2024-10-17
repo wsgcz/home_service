@@ -1,0 +1,1 @@
+/usr/bin/g++ -fPIC -std=c++11 -03 -g  -shared -Wl,-soname,libgtest_maind.so -o ../lib/libgtest_maind.so CMakeFiles/gtest_main.dir/src/gtest_main.cc.o  -Wl,-rpath,/home/zzy/vision/src/vis/build/gtest/lib ../lib/libgtestd.so -lpthread 

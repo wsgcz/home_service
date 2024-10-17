@@ -315,7 +315,7 @@ class ros_voice
 		if (msg->data=="startlisten")
 		{	
 			ROS_INFO("yes ,i have got the message");
-			const char *login_config    = "appid = a34011d4"; //登录参数
+			const char *login_config    = "appid = 2b5afdaa"; //登录参数
 			UserData asr_data; 
 			int ret                     = 0 ;
 			std_msgs::String shuju;

@@ -1,0 +1,56 @@
+<launch>
+
+  <arg name="model" default="$(find wpb_home_bringup)/urdf/wpb_home.urdf"/>
+  <arg name="gui" default="false" />
+  <arg name="rvizconfig" default="$(find wpb_home_tutorials)/rviz/obj_detect.rviz" />
+
+  <param name="robot_description" command="$(find xacro)/xacro $(arg model)" />
+  <param name="use_gui" value="$(arg gui)"/>
+
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+  <rosparam command="load" file="$(find wpb_home_bringup)/config/wpb_home.yaml" />
+  </node>
+ 
+  <node pkg="vis" type="shan_pose33.py" name="vision" output="screen"/>
+
+  <!--- Run Kinect -->
+  <!--************************ kinect ************************-->
+  <arg name="base_name"         default="kinect2"/>
+  <arg name="sensor"            default=""/>
+  <arg name="publish_tf"        default="false"/>
+  <arg name="base_name_tf"      default="$(arg base_name)"/>
+  <arg name="fps_limit"         default="-1.0"/>
+  <arg name="calib_path"        default="$(find kinect2_bridge)/data/"/>
+  <arg name="use_png"           default="false"/>
+  <arg name="jpeg_quality"      default="90"/>
+  <arg name="png_level"         default="1"/>
+  <arg name="depth_method"      default="cpu"/>
+  <arg name="depth_device"      default="-1"/>
+  <arg name="reg_method"        default="cpu"/>
+  <arg name="reg_device"        default="-1"/>
+  <arg name="max_depth"         default="12.0"/>
+  <arg name="min_depth"         default="0.1"/>
+  <arg name="queue_size"        default="5"/>
+  <arg name="bilateral_filter"  default="true"/>
+  <arg name="edge_aware_filter" default="true"/>
+  <arg name="worker_threads"    default="4"/>
+  <arg name="machine"           default="localhost"/>
+  <arg name="nodelet_manager"   default="$(arg base_name)"/>
+  <arg name="start_manager"     default="true"/>
+  <arg name="use_machine"       default="true"/>
+  <arg name="respawn"           default="true"/>
+  <arg name="use_nodelet"       default="true"/>
+  <arg name="output"            default="log"/>
+
+  <machine name="localhost" address="localhost" if="$(arg use_machine)"/>
+
+
+  <!-- Nodelet version of kinect2_bridge -->
+ 
+  <!-- Node version of kinect2_bridge -->
+ 
+
+   <!-- qhd point cloud (960 x 540) -->
+  <!--************************ end ************************-->
+
+</launch>

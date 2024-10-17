@@ -80,28 +80,6 @@ install/local/fast: preinstall/fast
 	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
 .PHONY : install/local/fast
 
-# Special rule for the target edit_cache
-edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
-	/usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
-.PHONY : edit_cache
-
-# Special rule for the target edit_cache
-edit_cache/fast: edit_cache
-
-.PHONY : edit_cache/fast
-
-# Special rule for the target test
-test:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running tests..."
-	/usr/bin/ctest --force-new-ctest-process $(ARGS)
-.PHONY : test
-
-# Special rule for the target test
-test/fast: test
-
-.PHONY : test/fast
-
 # Special rule for the target install
 install: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
@@ -134,6 +112,28 @@ rebuild_cache:
 rebuild_cache/fast: rebuild_cache
 
 .PHONY : rebuild_cache/fast
+
+# Special rule for the target edit_cache
+edit_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
+	/usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+.PHONY : edit_cache
+
+# Special rule for the target edit_cache
+edit_cache/fast: edit_cache
+
+.PHONY : edit_cache/fast
+
+# Special rule for the target test
+test:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running tests..."
+	/usr/bin/ctest --force-new-ctest-process $(ARGS)
+.PHONY : test
+
+# Special rule for the target test
+test/fast: test
+
+.PHONY : test/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -168,51 +168,6 @@ depend:
 .PHONY : depend
 
 # Convenience name for target.
-voice/CMakeFiles/asr_offline_record.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 voice/CMakeFiles/asr_offline_record.dir/rule
-.PHONY : voice/CMakeFiles/asr_offline_record.dir/rule
-
-# Convenience name for target.
-asr_offline_record: voice/CMakeFiles/asr_offline_record.dir/rule
-
-.PHONY : asr_offline_record
-
-# fast build rule for target.
-asr_offline_record/fast:
-	cd /home/lzh/test/build && $(MAKE) -f voice/CMakeFiles/asr_offline_record.dir/build.make voice/CMakeFiles/asr_offline_record.dir/build
-.PHONY : asr_offline_record/fast
-
-# Convenience name for target.
-voice/CMakeFiles/textprocess.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 voice/CMakeFiles/textprocess.dir/rule
-.PHONY : voice/CMakeFiles/textprocess.dir/rule
-
-# Convenience name for target.
-textprocess: voice/CMakeFiles/textprocess.dir/rule
-
-.PHONY : textprocess
-
-# fast build rule for target.
-textprocess/fast:
-	cd /home/lzh/test/build && $(MAKE) -f voice/CMakeFiles/textprocess.dir/build.make voice/CMakeFiles/textprocess.dir/build
-.PHONY : textprocess/fast
-
-# Convenience name for target.
-voice/CMakeFiles/xfsaywords_process.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 voice/CMakeFiles/xfsaywords_process.dir/rule
-.PHONY : voice/CMakeFiles/xfsaywords_process.dir/rule
-
-# Convenience name for target.
-xfsaywords_process: voice/CMakeFiles/xfsaywords_process.dir/rule
-
-.PHONY : xfsaywords_process
-
-# fast build rule for target.
-xfsaywords_process/fast:
-	cd /home/lzh/test/build && $(MAKE) -f voice/CMakeFiles/xfsaywords_process.dir/build.make voice/CMakeFiles/xfsaywords_process.dir/build
-.PHONY : xfsaywords_process/fast
-
-# Convenience name for target.
 voice/CMakeFiles/xf_tts.dir/rule:
 	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 voice/CMakeFiles/xf_tts.dir/rule
 .PHONY : voice/CMakeFiles/xf_tts.dir/rule
@@ -226,114 +181,6 @@ xf_tts: voice/CMakeFiles/xf_tts.dir/rule
 xf_tts/fast:
 	cd /home/lzh/test/build && $(MAKE) -f voice/CMakeFiles/xf_tts.dir/build.make voice/CMakeFiles/xf_tts.dir/build
 .PHONY : xf_tts/fast
-
-src/asr_offline_record.o: src/asr_offline_record.cpp.o
-
-.PHONY : src/asr_offline_record.o
-
-# target to build an object file
-src/asr_offline_record.cpp.o:
-	cd /home/lzh/test/build && $(MAKE) -f voice/CMakeFiles/asr_offline_record.dir/build.make voice/CMakeFiles/asr_offline_record.dir/src/asr_offline_record.cpp.o
-.PHONY : src/asr_offline_record.cpp.o
-
-src/asr_offline_record.i: src/asr_offline_record.cpp.i
-
-.PHONY : src/asr_offline_record.i
-
-# target to preprocess a source file
-src/asr_offline_record.cpp.i:
-	cd /home/lzh/test/build && $(MAKE) -f voice/CMakeFiles/asr_offline_record.dir/build.make voice/CMakeFiles/asr_offline_record.dir/src/asr_offline_record.cpp.i
-.PHONY : src/asr_offline_record.cpp.i
-
-src/asr_offline_record.s: src/asr_offline_record.cpp.s
-
-.PHONY : src/asr_offline_record.s
-
-# target to generate assembly for a file
-src/asr_offline_record.cpp.s:
-	cd /home/lzh/test/build && $(MAKE) -f voice/CMakeFiles/asr_offline_record.dir/build.make voice/CMakeFiles/asr_offline_record.dir/src/asr_offline_record.cpp.s
-.PHONY : src/asr_offline_record.cpp.s
-
-src/linuxrec.o: src/linuxrec.c.o
-
-.PHONY : src/linuxrec.o
-
-# target to build an object file
-src/linuxrec.c.o:
-	cd /home/lzh/test/build && $(MAKE) -f voice/CMakeFiles/asr_offline_record.dir/build.make voice/CMakeFiles/asr_offline_record.dir/src/linuxrec.c.o
-.PHONY : src/linuxrec.c.o
-
-src/linuxrec.i: src/linuxrec.c.i
-
-.PHONY : src/linuxrec.i
-
-# target to preprocess a source file
-src/linuxrec.c.i:
-	cd /home/lzh/test/build && $(MAKE) -f voice/CMakeFiles/asr_offline_record.dir/build.make voice/CMakeFiles/asr_offline_record.dir/src/linuxrec.c.i
-.PHONY : src/linuxrec.c.i
-
-src/linuxrec.s: src/linuxrec.c.s
-
-.PHONY : src/linuxrec.s
-
-# target to generate assembly for a file
-src/linuxrec.c.s:
-	cd /home/lzh/test/build && $(MAKE) -f voice/CMakeFiles/asr_offline_record.dir/build.make voice/CMakeFiles/asr_offline_record.dir/src/linuxrec.c.s
-.PHONY : src/linuxrec.c.s
-
-src/speech_recognizer.o: src/speech_recognizer.c.o
-
-.PHONY : src/speech_recognizer.o
-
-# target to build an object file
-src/speech_recognizer.c.o:
-	cd /home/lzh/test/build && $(MAKE) -f voice/CMakeFiles/asr_offline_record.dir/build.make voice/CMakeFiles/asr_offline_record.dir/src/speech_recognizer.c.o
-.PHONY : src/speech_recognizer.c.o
-
-src/speech_recognizer.i: src/speech_recognizer.c.i
-
-.PHONY : src/speech_recognizer.i
-
-# target to preprocess a source file
-src/speech_recognizer.c.i:
-	cd /home/lzh/test/build && $(MAKE) -f voice/CMakeFiles/asr_offline_record.dir/build.make voice/CMakeFiles/asr_offline_record.dir/src/speech_recognizer.c.i
-.PHONY : src/speech_recognizer.c.i
-
-src/speech_recognizer.s: src/speech_recognizer.c.s
-
-.PHONY : src/speech_recognizer.s
-
-# target to generate assembly for a file
-src/speech_recognizer.c.s:
-	cd /home/lzh/test/build && $(MAKE) -f voice/CMakeFiles/asr_offline_record.dir/build.make voice/CMakeFiles/asr_offline_record.dir/src/speech_recognizer.c.s
-.PHONY : src/speech_recognizer.c.s
-
-src/textprocess.o: src/textprocess.cpp.o
-
-.PHONY : src/textprocess.o
-
-# target to build an object file
-src/textprocess.cpp.o:
-	cd /home/lzh/test/build && $(MAKE) -f voice/CMakeFiles/textprocess.dir/build.make voice/CMakeFiles/textprocess.dir/src/textprocess.cpp.o
-.PHONY : src/textprocess.cpp.o
-
-src/textprocess.i: src/textprocess.cpp.i
-
-.PHONY : src/textprocess.i
-
-# target to preprocess a source file
-src/textprocess.cpp.i:
-	cd /home/lzh/test/build && $(MAKE) -f voice/CMakeFiles/textprocess.dir/build.make voice/CMakeFiles/textprocess.dir/src/textprocess.cpp.i
-.PHONY : src/textprocess.cpp.i
-
-src/textprocess.s: src/textprocess.cpp.s
-
-.PHONY : src/textprocess.s
-
-# target to generate assembly for a file
-src/textprocess.cpp.s:
-	cd /home/lzh/test/build && $(MAKE) -f voice/CMakeFiles/textprocess.dir/build.make voice/CMakeFiles/textprocess.dir/src/textprocess.cpp.s
-.PHONY : src/textprocess.cpp.s
 
 src/xf_tts.o: src/xf_tts.cpp.o
 
@@ -362,33 +209,6 @@ src/xf_tts.cpp.s:
 	cd /home/lzh/test/build && $(MAKE) -f voice/CMakeFiles/xf_tts.dir/build.make voice/CMakeFiles/xf_tts.dir/src/xf_tts.cpp.s
 .PHONY : src/xf_tts.cpp.s
 
-src/xfsaywords_process.o: src/xfsaywords_process.cpp.o
-
-.PHONY : src/xfsaywords_process.o
-
-# target to build an object file
-src/xfsaywords_process.cpp.o:
-	cd /home/lzh/test/build && $(MAKE) -f voice/CMakeFiles/xfsaywords_process.dir/build.make voice/CMakeFiles/xfsaywords_process.dir/src/xfsaywords_process.cpp.o
-.PHONY : src/xfsaywords_process.cpp.o
-
-src/xfsaywords_process.i: src/xfsaywords_process.cpp.i
-
-.PHONY : src/xfsaywords_process.i
-
-# target to preprocess a source file
-src/xfsaywords_process.cpp.i:
-	cd /home/lzh/test/build && $(MAKE) -f voice/CMakeFiles/xfsaywords_process.dir/build.make voice/CMakeFiles/xfsaywords_process.dir/src/xfsaywords_process.cpp.i
-.PHONY : src/xfsaywords_process.cpp.i
-
-src/xfsaywords_process.s: src/xfsaywords_process.cpp.s
-
-.PHONY : src/xfsaywords_process.s
-
-# target to generate assembly for a file
-src/xfsaywords_process.cpp.s:
-	cd /home/lzh/test/build && $(MAKE) -f voice/CMakeFiles/xfsaywords_process.dir/build.make voice/CMakeFiles/xfsaywords_process.dir/src/xfsaywords_process.cpp.s
-.PHONY : src/xfsaywords_process.cpp.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -397,33 +217,15 @@ help:
 	@echo "... depend"
 	@echo "... install/strip"
 	@echo "... install/local"
-	@echo "... edit_cache"
-	@echo "... test"
-	@echo "... asr_offline_record"
 	@echo "... install"
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
-	@echo "... textprocess"
-	@echo "... xfsaywords_process"
+	@echo "... edit_cache"
+	@echo "... test"
 	@echo "... xf_tts"
-	@echo "... src/asr_offline_record.o"
-	@echo "... src/asr_offline_record.i"
-	@echo "... src/asr_offline_record.s"
-	@echo "... src/linuxrec.o"
-	@echo "... src/linuxrec.i"
-	@echo "... src/linuxrec.s"
-	@echo "... src/speech_recognizer.o"
-	@echo "... src/speech_recognizer.i"
-	@echo "... src/speech_recognizer.s"
-	@echo "... src/textprocess.o"
-	@echo "... src/textprocess.i"
-	@echo "... src/textprocess.s"
 	@echo "... src/xf_tts.o"
 	@echo "... src/xf_tts.i"
 	@echo "... src/xf_tts.s"
-	@echo "... src/xfsaywords_process.o"
-	@echo "... src/xfsaywords_process.i"
-	@echo "... src/xfsaywords_process.s"
 .PHONY : help
 
 

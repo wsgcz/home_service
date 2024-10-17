@@ -64,9 +64,9 @@ waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_nodejs: /ho
 
 /home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/msg/Waypoint.js: /opt/ros/noetic/lib/gennodejs/gen_nodejs.py
 /home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/msg/Waypoint.js: /home/lzh/test/src/waterplus_map_tools/msg/Waypoint.msg
+/home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/msg/Waypoint.js: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
 /home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/msg/Waypoint.js: /opt/ros/noetic/share/geometry_msgs/msg/Pose.msg
 /home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/msg/Waypoint.js: /opt/ros/noetic/share/geometry_msgs/msg/Point.msg
-/home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/msg/Waypoint.js: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/lzh/test/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating Javascript code from waterplus_map_tools/Waypoint.msg"
 	cd /home/lzh/test/build/waterplus_map_tools && ../catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/gennodejs/cmake/../../../lib/gennodejs/gen_nodejs.py /home/lzh/test/src/waterplus_map_tools/msg/Waypoint.msg -Iwaterplus_map_tools:/home/lzh/test/src/waterplus_map_tools/msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -p waterplus_map_tools -o /home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/msg
 
@@ -77,9 +77,9 @@ waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_nodejs: /ho
 
 /home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/srv/AddNewWaypoint.js: /opt/ros/noetic/lib/gennodejs/gen_nodejs.py
 /home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/srv/AddNewWaypoint.js: /home/lzh/test/src/waterplus_map_tools/srv/AddNewWaypoint.srv
+/home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/srv/AddNewWaypoint.js: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
 /home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/srv/AddNewWaypoint.js: /opt/ros/noetic/share/geometry_msgs/msg/Pose.msg
 /home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/srv/AddNewWaypoint.js: /opt/ros/noetic/share/geometry_msgs/msg/Point.msg
-/home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/srv/AddNewWaypoint.js: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/lzh/test/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Generating Javascript code from waterplus_map_tools/AddNewWaypoint.srv"
 	cd /home/lzh/test/build/waterplus_map_tools && ../catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/gennodejs/cmake/../../../lib/gennodejs/gen_nodejs.py /home/lzh/test/src/waterplus_map_tools/srv/AddNewWaypoint.srv -Iwaterplus_map_tools:/home/lzh/test/src/waterplus_map_tools/msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -p waterplus_map_tools -o /home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/srv
 
@@ -90,25 +90,25 @@ waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_nodejs: /ho
 
 /home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/srv/GetWaypointByIndex.js: /opt/ros/noetic/lib/gennodejs/gen_nodejs.py
 /home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/srv/GetWaypointByIndex.js: /home/lzh/test/src/waterplus_map_tools/srv/GetWaypointByIndex.srv
+/home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/srv/GetWaypointByIndex.js: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
 /home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/srv/GetWaypointByIndex.js: /opt/ros/noetic/share/geometry_msgs/msg/Pose.msg
 /home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/srv/GetWaypointByIndex.js: /opt/ros/noetic/share/geometry_msgs/msg/Point.msg
-/home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/srv/GetWaypointByIndex.js: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/lzh/test/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Generating Javascript code from waterplus_map_tools/GetWaypointByIndex.srv"
 	cd /home/lzh/test/build/waterplus_map_tools && ../catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/gennodejs/cmake/../../../lib/gennodejs/gen_nodejs.py /home/lzh/test/src/waterplus_map_tools/srv/GetWaypointByIndex.srv -Iwaterplus_map_tools:/home/lzh/test/src/waterplus_map_tools/msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -p waterplus_map_tools -o /home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/srv
 
 /home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/srv/GetWaypointByName.js: /opt/ros/noetic/lib/gennodejs/gen_nodejs.py
 /home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/srv/GetWaypointByName.js: /home/lzh/test/src/waterplus_map_tools/srv/GetWaypointByName.srv
+/home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/srv/GetWaypointByName.js: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
 /home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/srv/GetWaypointByName.js: /opt/ros/noetic/share/geometry_msgs/msg/Pose.msg
 /home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/srv/GetWaypointByName.js: /opt/ros/noetic/share/geometry_msgs/msg/Point.msg
-/home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/srv/GetWaypointByName.js: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/lzh/test/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Generating Javascript code from waterplus_map_tools/GetWaypointByName.srv"
 	cd /home/lzh/test/build/waterplus_map_tools && ../catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/gennodejs/cmake/../../../lib/gennodejs/gen_nodejs.py /home/lzh/test/src/waterplus_map_tools/srv/GetWaypointByName.srv -Iwaterplus_map_tools:/home/lzh/test/src/waterplus_map_tools/msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -p waterplus_map_tools -o /home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/srv
 
 /home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/srv/GetChargerByName.js: /opt/ros/noetic/lib/gennodejs/gen_nodejs.py
 /home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/srv/GetChargerByName.js: /home/lzh/test/src/waterplus_map_tools/srv/GetChargerByName.srv
+/home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/srv/GetChargerByName.js: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
 /home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/srv/GetChargerByName.js: /opt/ros/noetic/share/geometry_msgs/msg/Pose.msg
 /home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/srv/GetChargerByName.js: /opt/ros/noetic/share/geometry_msgs/msg/Point.msg
-/home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/srv/GetChargerByName.js: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/lzh/test/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Generating Javascript code from waterplus_map_tools/GetChargerByName.srv"
 	cd /home/lzh/test/build/waterplus_map_tools && ../catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/gennodejs/cmake/../../../lib/gennodejs/gen_nodejs.py /home/lzh/test/src/waterplus_map_tools/srv/GetChargerByName.srv -Iwaterplus_map_tools:/home/lzh/test/src/waterplus_map_tools/msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -p waterplus_map_tools -o /home/lzh/test/devel/share/gennodejs/ros/waterplus_map_tools/srv
 

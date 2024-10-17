@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Site BuildName="(empty)"
+	BuildStamp="20241011-1704-Experimental"
+	Name="zzy-KLVF-XX"
+	Generator="ctest-3.16.3"
+	CompilerName="/usr/bin/g++"
+	CompilerVersion="9.4.0"
+	OSName="Linux"
+	Hostname="zzy-KLVF-XX"
+	OSRelease="5.15.0-122-generic"
+	OSVersion="#132~20.04.1-Ubuntu SMP Fri Aug 30 15:50:07 UTC 2024"
+	OSPlatform="x86_64"
+	Is64Bits="1"
+	VendorString="GenuineIntel"
+	VendorID="Intel Corporation"
+	FamilyID="6"
+	ModelID="154"
+	ProcessorCacheSize="18432"
+	NumberOfLogicalCPU="16"
+	NumberOfPhysicalCPU="12"
+	TotalVirtualMemory="2047"
+	TotalPhysicalMemory="15712"
+	LogicalProcessorsPerPhysical="1"
+	ProcessorClockFrequency="3796.99"
+	>
+	<Testing>
+		<StartDateTime>Oct 12 00:44 CST</StartDateTime>
+		<StartTestTime>1728665071</StartTestTime>
+		<TestList/>
+		<EndDateTime>Oct 12 00:44 CST</EndDateTime>
+		<EndTestTime>1728665071</EndTestTime>
+		<ElapsedMinutes>0</ElapsedMinutes>
+	</Testing>
+</Site>

@@ -1,8 +1,0 @@
-prefix=/home/wmy/grab/devel
-
-Name: wpb_home_apps
-Description: Description of wpb_home_apps
-Version: 0.0.0
-Cflags: -I/home/wmy/grab/src/wpb_home_apps/include
-Libs: -L${prefix}/lib 
-Requires: message_runtime

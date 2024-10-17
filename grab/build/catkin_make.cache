@@ -1,2 +1,0 @@
-grab_general:grabth:waterplus_map_tools:wpb_home/wpb_home_behaviors:wpb_home/wpb_home_bringup:wpb_home/wpb_home_python:wpb_home/wpb_home_python3:wpb_home/wpb_home_remote:wpb_home/wpb_home_tutorials:wpb_home/wpbh_local_planner:wpb_home_apps:xfyun_waterplus
--DCATKIN_DEVEL_PREFIX=/home/wmy/grab/devel -DCMAKE_INSTALL_PREFIX=/home/wmy/grab/install -G Unix Makefiles

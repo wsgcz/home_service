@@ -32,7 +32,7 @@ extern BOOL g_is_order_publiced;
 
 
 #define concat(first, second) first second
-#define PACKAGE_PATH         "/home/gcz/test/src/voice/bin/"
+#define PACKAGE_PATH         "/home/lzh/test/src/voice/bin/"
 
 #define ASR_RES_PATH_HEAD    concat("fo|", PACKAGE_PATH)
 #define ASR_RES_PATH         concat(ASR_RES_PATH_HEAD, "msc/res/asr/common.jet")//"fo|/home/riki/iflytek_awaken_asr-master/res/asr/common.jet"; //离线语法识别资源路径

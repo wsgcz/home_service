@@ -13,8 +13,6 @@ std_msgs/String.h
 /home/lzh/test/src/voice/src/std_msgs/String.h
 sstream
 -
-map
--
 
 /opt/ros/noetic/include/ros/advertise_options.h
 ros/forwards.h

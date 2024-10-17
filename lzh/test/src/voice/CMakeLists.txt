@@ -146,9 +146,6 @@ endif()
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(xf_tts src/xf_tts.cpp)
-add_executable(xfsaywords_process src/xfsaywords_process.cpp)
-add_executable(textprocess src/textprocess.cpp)
-add_executable(asr_offline_record src/asr_offline_record.cpp src/speech_recognizer.c src/linuxrec.c)
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
@@ -163,17 +160,6 @@ add_executable(asr_offline_record src/asr_offline_record.cpp src/speech_recogniz
 target_link_libraries(xf_tts
   ${catkin_LIBRARIES} 
   libmsc.so -lmsc -lrt -ldl -lpthread -lm
-)
-target_link_libraries(textprocess
-  ${catkin_LIBRARIES} 
-)
-target_link_libraries(xfsaywords_process
-  ${catkin_LIBRARIES} 
-)
-
-target_link_libraries(asr_offline_record
-  ${catkin_LIBRARIES} 
-  libmsc.so -lmsc -lrt -ldl -lpthread -lasound -lm
 )
 #############
 ## Install ##

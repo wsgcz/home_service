@@ -16,6 +16,8 @@ find_robbish：同find，找到垃圾进入collect_robbish，找不到就重来
 
 collect_robbish：开始识别垃圾种类，after find robbish,start getting pos,movebase to robbish pos,speaking "give me robbish",and open the robot arm,waiting 20s(unsure),close robot arm,进入send模式
 
+
+
 send：
 
 
@@ -47,6 +49,8 @@ collect_robbish 发布OK开始识别，垃圾种类结果保存到Robbish_det.re
 
 get_robbish_pos publish OK to start (return MoveBaseGoal,which contains robbish pos)
 
-move_robot_arm publish 1 to open,0 to close,after finish change Params.finish to 1,0 means error(return int)
+move_robot_arm publish '1' to open,'0' to close,after finish change Params.finish to 1,0 means error(return String)
+
+orient_angle chao xiang jiao (return MoveBaseGoal)
 
 other pkg only need to write puber to send msg,for example, to reply "start_recognize",the puber's theme is "start_recognize_reply"
