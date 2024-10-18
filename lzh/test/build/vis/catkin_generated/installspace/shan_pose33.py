@@ -438,9 +438,15 @@ def image_callback(image_rgb,image_depth):
         elif GlobalVar.reaction_flag == 2:
             rospy.loginfo(f"Now the task is 2")
             results = face.recognition(image)
+            ###test!!!
+            #results=["son"]
+            ###test!!!
             for result in results:
-                if result != "Unknown":
+
+                rospy.loginfo(result)
+                if result != "unknown":
                     rospy.loginfo(f"任务2检测到{result}")
+                    facial_det_reply.publish(result)
                     break
             # GlobalVar.reaction_flag == 0
         elif GlobalVar.reaction_flag == 3:
@@ -471,6 +477,7 @@ def start_recognize_callback(msg:String):
 
 def facial_det_callback(msg:String):
     if msg.data == 'OK':
+        rospy.loginfo("start facial_det")
         GlobalVar.reaction_flag=2
 
 def pose_det_callback(msg:String):
@@ -495,7 +502,7 @@ if __name__ == '__main__':
     mediapipe = Mediapipe()
 
     start_recognize_sub = rospy.Subscriber("start_recognize",String,start_recognize_callback)
-    facial_det_sub = rospy.Subscriber("facial_deb",String,facial_det_callback)
+    facial_det_sub = rospy.Subscriber("facial_det",String,facial_det_callback)
     pose_det = rospy.Subscriber("pose_det",String,pose_det_callback)
     start_recognize_robbish = rospy.Subscriber("start_recognize_robbish",String,start_recognize_robbish_callback)
     collect_robbish = rospy.Subscriber("collect_robbish",String,collect_robbish_callback)
@@ -503,9 +510,10 @@ if __name__ == '__main__':
     rgb_sub = message_filters.Subscriber('/kinect2/qhd/image_color', Image)
     depth_sub = message_filters.Subscriber('/kinect2/qhd/image_depth_rect', Image)
 
+    facial_det_reply=rospy.Publisher("facial_det_reply",String,queue_size=10)
     ts = message_filters.TimeSynchronizer([rgb_sub, depth_sub], 10)
     ts.registerCallback(image_callback)
-
+    
     rospy.spin()
 
 

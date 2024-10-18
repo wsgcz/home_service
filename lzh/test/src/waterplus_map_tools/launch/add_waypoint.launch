@@ -1,7 +1,7 @@
 <launch>
 
   <!-- Map server -->
-  <node name="map_server" pkg="map_server" type="map_server" args="$(find wpb_home_tutorials)/maps/map.yaml"/>
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find main_function)/maps/map.yaml"/>
   
   <!-- RViz and TF  -->
   <arg name="rvizconfig" default="$(find waterplus_map_tools)/rviz/editwaypoints.rviz" />
@@ -10,5 +10,5 @@
 
   <!-- Map tools  -->
   <node pkg="waterplus_map_tools" type="wp_edit_node" name="wp_edit_node" output="screen"/>
-  <param name="load" type="string" value="/home/lzh/waypoints.xml"/>
+  <param name="load" type="string" value="/home/lzh/test/src/main_function/waypoints.xml"/>
 </launch>

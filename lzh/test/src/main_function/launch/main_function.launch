@@ -26,10 +26,10 @@ amcl是蒙特卡洛自适应定位算法，用于确定机器人在地图的位�
   <include file="$(find main_function)/launch/vision.launch" />
   <include file="$(find main_function)/launch/voice.launch" />
 error here
-  <!-- <node pkg="waterplus_map_tools" type="wp_manager" name="wp_manager" output="screen">
+  <node pkg="waterplus_map_tools" type="wp_manager" name="wp_manager" output="screen">
 
     <param name="load" type="string" value="$(find main_function)/$(arg map)/waypoints.xml"/>
-  </node> -->
+  </node>
   <node pkg="wpb_home_bringup" type="wpb_home_core" name="wpb_home_core" output="screen">
     <param name="serial_port" type="string" value="/dev/ftdi"/>
     <rosparam file="$(find wpb_home_bringup)/config/wpb_home.yaml" command="load" />
@@ -143,5 +143,6 @@ error here
 
     <param name= "controller_frequency" value="20" type="double"/>
   </node>
+
 
 </launch>
