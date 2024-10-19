@@ -15,10 +15,10 @@
     <param name="serial_port" type="string" value="/dev/ftdi"/> 
     <rosparam file="$(find wpb_home_bringup)/config/wpb_home.yaml" command="load" />
   </node>
-    <node name="general_service_throw" pkg="grabth" type="grab.py" output="screen">
+    <node name="general_service_throw" pkg="grabth" type="throw.py" output="screen">
     </node>
 
-    <node name="move_robot_arm" pkg="grabth" type="grab.py" output="screen">
+    <node name="move_robot_arm" pkg="grabth" type="throw.py" output="screen">
     </node>
   
 </launch>
