@@ -115,7 +115,7 @@ class GlobalVar:
         _,_,GlobalVar.mathince_theta=transformations.euler_from_quaternion([odom_ox,odom_oy,odom_oz,odom_ow])
 
 class FaceRecognition:
-    def __init__(self, gpu_id=0, face_db='/home/shanhe/demo02/src/vis/face_db', threshold=1.24, det_thresh=0.50, det_size=(640, 640)):
+    def __init__(self, gpu_id=0, face_db='/home/zzy/vision/src/vis/src/face_db', threshold=1.24, det_thresh=0.50, det_size=(640, 640)):
         """
         人脸识别工具类
         :param gpu_id: 正数为GPU的ID，负数为使用CPU
@@ -361,7 +361,7 @@ class Mediapipe:
     pose = mp_pose.Pose(static_image_mode=True)
 
     # v2相对于v1顺时针小于0、逆时针大于0
-    def get_angle(self, v1, v2):
+    def get_angle(v1, v2):
         angle = np.dot(v1, v2) / (np.sqrt(np.sum(v1 * v1)) * np.sqrt(np.sum(v2 * v2)))
         angle = np.arccos(angle) / 3.14159265 * 180
 
@@ -370,10 +370,10 @@ class Mediapipe:
             angle = - angle
         return angle
 
-    def get_distance(self, v1, v2):
+    def get_distance(v1, v2):
         return np.sqrt(np.sum((v1 - v2) ** 2))
 
-    def get_pos(self, keypoints):
+    def get_pos(keypoints):
         """
         0 - 鼻子
         1 - 左眼(内)
@@ -538,7 +538,7 @@ class Mediapipe:
             return str_pose
         # return str_pose
 
-    def process_frame(self, img):
+    def process_frame(img):
         start_time = time.time()
         h, w = img.shape[0], img.shape[1]               # 高和宽
         # 调整字体
@@ -569,13 +569,13 @@ class Mediapipe:
             cx, cy = keypoints[i]
             #if i in range(33):
             img = cv2.circle(img, (cx, cy), radius[i], colors[i], -1)
-        str_pose = self.get_pos(keypoints)            #获取姿态
+        str_pose = get_pos(keypoints)            #获取姿态
         # cv2.putText(img, "POSE-{}".format(str_pose), (12, 100), cv2.FONT_HERSHEY_TRIPLEX,
         #             tl / 3, (255, 0, 0), thickness=tf)
         cv2.putText(img, "FPS-{}".format(str(int(fps))), (12, 100), cv2.FONT_HERSHEY_SIMPLEX,tl/3, (255, 255, 0),thickness=tf)
         return img, str_pose
     
-    def main_mediapipe(self):
+    def main_mediapipe():
         img_folder_path = "/home/shanhe/mediapipe_pose_predict/all/all_static"
 
         # 指定图片文件夹路径
@@ -592,7 +592,7 @@ class Mediapipe:
 
             # 开始预测
             img = cv2.imread(image_path)
-            image, pose_str = self.process_frame(img)
+            image, pose_str = process_frame(img)
 
             if pose_str == "NO PERSON":
                 print("未检测到人")
@@ -673,9 +673,9 @@ def image_callback(image_rgb, image_depth):
         GlobalVar.cb_mutex.acquire()
 
         # 使用YOLO进行人体或物体检测（用于检查人脸、姿态、垃圾等）
-        human_detect_result = face.recognition(image)
+        human_detect_result = face.detect(image)
         for person in human_detect_result:
-            store_path = f"/home/shanhe/demo02/src/vis/data_face/{GlobalVar.last_person}.jpg"
+            store_path = f"/home/zzy/vision/src/vis/src/data_face/{GlobalVar.last_person}.jpg"
             cv2.imwrite(store_path, image)  # 保存当前帧图像
             face_feature = face.retrieve(store_path)  # 进行人脸检测
 
@@ -714,7 +714,7 @@ def image_callback(image_rgb, image_depth):
                 else:
                     rospy.loginfo("No pose detected.")
 
-            # 使用YOLOv8进行垃圾检测
+        # 使用YOLOv8进行垃圾检测
             elif GlobalVar.reaction_flag == 4:
                 rospy.loginfo(f"Checking if rubbish is detected (reaction_flag=4)")
                 rubbish_detected, rubbish_classifications = yolo.detect_rubbish(image)
@@ -725,7 +725,7 @@ def image_callback(image_rgb, image_depth):
                     rospy.loginfo("No rubbish detected.")
                 Params.finish = 1
 
-            # 使用YOLOv8进行垃圾分类
+        # 使用YOLOv8进行垃圾分类
             else:
                 rospy.loginfo(f"Executing rubbish classification (reaction_flag=5)")
                 rubbish_detected, rubbish_classifications = yolo.detect_rubbish(image)

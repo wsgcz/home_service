@@ -55,7 +55,7 @@ include waterplus_map_tools/CMakeFiles/pose_navi_server_autogen.dir/progress.mak
 
 waterplus_map_tools/CMakeFiles/pose_navi_server_autogen:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/lzh/test/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Automatic MOC for target pose_navi_server"
-	cd /home/lzh/test/build/waterplus_map_tools && /usr/bin/cmake -E cmake_autogen /home/lzh/test/build/waterplus_map_tools/CMakeFiles/pose_navi_server_autogen.dir/AutogenInfo.json ""
+	cd /home/lzh/test/build/waterplus_map_tools && /usr/bin/cmake -E cmake_autogen /home/lzh/test/build/waterplus_map_tools/CMakeFiles/pose_navi_server_autogen.dir/AutogenInfo.json Release
 
 pose_navi_server_autogen: waterplus_map_tools/CMakeFiles/pose_navi_server_autogen
 pose_navi_server_autogen: waterplus_map_tools/CMakeFiles/pose_navi_server_autogen.dir/build.make

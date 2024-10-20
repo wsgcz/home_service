@@ -408,7 +408,7 @@ void CWPB_Home_driver::ManiCmd(float inManiLift, float inLiftSpeed, float inMani
 		nLiftPos = nLastCmdLiftPos;
 		if(nLiftPos < 11201)
 		{
-			ctrl_code = 0x63;
+			ctrl_code = 0x64;
 		}
 	}
 	else
@@ -416,7 +416,7 @@ void CWPB_Home_driver::ManiCmd(float inManiLift, float inLiftSpeed, float inMani
 		if (tmpLift < nMinHeight)
 		{
 			tmpLift = 0;
-			ctrl_code = 0x63;
+			ctrl_code = 0x64;
 		}
 		if (tmpLift > nMaxHeight)
 		{
