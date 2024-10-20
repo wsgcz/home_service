@@ -247,30 +247,32 @@ class Yolov8:
         
         # 找到识别到的面积最大的4个人，并裁剪图片
         area=[]
-        for i in range(output.shape[0]) :
-            area.append((output[i,5]*output[i,4],i))
-        for i in range(output.shape[0]):
-            for j in range(i+1,output.shape[0],1):
-                if (area[i]<area[j]):
-                    area[i],area[j]=area[j],area[i]
-                    output[i],output[j]=output[j],output[i]
-        length_area=min(len(area),4)
-        idx_list=[]
-        for i in range(length_area):
-            idx_list.append(area[i][1])
-        idx_count=0
-        results = list()
-        for idx in idx_list:
-            # idx=area[idx][1]
-            # plot_skeleton_kpts(nimg, output[idx, 7:].T, 3)
-            idx_count+=1
-            x_center=int(output[idx][2])
-            y_center=int(output[idx][3])
-            half_w=int(output[idx][4]/2)
-            half_h=int(output[idx][5]/2)
-            cv2.rectangle(nimg,(int(output[idx][2]-output[idx][4]/2),int(output[idx][3]-output[idx][5]/2)),(int(output[idx][4]/2+output[idx][2]),int(output[idx][5]/2+output[idx][3])),color=(0,0,0),thickness=2)
-            change_image=nimg[y_center-half_h:y_center+half_h,x_center-half_w:x_center+half_w]      
-            results.append((change_image,half_w*2,half_h*2,x_center,y_center,idx))
+        rec_name = yolov8.start_single_predict(yolo_model,image)
+        if (GlobalVar.reaction_flag == 1 and rec_name == "people") or (GlobalVar.reaction_flag == 4 and rec_name != "people"):
+            for i in range(output.shape[0]) :
+                area.append((output[i,5]*output[i,4],i))
+            for i in range(output.shape[0]):
+                for j in range(i+1,output.shape[0],1):
+                    if (area[i]<area[j]):
+                        area[i],area[j]=area[j],area[i]
+                        output[i],output[j]=output[j],output[i]
+            length_area=1
+            idx_list=[]
+            for i in range(length_area):
+                idx_list.append(area[i][1])
+            idx_count=0
+            results = list()
+            for idx in idx_list:
+                # idx=area[idx][1]
+                # plot_skeleton_kpts(nimg, output[idx, 7:].T, 3)
+                idx_count+=1
+                x_center=int(output[idx][2])
+                y_center=int(output[idx][3])
+                half_w=int(output[idx][4]/2)
+                half_h=int(output[idx][5]/2)
+                cv2.rectangle(nimg,(int(output[idx][2]-output[idx][4]/2),int(output[idx][3]-output[idx][5]/2)),(int(output[idx][4]/2+output[idx][2]),int(output[idx][5]/2+output[idx][3])),color=(0,0,0),thickness=2)
+                change_image=nimg[y_center-half_h:y_center+half_h,x_center-half_w:x_center+half_w]      
+                results.append((change_image,half_w*2,half_h*2,x_center,y_center,idx))
         return results
 
     def start_single_predict(self, yolo_model, img_path):
@@ -603,18 +605,22 @@ class Mediapipe:
             if d < GlobalVar.eps:
                 length -= 1
         average_depth = sum(depths) / length
-        real_person = Mediapipe.real_pose(x_mid, y_mid, average_depth)
+        real_person = mediapipe.real_pose(x_mid, y_mid, average_depth)
         rospy.loginfo(f"this is the relative pos of person: {real_person}")
         if real_person[2] < GlobalVar.eps:
             return
         # 接下来是坐标转换
-        alpha = Mediapipe.get_alpha(results)
+        alpha = mediapipe.get_alpha(results)
         robot_states = GlobalVar.get_map_pose_theta()
         rospy.loginfo(f"this is robot position:{robot_states}")
         rpy = GlobalVar.ori_to_rpy(0.0, 0.0, robot_states[2], robot_states[3])
-        # 人前2m位置
-        z_second = real_person[2] - 2 * cos(alpha)
-        x_second = real_person[0] + 2 * sin(alpha)
+        # 如果是人，就到人前2m，如果是垃圾，就到垃圾前1m
+        if GlobalVar.reaction_flag == 1:
+            dist = 2
+        elif GlobalVar.reaction_flag == 4:
+            dist = 1
+        z_second = real_person[2] - dist * cos(alpha)
+        x_second = real_person[0] + dist * sin(alpha)
         # if alpha == 0.5 * pi or alpha == 1.5 * pi:
         #     z_second -= 0.2
         if alpha >= 0.8 * pi and alpha <= 1.2 * pi:
@@ -640,10 +646,6 @@ class Mediapipe:
     def main1_mediapipe(self, image):
         pose_str = self.process_frame(image)
         return pose_str
-    
-    def main2_mediapipe(self, image, person,store_path, depth):
-        goal = self.detect(image, *person[:5], store)
-        return goal
 
 image,depth = None, None
 yolo_model = "/home/zzy/vision/src/vis/scripts/best.pt"
@@ -653,6 +655,7 @@ def image_callback(image_rgb,image_depth):
     global image, depth, flag
     image = GlobalVar.bridge.imgmsg_to_cv2(
             image_rgb, desired_encoding='passthrough')
+    image = np.rot90(image, -1)
     depth = GlobalVar.bridge.imgmsg_to_cv2(
             image_depth, desired_encoding='passthrough')
     last_detection_time = 0
@@ -687,11 +690,10 @@ def image_callback(image_rgb,image_depth):
         elif GlobalVar.reaction_flag == 1:
             rospy.loginfo(f"Now the task is 1")
             goal = mediapipe.Mediapipe_thread(mediapipe.detect,*human_detect_result[:5],store_path,depth)
-            pub_msg = goal
+            # pub_msg = goal
             # pub_thread = threading.Thread(target=GlobalVar.put_data_into_quene, args=(pub_msg,))
             # pub_thread.start()
             orient_angle_pub.publish(goal)
-            Globalvar.reaction_flag = -1
         elif GlobalVar.reaction_flag == 2:
             rospy.loginfo(f"Now the task is 2")
             results = face.recognition(image)
