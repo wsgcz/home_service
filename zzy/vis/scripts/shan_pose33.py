@@ -23,6 +23,9 @@ from std_msgs.msg import String
 from move_base_msgs.msg import MoveBaseGoal
 from move_base_msgs.msg import MoveBaseAction
 
+from datasets import letterbox
+from general import non_max_suppression_kpt
+from plots import output_to_keypoint, plot_skeleton_kpts,plot_one_box
 class GlobalVar:
     eps = 1e-2
     P_x = 479 
@@ -34,7 +37,7 @@ class GlobalVar:
     machine_theta = 0
     frame = 0
     last_person = 0
-    reaction_flag = 0
+    reaction_flag = -1
     start_work = False
     '''
     reaction_flag:
@@ -45,7 +48,6 @@ class GlobalVar:
     3:姿态识别
     4:识别是否有垃圾
     5:垃圾识别
-    1，2对应start_work == False, 3,4对应start_work == True
     '''
     rospy.init_node("pose3")
     tfBuffer = tf2_ros.Buffer()
@@ -113,7 +115,7 @@ class GlobalVar:
         _,_,GlobalVar.mathince_theta=transformations.euler_from_quaternion([odom_ox,odom_oy,odom_oz,odom_ow])
 
 class FaceRecognition:
-    def __init__(self, gpu_id=0, face_db='/home/shanhe/demo02/src/vis/face_db', threshold=1.24, det_thresh=0.50, det_size=(640, 640)):
+    def __init__(self, gpu_id=0, face_db='/home/lzh/test/src/vis/face_db', threshold=1.24, det_thresh=0.50, det_size=(640, 640)):
         """
         人脸识别工具类
         :param gpu_id: 正数为GPU的ID，负数为使用CPU
@@ -175,6 +177,17 @@ class FaceRecognition:
             results.append(user_name)
         return results
 
+    def retrieve(self, addr):
+        GlobalVar.face_mutex.acquire()
+        face = cv2.imdecode(np.fromfile(addr,dtype=np.uint8),-1)
+        store_name = addr.split('/')[-1].split('.')[0] 
+        result = self.recognition(face)
+        try:
+            result=result[0]
+        except BaseException as e:
+            result="unknown"
+        GlobalVar.face_mutex.release()
+        return result
     # 特征比较
     @staticmethod
     def feature_compare(feature1, feature2, threshold):
@@ -210,8 +223,55 @@ class FaceRecognition:
         return "成功添加人脸"
 
 class Yolov8:
-    def __init__(self):
-        pass
+    def __init__(self,model_path="/home/lzh/test/src/vis/scripts/best.pt"):
+        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        weights = torch.load(model_path)
+        self.model = weights['model']
+        self.model = self.model.half().to(self.device)
+        self.model.eval()
+
+    def detect(self,image):
+        image = letterbox(image, 960, stride=64, auto=True)[0]
+        image = transforms.ToTensor()(image)
+        image = torch.tensor(np.array([image.numpy()]))
+        image = image.to(self.device)
+        image = image.half()
+        with torch.no_grad():
+            output, _ = self.model(image)
+            output = non_max_suppression_kpt(output, 0.25, 0.65, nc=self.model.yaml['nc'], nkpt=self.model.yaml['nkpt'], kpt_label=True)
+            output = output_to_keypoint(output)
+        # 原图像nimg    
+        nimg = image[0].permute(1, 2, 0) * 255
+        nimg = nimg.cpu().numpy().astype(np.uint8)
+        nimg = cv2.cvtColor(nimg, cv2.COLOR_RGB2BGR)
+        
+        # 找到识别到的面积最大的4个人，并裁剪图片
+        area=[]
+        for i in range(output.shape[0]) :
+            area.append((output[i,5]*output[i,4],i))
+        for i in range(output.shape[0]):
+            for j in range(i+1,output.shape[0],1):
+                if (area[i]<area[j]):
+                    area[i],area[j]=area[j],area[i]
+                    output[i],output[j]=output[j],output[i]
+        length_area=min(len(area),4)
+        idx_list=[]
+        for i in range(length_area):
+            idx_list.append(area[i][1])
+        idx_count=0
+        results = list()
+        for idx in idx_list:
+            # idx=area[idx][1]
+            # plot_skeleton_kpts(nimg, output[idx, 7:].T, 3)
+            idx_count+=1
+            x_center=int(output[idx][2])
+            y_center=int(output[idx][3])
+            half_w=int(output[idx][4]/2)
+            half_h=int(output[idx][5]/2)
+            cv2.rectangle(nimg,(int(output[idx][2]-output[idx][4]/2),int(output[idx][3]-output[idx][5]/2)),(int(output[idx][4]/2+output[idx][2]),int(output[idx][5]/2+output[idx][3])),color=(0,0,0),thickness=2)
+            change_image=nimg[y_center-half_h:y_center+half_h,x_center-half_w:x_center+half_w]      
+            results.append((change_image,half_w*2,half_h*2,x_center,y_center,idx))
+        return results
 
     def start_single_predict(self, yolo_model, img_path):
         model = YOLO(yolo_model)
@@ -320,78 +380,78 @@ class Mediapipe:
         # 左
         v1 = keypoints[11] - keypoints[23]
         v2 = np.array([0, -1]); # 竖直向上的向量
-        from_23_11_to_y = Mediapipe.get_angle(v1, v2)
+        from_23_11_to_y = mediapipe.get_angle(v1, v2)
         # 右
         v1 = keypoints[12] - keypoints[24]
         v2 = np.array([0, -1]); # 竖直向上的向量
-        from_24_12_to_y = Mediapipe.get_angle(v1, v2)
+        from_24_12_to_y = mediapipe.get_angle(v1, v2)
 
         # 小腿之间
         v1 = keypoints[27] - keypoints[25]
         v2 = keypoints[28] - keypoints[26]
-        from_25_27_to_26_28 = Mediapipe.get_angle(v1, v2)
+        from_25_27_to_26_28 = mediapipe.get_angle(v1, v2)
 
         # 大腿之间
         v1 = keypoints[25] - keypoints[23]
         v2 = keypoints[26] - keypoints[24]
-        from_23_25_to_24_26 = Mediapipe.get_angle(v1,v2)
+        from_23_25_to_24_26 = mediapipe.get_angle(v1,v2)
 
         # 躯干与大腿
         # 左
         v1 = keypoints[11] - keypoints[23]
         v2 = keypoints[25] - keypoints[23]
-        from_23_to_11_25 = Mediapipe.get_angle(v1, v2)
+        from_23_to_11_25 = mediapipe.get_angle(v1, v2)
         # 右
         v1 = keypoints[12] - keypoints[24]
         v2 = keypoints[26] - keypoints[24]
-        from_24_to_12_26 = Mediapipe.get_angle(v1, v2)    
+        from_24_to_12_26 = mediapipe.get_angle(v1, v2)    
 
         # 大腿和小腿
         # 左
         v1 = keypoints[23] - keypoints[25]
         v2 = keypoints[27] - keypoints[25]
-        from_25_to_23_27 = Mediapipe.get_angle(v1, v2)
+        from_25_to_23_27 = mediapipe.get_angle(v1, v2)
         # 右
         v1 = keypoints[24] - keypoints[26]
         v2 = keypoints[28] - keypoints[26]
-        from_26_to_24_28 = Mediapipe.get_angle(v1, v2)
+        from_26_to_24_28 = mediapipe.get_angle(v1, v2)
 
         # 躯干与小臂
         # 左
         v1 = keypoints[23] - keypoints[11]
         v2 = keypoints[15] - keypoints[13]
-        from_11_23_to_13_15 = Mediapipe.get_angle(v1,v2)
+        from_11_23_to_13_15 = mediapipe.get_angle(v1,v2)
         # 右
         v1 = keypoints[24] - keypoints[12]
         v2 = keypoints[16] - keypoints[14]
-        from_12_24_to_14_16 = Mediapipe.get_angle(v1,v2)
+        from_12_24_to_14_16 = mediapipe.get_angle(v1,v2)
 
         # 手肘
         # 左
         v1 = keypoints[11] - keypoints[13]
         v2 = keypoints[15] - keypoints[13]
-        from_13_to_11_15 = Mediapipe.get_angle(v1, v2)
+        from_13_to_11_15 = mediapipe.get_angle(v1, v2)
         # 右
         v1 = keypoints[12] - keypoints[14]
         v2 = keypoints[16] - keypoints[14]
-        from_14_to_12_16 = Mediapipe.get_angle(v1, v2)
+        from_14_to_12_16 = mediapipe.get_angle(v1, v2)
         
         ### 距离
         
         # 肩膀之间
-        distance_11_12 = Mediapipe.get_distance(keypoints[11],keypoints[12])
+        distance_11_12 = mediapipe.get_distance(keypoints[11],keypoints[12])
 
         # 食指和嘴
         # 左
-        distance_19_9 = Mediapipe.get_distance(keypoints[19],keypoints[9])
+        distance_19_9 = mediapipe.get_distance(keypoints[19],keypoints[9])
         # 右
-        distance_20_10 = Mediapipe.get_distance(keypoints[20],keypoints[10])
+        distance_20_10 = mediapipe.get_distance(keypoints[20],keypoints[10])
 
         # 食指和耳
         # 左
-        distance_19_7 = Mediapipe.get_distance(keypoints[19],keypoints[7])
+        distance_19_7 = mediapipe.get_distance(keypoints[19],keypoints[7])
         # 右
-        distance_20_8 = Mediapipe.get_distance(keypoints[20],keypoints[8])
+        distance_20_8 = mediapipe.get_distance(keypoints[20],keypoints[8])
 
         ### 姿态识别
 
@@ -439,8 +499,6 @@ class Mediapipe:
                 return str_pose
             return str_pose
         
-        return str_pose
-
     def process_frame(self, img):
         # start_time = time.time()
         h, w = img.shape[0], img.shape[1]               # 高和宽
@@ -554,9 +612,9 @@ class Mediapipe:
         robot_states = GlobalVar.get_map_pose_theta()
         rospy.loginfo(f"this is robot position:{robot_states}")
         rpy = GlobalVar.ori_to_rpy(0.0, 0.0, robot_states[2], robot_states[3])
-        # 人前1.5m位置
-        z_second = real_person[2] - 1.5 * cos(alpha)
-        x_second = real_person[0] + 1.5 * sin(alpha)
+        # 人前2m位置
+        z_second = real_person[2] - 2 * cos(alpha)
+        x_second = real_person[0] + 2 * sin(alpha)
         # if alpha == 0.5 * pi or alpha == 1.5 * pi:
         #     z_second -= 0.2
         if alpha >= 0.8 * pi and alpha <= 1.2 * pi:
@@ -583,26 +641,30 @@ class Mediapipe:
         pose_str = self.process_frame(image)
         return pose_str
     
-    def main2_mediapipe(self, image):
-        goal = self.detect(image)
+    def main2_mediapipe(self, image, person,store_path, depth):
+        goal = self.detect(image, *person[:5], store)
         return goal
 
 image,depth = None, None
-yolo_model = "zzy/vis/best.pt"
+yolo_model = "/home/zzy/vision/src/vis/scripts/best.pt"
+#flag=0
 
 def image_callback(image_rgb,image_depth):
-    global image, depth
+    global image, depth, flag
     image = GlobalVar.bridge.imgmsg_to_cv2(
             image_rgb, desired_encoding='passthrough')
     depth = GlobalVar.bridge.imgmsg_to_cv2(
             image_depth, desired_encoding='passthrough')
-    
     last_detection_time = 0
     detection_interval = 0.5  # 每0.5秒执行一次检测
 
     if time.time() - last_detection_time > detection_interval:
         last_detection_time = time.time()
         GlobalVar.cb_mutex.acquire()
+        human_detect_result = yolov8.detect(image)
+        store_path=f"/home/zzy/vision/src/vis/data_face/{GlobalVar.last_person}.jpg"
+        cv2.imwrite(store_path,image)
+        face_feature = face.retrieve(store_path)
         if GlobalVar.reaction_flag == 0:
             rospy.loginfo(f"Now the task is 0")
             results = face.recognition(image)
@@ -611,79 +673,114 @@ def image_callback(image_rgb,image_depth):
                 if result != "unknown":
                     num += 1
                     break
-            if num > 0:
-                rospy.loginfo("任务1检测到有人")
-                start_recognize_pub.publish(f"finish+1")
-            GlobalVar.reaction_flag == -1
+            if num > 0 and flag==1:
+                rospy.loginfo("find people")
+                start_recognize_pub.publish("1")
+                flag=0
+            elif num==0 and flag ==1:
+                rospy.loginfo("no people")
+                start_recognize_pub.publish("0")
+                flag=0
+            GlobalVar.reaction_flag = -1
+            rospy.loginfo(f'GlobalVar.reaction_flag:{GlobalVar.reaction_flag}')
+
         elif GlobalVar.reaction_flag == 1:
             rospy.loginfo(f"Now the task is 1")
-            goal = mediapipe.main2_mediapipe(image,depth)
+            goal = mediapipe.Mediapipe_thread(mediapipe.detect,*human_detect_result[:5],store_path,depth)
+            pub_msg = goal
+            # pub_thread = threading.Thread(target=GlobalVar.put_data_into_quene, args=(pub_msg,))
+            # pub_thread.start()
             orient_angle_pub.publish(goal)
-            GlobalVar.reaction_flag == -1
         elif GlobalVar.reaction_flag == 2:
             rospy.loginfo(f"Now the task is 2")
             results = face.recognition(image)
+            rospy.loginfo(f"results={results}")
+            temp = "unknown"
             for result in results:
                 if result != "unknown":
-                    rospy.loginfo(f"任务2检测到{result}")
+                    temp = result
                     break
-                facial_det_pub.publish(f"{result}")
-            GlobalVar.reaction_flag == -1
+            if flag == 1:
+                rospy.loginfo(f"this people is {temp}")
+                facial_det_pub.publish(temp)
+                flag=0
+            GlobalVar.reaction_flag = -1
+
         elif GlobalVar.reaction_flag == 3:
             rospy.loginfo(f"Now the task is 3")
             pose_str = mediapipe.main1_mediapipe(image)
             rospy.loginfo(f"任务3检测到{pose_str}")
-            pose_det_pub.publish(f"{result}")
-            GlobalVar.reaction_flag == -1
+            rospy.loginfo(f"flag:{flag}")
+            if flag==1:
+                pose_det_pub.publish(pose_str)
+                flag=0
+            GlobalVar.reaction_flag = -1
+
         elif GlobalVar.reaction_flag == 4:
             rospy.loginfo(f"Now the task is 4")
             confidence, result = yolov8.start_single_predict(yolo_model, image)
             if confidence > 0.5:
                 rospy.loginfo("任务4检测到有垃圾")
-            start_recognize_robbish_pub.publish(f"finish+{round(confidence)}")
-            GlobalVar.reaction_flag == -1
+                start_recognize_robbish_pub.publish("1")
+            else:
+                rospy.loginfo("任务4检测到no垃圾")
+                start_recognize_robbish_pub.publish("0")
+            GlobalVar.reaction_flag = -1
         elif GlobalVar.reaction_flag == 5:
             rospy.loginfo(f"Now the task is 5")
             confidence, result = yolov8.start_single_predict(yolo_model, image)
             rospy.loginfo(f"任务5检测到{result}")
-            collect_robbish_pub.publish(f"{result}")
-            GlobalVar.reaction_flag == -1
+            collect_robbish_pub.publish(result)
+            GlobalVar.reaction_flag = -1
+        GlobalVar.frame+=1
         GlobalVar.cb_mutex.release()
+        GlobalVar.reaction_flag = -1
 
 def start_recognize_callback(msg:String):
+    global flag
     if msg.data == 'OK':
         GlobalVar.reaction_flag=0
+        flag = 1
+        rospy.loginfo(f"start_recognize_callback flag:{flag}")
 
 def orient_angle_callback(msg:String):
     if msg.data == 'OK':
         GlobalVar.reaction_flag=1
 
 def facial_det_callback(msg:String):
+    global flag
     if msg.data == 'OK':
         GlobalVar.reaction_flag=2
+        flag=1
+        rospy.loginfo(f"facial_det_callback flag:{flag}")
 
 def pose_det_callback(msg:String):
+    global flag
     if msg.data == 'OK':
         GlobalVar.reaction_flag=3
+        flag=1
+        rospy.loginfo(f"pose_det_callback flag:{flag}")
 
 def start_recognize_robbish_callback(msg:String):
+    global flag
     if msg.data == 'OK':
         GlobalVar.reaction_flag=4
+        rospy.loginfo(f"start_recognize_robbish_callback flag:{flag}")
 
 def collect_robbish_callback(msg:String):
     if msg.data == 'OK':
         GlobalVar.reaction_flag=5
-        
-
+        rospy.loginfo(f"collect_robbish_callback flag:{flag}")
+flag=0
 if __name__ == '__main__':
-
+    # flag=0
     face = FaceRecognition()
     yolov8 = Yolov8()
     mediapipe = Mediapipe()
 
     orient_angle_sub = rospy.Subscriber("orient_angle",String,orient_angle_callback)
     start_recognize_sub = rospy.Subscriber("start_recognize",String,start_recognize_callback)
-    facial_det_sub = rospy.Subscriber("facial_deb",String,facial_det_callback)
+    facial_det_sub = rospy.Subscriber("facial_det",String,facial_det_callback)
     pose_det = rospy.Subscriber("pose_det",String,pose_det_callback)
     start_recognize_robbish = rospy.Subscriber("start_recognize_robbish",String,start_recognize_robbish_callback)
     collect_robbish = rospy.Subscriber("collect_robbish",String,collect_robbish_callback)
