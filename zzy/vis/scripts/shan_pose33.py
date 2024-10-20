@@ -691,6 +691,7 @@ def image_callback(image_rgb,image_depth):
             # pub_thread = threading.Thread(target=GlobalVar.put_data_into_quene, args=(pub_msg,))
             # pub_thread.start()
             orient_angle_pub.publish(goal)
+            Globalvar.reaction_flag = -1
         elif GlobalVar.reaction_flag == 2:
             rospy.loginfo(f"Now the task is 2")
             results = face.recognition(image)
