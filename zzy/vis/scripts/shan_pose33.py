@@ -588,7 +588,7 @@ class Mediapipe:
         return goal
 
 image,depth = None, None
-yolo_model = ""
+yolo_model = "zzy/vis/best.pt"
 
 def image_callback(image_rgb,image_depth):
     global image, depth
@@ -602,7 +602,7 @@ def image_callback(image_rgb,image_depth):
 
     if time.time() - last_detection_time > detection_interval:
         last_detection_time = time.time()
-        # GlobalVar.cb_mutex.acquire()
+        GlobalVar.cb_mutex.acquire()
         if GlobalVar.reaction_flag == 0:
             rospy.loginfo(f"Now the task is 0")
             results = face.recognition(image)
@@ -613,13 +613,12 @@ def image_callback(image_rgb,image_depth):
                     break
             if num > 0:
                 rospy.loginfo("任务1检测到有人")
-            start_recognize_pub.publish(f"finish+{num}")
+                start_recognize_pub.publish(f"finish+1")
             GlobalVar.reaction_flag == -1
-
         elif GlobalVar.reaction_flag == 1:
             rospy.loginfo(f"Now the task is 1")
             goal = mediapipe.main2_mediapipe(image,depth)
-            orient_angle_pub.publish(f"{goal}")
+            orient_angle_pub.publish(goal)
             GlobalVar.reaction_flag == -1
         elif GlobalVar.reaction_flag == 2:
             rospy.loginfo(f"Now the task is 2")
@@ -682,19 +681,19 @@ if __name__ == '__main__':
     yolov8 = Yolov8()
     mediapipe = Mediapipe()
 
-    orient_angle_sub = rospy.Subscriber("/orient_angle",String,orient_angle_callback)
+    orient_angle_sub = rospy.Subscriber("orient_angle",String,orient_angle_callback)
     start_recognize_sub = rospy.Subscriber("start_recognize",String,start_recognize_callback)
     facial_det_sub = rospy.Subscriber("facial_deb",String,facial_det_callback)
     pose_det = rospy.Subscriber("pose_det",String,pose_det_callback)
     start_recognize_robbish = rospy.Subscriber("start_recognize_robbish",String,start_recognize_robbish_callback)
     collect_robbish = rospy.Subscriber("collect_robbish",String,collect_robbish_callback)
 
-    orient_angle_pub = rospy.Publisher("/orient_angle_reply",MoveBaseGoal,queue_size=10)
-    start_recognize_pub = rospy.Publisher("/start_recognize_reply", String, queue_size=10)
-    facial_det_pub = rospy.Publisher("/facial_det_reply", String, queue_size=10)
-    pose_det_pub = rospy.Publisher("/pose_det_reply", String, queue_size=10)
-    start_recognize_robbish_pub = rospy.Publisher("/start_recognize_robbish_reply", String, queue_size=10)
-    collect_robbish_pub = rospy.Publisher("/collect_robbish_reply", String, queue_size=10)
+    orient_angle_pub = rospy.Publisher("orient_angle_reply",MoveBaseGoal,queue_size=10)
+    start_recognize_pub = rospy.Publisher("start_recognize_reply", String, queue_size=10)
+    facial_det_pub = rospy.Publisher("facial_det_reply", String, queue_size=10)
+    pose_det_pub = rospy.Publisher("pose_det_reply", String, queue_size=10)
+    start_recognize_robbish_pub = rospy.Publisher("start_recognize_robbish_reply", String, queue_size=10)
+    collect_robbish_pub = rospy.Publisher("collect_robbish_reply", String, queue_size=10)
 
     ac = actionlib.SimpleActionClient('move_base', MoveBaseAction)
     ac.wait_for_server()
