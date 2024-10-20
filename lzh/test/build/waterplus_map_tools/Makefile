@@ -56,38 +56,17 @@ CMAKE_BINARY_DIR = /home/lzh/test/build
 #=============================================================================
 # Targets provided globally by CMake.
 
-# Special rule for the target rebuild_cache
-rebuild_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/usr/bin/cmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
-.PHONY : rebuild_cache
+# Special rule for the target install/strip
+install/strip: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
+	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip
 
-# Special rule for the target rebuild_cache
-rebuild_cache/fast: rebuild_cache
-
-.PHONY : rebuild_cache/fast
-
-# Special rule for the target edit_cache
-edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
-	/usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
-.PHONY : edit_cache
-
-# Special rule for the target edit_cache
-edit_cache/fast: edit_cache
-
-.PHONY : edit_cache/fast
-
-# Special rule for the target test
-test:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running tests..."
-	/usr/bin/ctest --force-new-ctest-process $(ARGS)
-.PHONY : test
-
-# Special rule for the target test
-test/fast: test
-
-.PHONY : test/fast
+# Special rule for the target install/strip
+install/strip/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
+	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip/fast
 
 # Special rule for the target install/local
 install/local: preinstall
@@ -101,6 +80,28 @@ install/local/fast: preinstall/fast
 	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
 .PHONY : install/local/fast
 
+# Special rule for the target edit_cache
+edit_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
+	/usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+.PHONY : edit_cache
+
+# Special rule for the target edit_cache
+edit_cache/fast: edit_cache
+
+.PHONY : edit_cache/fast
+
+# Special rule for the target rebuild_cache
+rebuild_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
+	/usr/bin/cmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : rebuild_cache
+
+# Special rule for the target rebuild_cache
+rebuild_cache/fast: rebuild_cache
+
+.PHONY : rebuild_cache/fast
+
 # Special rule for the target install
 install: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
@@ -112,18 +113,6 @@ install/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
 	/usr/bin/cmake -P cmake_install.cmake
 .PHONY : install/fast
-
-# Special rule for the target install/strip
-install/strip: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
-	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
-.PHONY : install/strip
-
-# Special rule for the target install/strip
-install/strip/fast: preinstall/fast
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
-	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
-.PHONY : install/strip/fast
 
 # Special rule for the target list_install_components
 list_install_components:
@@ -168,844 +157,19 @@ depend:
 .PHONY : depend
 
 # Convenience name for target.
-waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_lisp.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_lisp.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_lisp.dir/rule
+waterplus_map_tools/CMakeFiles/wp_navi_server.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/wp_navi_server.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/wp_navi_server.dir/rule
 
 # Convenience name for target.
-move_base_msgs_generate_messages_lisp: waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_lisp.dir/rule
+wp_navi_server: waterplus_map_tools/CMakeFiles/wp_navi_server.dir/rule
 
-.PHONY : move_base_msgs_generate_messages_lisp
-
-# fast build rule for target.
-move_base_msgs_generate_messages_lisp/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_lisp.dir/build.make waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_lisp.dir/build
-.PHONY : move_base_msgs_generate_messages_lisp/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_eus.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_eus.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_eus.dir/rule
-
-# Convenience name for target.
-move_base_msgs_generate_messages_eus: waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_eus.dir/rule
-
-.PHONY : move_base_msgs_generate_messages_eus
+.PHONY : wp_navi_server
 
 # fast build rule for target.
-move_base_msgs_generate_messages_eus/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_eus.dir/build.make waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_eus.dir/build
-.PHONY : move_base_msgs_generate_messages_eus/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/std_srvs_generate_messages_py.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/std_srvs_generate_messages_py.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/std_srvs_generate_messages_py.dir/rule
-
-# Convenience name for target.
-std_srvs_generate_messages_py: waterplus_map_tools/CMakeFiles/std_srvs_generate_messages_py.dir/rule
-
-.PHONY : std_srvs_generate_messages_py
-
-# fast build rule for target.
-std_srvs_generate_messages_py/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/std_srvs_generate_messages_py.dir/build.make waterplus_map_tools/CMakeFiles/std_srvs_generate_messages_py.dir/build
-.PHONY : std_srvs_generate_messages_py/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/std_srvs_generate_messages_nodejs.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/std_srvs_generate_messages_nodejs.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/std_srvs_generate_messages_nodejs.dir/rule
-
-# Convenience name for target.
-std_srvs_generate_messages_nodejs: waterplus_map_tools/CMakeFiles/std_srvs_generate_messages_nodejs.dir/rule
-
-.PHONY : std_srvs_generate_messages_nodejs
-
-# fast build rule for target.
-std_srvs_generate_messages_nodejs/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/std_srvs_generate_messages_nodejs.dir/build.make waterplus_map_tools/CMakeFiles/std_srvs_generate_messages_nodejs.dir/build
-.PHONY : std_srvs_generate_messages_nodejs/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_Waypoint.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_Waypoint.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_Waypoint.dir/rule
-
-# Convenience name for target.
-_waterplus_map_tools_generate_messages_check_deps_Waypoint: waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_Waypoint.dir/rule
-
-.PHONY : _waterplus_map_tools_generate_messages_check_deps_Waypoint
-
-# fast build rule for target.
-_waterplus_map_tools_generate_messages_check_deps_Waypoint/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_Waypoint.dir/build.make waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_Waypoint.dir/build
-.PHONY : _waterplus_map_tools_generate_messages_check_deps_Waypoint/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/std_srvs_generate_messages_lisp.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/std_srvs_generate_messages_lisp.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/std_srvs_generate_messages_lisp.dir/rule
-
-# Convenience name for target.
-std_srvs_generate_messages_lisp: waterplus_map_tools/CMakeFiles/std_srvs_generate_messages_lisp.dir/rule
-
-.PHONY : std_srvs_generate_messages_lisp
-
-# fast build rule for target.
-std_srvs_generate_messages_lisp/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/std_srvs_generate_messages_lisp.dir/build.make waterplus_map_tools/CMakeFiles/std_srvs_generate_messages_lisp.dir/build
-.PHONY : std_srvs_generate_messages_lisp/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/rviz_generate_messages_lisp.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/rviz_generate_messages_lisp.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/rviz_generate_messages_lisp.dir/rule
-
-# Convenience name for target.
-rviz_generate_messages_lisp: waterplus_map_tools/CMakeFiles/rviz_generate_messages_lisp.dir/rule
-
-.PHONY : rviz_generate_messages_lisp
-
-# fast build rule for target.
-rviz_generate_messages_lisp/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/rviz_generate_messages_lisp.dir/build.make waterplus_map_tools/CMakeFiles/rviz_generate_messages_lisp.dir/build
-.PHONY : rviz_generate_messages_lisp/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/std_srvs_generate_messages_cpp.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/std_srvs_generate_messages_cpp.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/std_srvs_generate_messages_cpp.dir/rule
-
-# Convenience name for target.
-std_srvs_generate_messages_cpp: waterplus_map_tools/CMakeFiles/std_srvs_generate_messages_cpp.dir/rule
-
-.PHONY : std_srvs_generate_messages_cpp
-
-# fast build rule for target.
-std_srvs_generate_messages_cpp/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/std_srvs_generate_messages_cpp.dir/build.make waterplus_map_tools/CMakeFiles/std_srvs_generate_messages_cpp.dir/build
-.PHONY : std_srvs_generate_messages_cpp/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/nav_msgs_generate_messages_lisp.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/nav_msgs_generate_messages_lisp.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/nav_msgs_generate_messages_lisp.dir/rule
-
-# Convenience name for target.
-nav_msgs_generate_messages_lisp: waterplus_map_tools/CMakeFiles/nav_msgs_generate_messages_lisp.dir/rule
-
-.PHONY : nav_msgs_generate_messages_lisp
-
-# fast build rule for target.
-nav_msgs_generate_messages_lisp/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/nav_msgs_generate_messages_lisp.dir/build.make waterplus_map_tools/CMakeFiles/nav_msgs_generate_messages_lisp.dir/build
-.PHONY : nav_msgs_generate_messages_lisp/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_cpp.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_cpp.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_cpp.dir/rule
-
-# Convenience name for target.
-move_base_msgs_generate_messages_cpp: waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_cpp.dir/rule
-
-.PHONY : move_base_msgs_generate_messages_cpp
-
-# fast build rule for target.
-move_base_msgs_generate_messages_cpp/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_cpp.dir/build.make waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_cpp.dir/build
-.PHONY : move_base_msgs_generate_messages_cpp/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/wp_edit_node.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/wp_edit_node.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/wp_edit_node.dir/rule
-
-# Convenience name for target.
-wp_edit_node: waterplus_map_tools/CMakeFiles/wp_edit_node.dir/rule
-
-.PHONY : wp_edit_node
-
-# fast build rule for target.
-wp_edit_node/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/wp_edit_node.dir/build.make waterplus_map_tools/CMakeFiles/wp_edit_node.dir/build
-.PHONY : wp_edit_node/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_cpp.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_cpp.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_cpp.dir/rule
-
-# Convenience name for target.
-visualization_msgs_generate_messages_cpp: waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_cpp.dir/rule
-
-.PHONY : visualization_msgs_generate_messages_cpp
-
-# fast build rule for target.
-visualization_msgs_generate_messages_cpp/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_cpp.dir/build.make waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_cpp.dir/build
-.PHONY : visualization_msgs_generate_messages_cpp/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_eus.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_eus.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_eus.dir/rule
-
-# Convenience name for target.
-map_msgs_generate_messages_eus: waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_eus.dir/rule
-
-.PHONY : map_msgs_generate_messages_eus
-
-# fast build rule for target.
-map_msgs_generate_messages_eus/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_eus.dir/build.make waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_eus.dir/build
-.PHONY : map_msgs_generate_messages_eus/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/std_srvs_generate_messages_eus.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/std_srvs_generate_messages_eus.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/std_srvs_generate_messages_eus.dir/rule
-
-# Convenience name for target.
-std_srvs_generate_messages_eus: waterplus_map_tools/CMakeFiles/std_srvs_generate_messages_eus.dir/rule
-
-.PHONY : std_srvs_generate_messages_eus
-
-# fast build rule for target.
-std_srvs_generate_messages_eus/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/std_srvs_generate_messages_eus.dir/build.make waterplus_map_tools/CMakeFiles/std_srvs_generate_messages_eus.dir/build
-.PHONY : std_srvs_generate_messages_eus/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_nodejs.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_nodejs.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_nodejs.dir/rule
-
-# Convenience name for target.
-move_base_msgs_generate_messages_nodejs: waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_nodejs.dir/rule
-
-.PHONY : move_base_msgs_generate_messages_nodejs
-
-# fast build rule for target.
-move_base_msgs_generate_messages_nodejs/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_nodejs.dir/build.make waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_nodejs.dir/build
-.PHONY : move_base_msgs_generate_messages_nodejs/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_lisp.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_lisp.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_lisp.dir/rule
-
-# Convenience name for target.
-visualization_msgs_generate_messages_lisp: waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_lisp.dir/rule
-
-.PHONY : visualization_msgs_generate_messages_lisp
-
-# fast build rule for target.
-visualization_msgs_generate_messages_lisp/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_lisp.dir/build.make waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_lisp.dir/build
-.PHONY : visualization_msgs_generate_messages_lisp/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/rviz_generate_messages_py.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/rviz_generate_messages_py.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/rviz_generate_messages_py.dir/rule
-
-# Convenience name for target.
-rviz_generate_messages_py: waterplus_map_tools/CMakeFiles/rviz_generate_messages_py.dir/rule
-
-.PHONY : rviz_generate_messages_py
-
-# fast build rule for target.
-rviz_generate_messages_py/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/rviz_generate_messages_py.dir/build.make waterplus_map_tools/CMakeFiles/rviz_generate_messages_py.dir/build
-.PHONY : rviz_generate_messages_py/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/nav_msgs_generate_messages_cpp.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/nav_msgs_generate_messages_cpp.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/nav_msgs_generate_messages_cpp.dir/rule
-
-# Convenience name for target.
-nav_msgs_generate_messages_cpp: waterplus_map_tools/CMakeFiles/nav_msgs_generate_messages_cpp.dir/rule
-
-.PHONY : nav_msgs_generate_messages_cpp
-
-# fast build rule for target.
-nav_msgs_generate_messages_cpp/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/nav_msgs_generate_messages_cpp.dir/build.make waterplus_map_tools/CMakeFiles/nav_msgs_generate_messages_cpp.dir/build
-.PHONY : nav_msgs_generate_messages_cpp/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_eus.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_eus.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_eus.dir/rule
-
-# Convenience name for target.
-visualization_msgs_generate_messages_eus: waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_eus.dir/rule
-
-.PHONY : visualization_msgs_generate_messages_eus
-
-# fast build rule for target.
-visualization_msgs_generate_messages_eus/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_eus.dir/build.make waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_eus.dir/build
-.PHONY : visualization_msgs_generate_messages_eus/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/nav_msgs_generate_messages_eus.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/nav_msgs_generate_messages_eus.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/nav_msgs_generate_messages_eus.dir/rule
-
-# Convenience name for target.
-nav_msgs_generate_messages_eus: waterplus_map_tools/CMakeFiles/nav_msgs_generate_messages_eus.dir/rule
-
-.PHONY : nav_msgs_generate_messages_eus
-
-# fast build rule for target.
-nav_msgs_generate_messages_eus/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/nav_msgs_generate_messages_eus.dir/build.make waterplus_map_tools/CMakeFiles/nav_msgs_generate_messages_eus.dir/build
-.PHONY : nav_msgs_generate_messages_eus/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/pose_navi_server.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/pose_navi_server.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/pose_navi_server.dir/rule
-
-# Convenience name for target.
-pose_navi_server: waterplus_map_tools/CMakeFiles/pose_navi_server.dir/rule
-
-.PHONY : pose_navi_server
-
-# fast build rule for target.
-pose_navi_server/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/pose_navi_server.dir/build.make waterplus_map_tools/CMakeFiles/pose_navi_server.dir/build
-.PHONY : pose_navi_server/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_py.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_py.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_py.dir/rule
-
-# Convenience name for target.
-visualization_msgs_generate_messages_py: waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_py.dir/rule
-
-.PHONY : visualization_msgs_generate_messages_py
-
-# fast build rule for target.
-visualization_msgs_generate_messages_py/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_py.dir/build.make waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_py.dir/build
-.PHONY : visualization_msgs_generate_messages_py/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/waterplus_map_tools.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/waterplus_map_tools.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/waterplus_map_tools.dir/rule
-
-# Convenience name for target.
-waterplus_map_tools: waterplus_map_tools/CMakeFiles/waterplus_map_tools.dir/rule
-
-.PHONY : waterplus_map_tools
-
-# fast build rule for target.
-waterplus_map_tools/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/waterplus_map_tools.dir/build.make waterplus_map_tools/CMakeFiles/waterplus_map_tools.dir/build
-.PHONY : waterplus_map_tools/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/waterplus_map_tools_geneus.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/waterplus_map_tools_geneus.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/waterplus_map_tools_geneus.dir/rule
-
-# Convenience name for target.
-waterplus_map_tools_geneus: waterplus_map_tools/CMakeFiles/waterplus_map_tools_geneus.dir/rule
-
-.PHONY : waterplus_map_tools_geneus
-
-# fast build rule for target.
-waterplus_map_tools_geneus/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/waterplus_map_tools_geneus.dir/build.make waterplus_map_tools/CMakeFiles/waterplus_map_tools_geneus.dir/build
-.PHONY : waterplus_map_tools_geneus/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/rviz_generate_messages_cpp.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/rviz_generate_messages_cpp.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/rviz_generate_messages_cpp.dir/rule
-
-# Convenience name for target.
-rviz_generate_messages_cpp: waterplus_map_tools/CMakeFiles/rviz_generate_messages_cpp.dir/rule
-
-.PHONY : rviz_generate_messages_cpp
-
-# fast build rule for target.
-rviz_generate_messages_cpp/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/rviz_generate_messages_cpp.dir/build.make waterplus_map_tools/CMakeFiles/rviz_generate_messages_cpp.dir/build
-.PHONY : rviz_generate_messages_cpp/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_lisp.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_lisp.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_lisp.dir/rule
-
-# Convenience name for target.
-map_msgs_generate_messages_lisp: waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_lisp.dir/rule
-
-.PHONY : map_msgs_generate_messages_lisp
-
-# fast build rule for target.
-map_msgs_generate_messages_lisp/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_lisp.dir/build.make waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_lisp.dir/build
-.PHONY : map_msgs_generate_messages_lisp/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_py.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_py.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_py.dir/rule
-
-# Convenience name for target.
-map_msgs_generate_messages_py: waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_py.dir/rule
-
-.PHONY : map_msgs_generate_messages_py
-
-# fast build rule for target.
-map_msgs_generate_messages_py/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_py.dir/build.make waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_py.dir/build
-.PHONY : map_msgs_generate_messages_py/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages.dir/rule
-
-# Convenience name for target.
-waterplus_map_tools_generate_messages: waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages.dir/rule
-
-.PHONY : waterplus_map_tools_generate_messages
-
-# fast build rule for target.
-waterplus_map_tools_generate_messages/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages.dir/build.make waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages.dir/build
-.PHONY : waterplus_map_tools_generate_messages/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_nodejs.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_nodejs.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_nodejs.dir/rule
-
-# Convenience name for target.
-visualization_msgs_generate_messages_nodejs: waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_nodejs.dir/rule
-
-.PHONY : visualization_msgs_generate_messages_nodejs
-
-# fast build rule for target.
-visualization_msgs_generate_messages_nodejs/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_nodejs.dir/build.make waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_nodejs.dir/build
-.PHONY : visualization_msgs_generate_messages_nodejs/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_nodejs.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_nodejs.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_nodejs.dir/rule
-
-# Convenience name for target.
-waterplus_map_tools_generate_messages_nodejs: waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_nodejs.dir/rule
-
-.PHONY : waterplus_map_tools_generate_messages_nodejs
-
-# fast build rule for target.
-waterplus_map_tools_generate_messages_nodejs/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_nodejs.dir/build.make waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_nodejs.dir/build
-.PHONY : waterplus_map_tools_generate_messages_nodejs/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_py.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_py.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_py.dir/rule
-
-# Convenience name for target.
-move_base_msgs_generate_messages_py: waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_py.dir/rule
-
-.PHONY : move_base_msgs_generate_messages_py
-
-# fast build rule for target.
-move_base_msgs_generate_messages_py/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_py.dir/build.make waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_py.dir/build
-.PHONY : move_base_msgs_generate_messages_py/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_nodejs.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_nodejs.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_nodejs.dir/rule
-
-# Convenience name for target.
-map_msgs_generate_messages_nodejs: waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_nodejs.dir/rule
-
-.PHONY : map_msgs_generate_messages_nodejs
-
-# fast build rule for target.
-map_msgs_generate_messages_nodejs/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_nodejs.dir/build.make waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_nodejs.dir/build
-.PHONY : map_msgs_generate_messages_nodejs/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetWaypointByIndex.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetWaypointByIndex.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetWaypointByIndex.dir/rule
-
-# Convenience name for target.
-_waterplus_map_tools_generate_messages_check_deps_GetWaypointByIndex: waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetWaypointByIndex.dir/rule
-
-.PHONY : _waterplus_map_tools_generate_messages_check_deps_GetWaypointByIndex
-
-# fast build rule for target.
-_waterplus_map_tools_generate_messages_check_deps_GetWaypointByIndex/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetWaypointByIndex.dir/build.make waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetWaypointByIndex.dir/build
-.PHONY : _waterplus_map_tools_generate_messages_check_deps_GetWaypointByIndex/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/waterplus_map_tools_gencpp.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/waterplus_map_tools_gencpp.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/waterplus_map_tools_gencpp.dir/rule
-
-# Convenience name for target.
-waterplus_map_tools_gencpp: waterplus_map_tools/CMakeFiles/waterplus_map_tools_gencpp.dir/rule
-
-.PHONY : waterplus_map_tools_gencpp
-
-# fast build rule for target.
-waterplus_map_tools_gencpp/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/waterplus_map_tools_gencpp.dir/build.make waterplus_map_tools/CMakeFiles/waterplus_map_tools_gencpp.dir/build
-.PHONY : waterplus_map_tools_gencpp/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_SaveWaypoints.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_SaveWaypoints.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_SaveWaypoints.dir/rule
-
-# Convenience name for target.
-_waterplus_map_tools_generate_messages_check_deps_SaveWaypoints: waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_SaveWaypoints.dir/rule
-
-.PHONY : _waterplus_map_tools_generate_messages_check_deps_SaveWaypoints
-
-# fast build rule for target.
-_waterplus_map_tools_generate_messages_check_deps_SaveWaypoints/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_SaveWaypoints.dir/build.make waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_SaveWaypoints.dir/build
-.PHONY : _waterplus_map_tools_generate_messages_check_deps_SaveWaypoints/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/rviz_generate_messages_nodejs.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/rviz_generate_messages_nodejs.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/rviz_generate_messages_nodejs.dir/rule
-
-# Convenience name for target.
-rviz_generate_messages_nodejs: waterplus_map_tools/CMakeFiles/rviz_generate_messages_nodejs.dir/rule
-
-.PHONY : rviz_generate_messages_nodejs
-
-# fast build rule for target.
-rviz_generate_messages_nodejs/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/rviz_generate_messages_nodejs.dir/build.make waterplus_map_tools/CMakeFiles/rviz_generate_messages_nodejs.dir/build
-.PHONY : rviz_generate_messages_nodejs/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/wp_nav_odom_report.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/wp_nav_odom_report.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/wp_nav_odom_report.dir/rule
-
-# Convenience name for target.
-wp_nav_odom_report: waterplus_map_tools/CMakeFiles/wp_nav_odom_report.dir/rule
-
-.PHONY : wp_nav_odom_report
-
-# fast build rule for target.
-wp_nav_odom_report/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/wp_nav_odom_report.dir/build.make waterplus_map_tools/CMakeFiles/wp_nav_odom_report.dir/build
-.PHONY : wp_nav_odom_report/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/nav_msgs_generate_messages_py.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/nav_msgs_generate_messages_py.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/nav_msgs_generate_messages_py.dir/rule
-
-# Convenience name for target.
-nav_msgs_generate_messages_py: waterplus_map_tools/CMakeFiles/nav_msgs_generate_messages_py.dir/rule
-
-.PHONY : nav_msgs_generate_messages_py
-
-# fast build rule for target.
-nav_msgs_generate_messages_py/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/nav_msgs_generate_messages_py.dir/build.make waterplus_map_tools/CMakeFiles/nav_msgs_generate_messages_py.dir/build
-.PHONY : nav_msgs_generate_messages_py/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/rviz_generate_messages_eus.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/rviz_generate_messages_eus.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/rviz_generate_messages_eus.dir/rule
-
-# Convenience name for target.
-rviz_generate_messages_eus: waterplus_map_tools/CMakeFiles/rviz_generate_messages_eus.dir/rule
-
-.PHONY : rviz_generate_messages_eus
-
-# fast build rule for target.
-rviz_generate_messages_eus/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/rviz_generate_messages_eus.dir/build.make waterplus_map_tools/CMakeFiles/rviz_generate_messages_eus.dir/build
-.PHONY : rviz_generate_messages_eus/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetNumOfWaypoints.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetNumOfWaypoints.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetNumOfWaypoints.dir/rule
-
-# Convenience name for target.
-_waterplus_map_tools_generate_messages_check_deps_GetNumOfWaypoints: waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetNumOfWaypoints.dir/rule
-
-.PHONY : _waterplus_map_tools_generate_messages_check_deps_GetNumOfWaypoints
-
-# fast build rule for target.
-_waterplus_map_tools_generate_messages_check_deps_GetNumOfWaypoints/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetNumOfWaypoints.dir/build.make waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetNumOfWaypoints.dir/build
-.PHONY : _waterplus_map_tools_generate_messages_check_deps_GetNumOfWaypoints/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/waterplus_map_tools_genpy.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/waterplus_map_tools_genpy.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/waterplus_map_tools_genpy.dir/rule
-
-# Convenience name for target.
-waterplus_map_tools_genpy: waterplus_map_tools/CMakeFiles/waterplus_map_tools_genpy.dir/rule
-
-.PHONY : waterplus_map_tools_genpy
-
-# fast build rule for target.
-waterplus_map_tools_genpy/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/waterplus_map_tools_genpy.dir/build.make waterplus_map_tools/CMakeFiles/waterplus_map_tools_genpy.dir/build
-.PHONY : waterplus_map_tools_genpy/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetChargerByName.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetChargerByName.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetChargerByName.dir/rule
-
-# Convenience name for target.
-_waterplus_map_tools_generate_messages_check_deps_GetChargerByName: waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetChargerByName.dir/rule
-
-.PHONY : _waterplus_map_tools_generate_messages_check_deps_GetChargerByName
-
-# fast build rule for target.
-_waterplus_map_tools_generate_messages_check_deps_GetChargerByName/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetChargerByName.dir/build.make waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetChargerByName.dir/build
-.PHONY : _waterplus_map_tools_generate_messages_check_deps_GetChargerByName/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_cpp.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_cpp.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_cpp.dir/rule
-
-# Convenience name for target.
-waterplus_map_tools_generate_messages_cpp: waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_cpp.dir/rule
-
-.PHONY : waterplus_map_tools_generate_messages_cpp
-
-# fast build rule for target.
-waterplus_map_tools_generate_messages_cpp/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_cpp.dir/build.make waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_cpp.dir/build
-.PHONY : waterplus_map_tools_generate_messages_cpp/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_AddNewWaypoint.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_AddNewWaypoint.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_AddNewWaypoint.dir/rule
-
-# Convenience name for target.
-_waterplus_map_tools_generate_messages_check_deps_AddNewWaypoint: waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_AddNewWaypoint.dir/rule
-
-.PHONY : _waterplus_map_tools_generate_messages_check_deps_AddNewWaypoint
-
-# fast build rule for target.
-_waterplus_map_tools_generate_messages_check_deps_AddNewWaypoint/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_AddNewWaypoint.dir/build.make waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_AddNewWaypoint.dir/build
-.PHONY : _waterplus_map_tools_generate_messages_check_deps_AddNewWaypoint/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_eus.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_eus.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_eus.dir/rule
-
-# Convenience name for target.
-waterplus_map_tools_generate_messages_eus: waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_eus.dir/rule
-
-.PHONY : waterplus_map_tools_generate_messages_eus
-
-# fast build rule for target.
-waterplus_map_tools_generate_messages_eus/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_eus.dir/build.make waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_eus.dir/build
-.PHONY : waterplus_map_tools_generate_messages_eus/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_lisp.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_lisp.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_lisp.dir/rule
-
-# Convenience name for target.
-waterplus_map_tools_generate_messages_lisp: waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_lisp.dir/rule
-
-.PHONY : waterplus_map_tools_generate_messages_lisp
-
-# fast build rule for target.
-waterplus_map_tools_generate_messages_lisp/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_lisp.dir/build.make waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_lisp.dir/build
-.PHONY : waterplus_map_tools_generate_messages_lisp/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/waterplus_map_tools_genlisp.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/waterplus_map_tools_genlisp.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/waterplus_map_tools_genlisp.dir/rule
-
-# Convenience name for target.
-waterplus_map_tools_genlisp: waterplus_map_tools/CMakeFiles/waterplus_map_tools_genlisp.dir/rule
-
-.PHONY : waterplus_map_tools_genlisp
-
-# fast build rule for target.
-waterplus_map_tools_genlisp/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/waterplus_map_tools_genlisp.dir/build.make waterplus_map_tools/CMakeFiles/waterplus_map_tools_genlisp.dir/build
-.PHONY : waterplus_map_tools_genlisp/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/nav_msgs_generate_messages_nodejs.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/nav_msgs_generate_messages_nodejs.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/nav_msgs_generate_messages_nodejs.dir/rule
-
-# Convenience name for target.
-nav_msgs_generate_messages_nodejs: waterplus_map_tools/CMakeFiles/nav_msgs_generate_messages_nodejs.dir/rule
-
-.PHONY : nav_msgs_generate_messages_nodejs
-
-# fast build rule for target.
-nav_msgs_generate_messages_nodejs/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/nav_msgs_generate_messages_nodejs.dir/build.make waterplus_map_tools/CMakeFiles/nav_msgs_generate_messages_nodejs.dir/build
-.PHONY : nav_msgs_generate_messages_nodejs/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/waterplus_map_tools_gennodejs.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/waterplus_map_tools_gennodejs.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/waterplus_map_tools_gennodejs.dir/rule
-
-# Convenience name for target.
-waterplus_map_tools_gennodejs: waterplus_map_tools/CMakeFiles/waterplus_map_tools_gennodejs.dir/rule
-
-.PHONY : waterplus_map_tools_gennodejs
-
-# fast build rule for target.
-waterplus_map_tools_gennodejs/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/waterplus_map_tools_gennodejs.dir/build.make waterplus_map_tools/CMakeFiles/waterplus_map_tools_gennodejs.dir/build
-.PHONY : waterplus_map_tools_gennodejs/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/wp_manager.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/wp_manager.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/wp_manager.dir/rule
-
-# Convenience name for target.
-wp_manager: waterplus_map_tools/CMakeFiles/wp_manager.dir/rule
-
-.PHONY : wp_manager
-
-# fast build rule for target.
-wp_manager/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/wp_manager.dir/build.make waterplus_map_tools/CMakeFiles/wp_manager.dir/build
-.PHONY : wp_manager/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_py.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_py.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_py.dir/rule
-
-# Convenience name for target.
-waterplus_map_tools_generate_messages_py: waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_py.dir/rule
-
-.PHONY : waterplus_map_tools_generate_messages_py
-
-# fast build rule for target.
-waterplus_map_tools_generate_messages_py/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_py.dir/build.make waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_py.dir/build
-.PHONY : waterplus_map_tools_generate_messages_py/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetWaypointByName.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetWaypointByName.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetWaypointByName.dir/rule
-
-# Convenience name for target.
-_waterplus_map_tools_generate_messages_check_deps_GetWaypointByName: waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetWaypointByName.dir/rule
-
-.PHONY : _waterplus_map_tools_generate_messages_check_deps_GetWaypointByName
-
-# fast build rule for target.
-_waterplus_map_tools_generate_messages_check_deps_GetWaypointByName/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetWaypointByName.dir/build.make waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetWaypointByName.dir/build
-.PHONY : _waterplus_map_tools_generate_messages_check_deps_GetWaypointByName/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/wp_nav_test.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/wp_nav_test.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/wp_nav_test.dir/rule
-
-# Convenience name for target.
-wp_nav_test: waterplus_map_tools/CMakeFiles/wp_nav_test.dir/rule
-
-.PHONY : wp_nav_test
-
-# fast build rule for target.
-wp_nav_test/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/wp_nav_test.dir/build.make waterplus_map_tools/CMakeFiles/wp_nav_test.dir/build
-.PHONY : wp_nav_test/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/wp_saver.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/wp_saver.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/wp_saver.dir/rule
-
-# Convenience name for target.
-wp_saver: waterplus_map_tools/CMakeFiles/wp_saver.dir/rule
-
-.PHONY : wp_saver
-
-# fast build rule for target.
-wp_saver/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/wp_saver.dir/build.make waterplus_map_tools/CMakeFiles/wp_saver.dir/build
-.PHONY : wp_saver/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/wp_nav_remote.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/wp_nav_remote.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/wp_nav_remote.dir/rule
-
-# Convenience name for target.
-wp_nav_remote: waterplus_map_tools/CMakeFiles/wp_nav_remote.dir/rule
-
-.PHONY : wp_nav_remote
-
-# fast build rule for target.
-wp_nav_remote/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/wp_nav_remote.dir/build.make waterplus_map_tools/CMakeFiles/wp_nav_remote.dir/build
-.PHONY : wp_nav_remote/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_cpp.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_cpp.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_cpp.dir/rule
-
-# Convenience name for target.
-map_msgs_generate_messages_cpp: waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_cpp.dir/rule
-
-.PHONY : map_msgs_generate_messages_cpp
-
-# fast build rule for target.
-map_msgs_generate_messages_cpp/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_cpp.dir/build.make waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_cpp.dir/build
-.PHONY : map_msgs_generate_messages_cpp/fast
+wp_navi_server/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/wp_navi_server.dir/build.make waterplus_map_tools/CMakeFiles/wp_navi_server.dir/build
+.PHONY : wp_navi_server/fast
 
 # Convenience name for target.
 waterplus_map_tools/CMakeFiles/charger_get_position.dir/rule:
@@ -1023,34 +187,784 @@ charger_get_position/fast:
 .PHONY : charger_get_position/fast
 
 # Convenience name for target.
-waterplus_map_tools/CMakeFiles/wp_navi_server.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/wp_navi_server.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/wp_navi_server.dir/rule
+waterplus_map_tools/CMakeFiles/wp_nav_remote.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/wp_nav_remote.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/wp_nav_remote.dir/rule
 
 # Convenience name for target.
-wp_navi_server: waterplus_map_tools/CMakeFiles/wp_navi_server.dir/rule
+wp_nav_remote: waterplus_map_tools/CMakeFiles/wp_nav_remote.dir/rule
 
-.PHONY : wp_navi_server
+.PHONY : wp_nav_remote
 
 # fast build rule for target.
-wp_navi_server/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/wp_navi_server.dir/build.make waterplus_map_tools/CMakeFiles/wp_navi_server.dir/build
-.PHONY : wp_navi_server/fast
+wp_nav_remote/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/wp_nav_remote.dir/build.make waterplus_map_tools/CMakeFiles/wp_nav_remote.dir/build
+.PHONY : wp_nav_remote/fast
 
 # Convenience name for target.
-waterplus_map_tools/CMakeFiles/wp_edit_node_autogen.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/wp_edit_node_autogen.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/wp_edit_node_autogen.dir/rule
+waterplus_map_tools/CMakeFiles/wp_saver.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/wp_saver.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/wp_saver.dir/rule
 
 # Convenience name for target.
-wp_edit_node_autogen: waterplus_map_tools/CMakeFiles/wp_edit_node_autogen.dir/rule
+wp_saver: waterplus_map_tools/CMakeFiles/wp_saver.dir/rule
 
-.PHONY : wp_edit_node_autogen
+.PHONY : wp_saver
 
 # fast build rule for target.
-wp_edit_node_autogen/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/wp_edit_node_autogen.dir/build.make waterplus_map_tools/CMakeFiles/wp_edit_node_autogen.dir/build
-.PHONY : wp_edit_node_autogen/fast
+wp_saver/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/wp_saver.dir/build.make waterplus_map_tools/CMakeFiles/wp_saver.dir/build
+.PHONY : wp_saver/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/wp_nav_test.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/wp_nav_test.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/wp_nav_test.dir/rule
+
+# Convenience name for target.
+wp_nav_test: waterplus_map_tools/CMakeFiles/wp_nav_test.dir/rule
+
+.PHONY : wp_nav_test
+
+# fast build rule for target.
+wp_nav_test/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/wp_nav_test.dir/build.make waterplus_map_tools/CMakeFiles/wp_nav_test.dir/build
+.PHONY : wp_nav_test/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/wp_manager.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/wp_manager.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/wp_manager.dir/rule
+
+# Convenience name for target.
+wp_manager: waterplus_map_tools/CMakeFiles/wp_manager.dir/rule
+
+.PHONY : wp_manager
+
+# fast build rule for target.
+wp_manager/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/wp_manager.dir/build.make waterplus_map_tools/CMakeFiles/wp_manager.dir/build
+.PHONY : wp_manager/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/waterplus_map_tools_gennodejs.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/waterplus_map_tools_gennodejs.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/waterplus_map_tools_gennodejs.dir/rule
+
+# Convenience name for target.
+waterplus_map_tools_gennodejs: waterplus_map_tools/CMakeFiles/waterplus_map_tools_gennodejs.dir/rule
+
+.PHONY : waterplus_map_tools_gennodejs
+
+# fast build rule for target.
+waterplus_map_tools_gennodejs/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/waterplus_map_tools_gennodejs.dir/build.make waterplus_map_tools/CMakeFiles/waterplus_map_tools_gennodejs.dir/build
+.PHONY : waterplus_map_tools_gennodejs/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/waterplus_map_tools_genlisp.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/waterplus_map_tools_genlisp.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/waterplus_map_tools_genlisp.dir/rule
+
+# Convenience name for target.
+waterplus_map_tools_genlisp: waterplus_map_tools/CMakeFiles/waterplus_map_tools_genlisp.dir/rule
+
+.PHONY : waterplus_map_tools_genlisp
+
+# fast build rule for target.
+waterplus_map_tools_genlisp/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/waterplus_map_tools_genlisp.dir/build.make waterplus_map_tools/CMakeFiles/waterplus_map_tools_genlisp.dir/build
+.PHONY : waterplus_map_tools_genlisp/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_lisp.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_lisp.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_lisp.dir/rule
+
+# Convenience name for target.
+waterplus_map_tools_generate_messages_lisp: waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_lisp.dir/rule
+
+.PHONY : waterplus_map_tools_generate_messages_lisp
+
+# fast build rule for target.
+waterplus_map_tools_generate_messages_lisp/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_lisp.dir/build.make waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_lisp.dir/build
+.PHONY : waterplus_map_tools_generate_messages_lisp/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_eus.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_eus.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_eus.dir/rule
+
+# Convenience name for target.
+waterplus_map_tools_generate_messages_eus: waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_eus.dir/rule
+
+.PHONY : waterplus_map_tools_generate_messages_eus
+
+# fast build rule for target.
+waterplus_map_tools_generate_messages_eus/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_eus.dir/build.make waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_eus.dir/build
+.PHONY : waterplus_map_tools_generate_messages_eus/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/rviz_generate_messages_cpp.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/rviz_generate_messages_cpp.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/rviz_generate_messages_cpp.dir/rule
+
+# Convenience name for target.
+rviz_generate_messages_cpp: waterplus_map_tools/CMakeFiles/rviz_generate_messages_cpp.dir/rule
+
+.PHONY : rviz_generate_messages_cpp
+
+# fast build rule for target.
+rviz_generate_messages_cpp/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/rviz_generate_messages_cpp.dir/build.make waterplus_map_tools/CMakeFiles/rviz_generate_messages_cpp.dir/build
+.PHONY : rviz_generate_messages_cpp/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/pose_navi_server.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/pose_navi_server.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/pose_navi_server.dir/rule
+
+# Convenience name for target.
+pose_navi_server: waterplus_map_tools/CMakeFiles/pose_navi_server.dir/rule
+
+.PHONY : pose_navi_server
+
+# fast build rule for target.
+pose_navi_server/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/pose_navi_server.dir/build.make waterplus_map_tools/CMakeFiles/pose_navi_server.dir/build
+.PHONY : pose_navi_server/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/rviz_generate_messages_lisp.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/rviz_generate_messages_lisp.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/rviz_generate_messages_lisp.dir/rule
+
+# Convenience name for target.
+rviz_generate_messages_lisp: waterplus_map_tools/CMakeFiles/rviz_generate_messages_lisp.dir/rule
+
+.PHONY : rviz_generate_messages_lisp
+
+# fast build rule for target.
+rviz_generate_messages_lisp/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/rviz_generate_messages_lisp.dir/build.make waterplus_map_tools/CMakeFiles/rviz_generate_messages_lisp.dir/build
+.PHONY : rviz_generate_messages_lisp/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_nodejs.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_nodejs.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_nodejs.dir/rule
+
+# Convenience name for target.
+map_msgs_generate_messages_nodejs: waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_nodejs.dir/rule
+
+.PHONY : map_msgs_generate_messages_nodejs
+
+# fast build rule for target.
+map_msgs_generate_messages_nodejs/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_nodejs.dir/build.make waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_nodejs.dir/build
+.PHONY : map_msgs_generate_messages_nodejs/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/waterplus_map_tools_geneus.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/waterplus_map_tools_geneus.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/waterplus_map_tools_geneus.dir/rule
+
+# Convenience name for target.
+waterplus_map_tools_geneus: waterplus_map_tools/CMakeFiles/waterplus_map_tools_geneus.dir/rule
+
+.PHONY : waterplus_map_tools_geneus
+
+# fast build rule for target.
+waterplus_map_tools_geneus/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/waterplus_map_tools_geneus.dir/build.make waterplus_map_tools/CMakeFiles/waterplus_map_tools_geneus.dir/build
+.PHONY : waterplus_map_tools_geneus/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_cpp.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_cpp.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_cpp.dir/rule
+
+# Convenience name for target.
+map_msgs_generate_messages_cpp: waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_cpp.dir/rule
+
+.PHONY : map_msgs_generate_messages_cpp
+
+# fast build rule for target.
+map_msgs_generate_messages_cpp/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_cpp.dir/build.make waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_cpp.dir/build
+.PHONY : map_msgs_generate_messages_cpp/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/waterplus_map_tools_genpy.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/waterplus_map_tools_genpy.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/waterplus_map_tools_genpy.dir/rule
+
+# Convenience name for target.
+waterplus_map_tools_genpy: waterplus_map_tools/CMakeFiles/waterplus_map_tools_genpy.dir/rule
+
+.PHONY : waterplus_map_tools_genpy
+
+# fast build rule for target.
+waterplus_map_tools_genpy/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/waterplus_map_tools_genpy.dir/build.make waterplus_map_tools/CMakeFiles/waterplus_map_tools_genpy.dir/build
+.PHONY : waterplus_map_tools_genpy/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetNumOfWaypoints.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetNumOfWaypoints.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetNumOfWaypoints.dir/rule
+
+# Convenience name for target.
+_waterplus_map_tools_generate_messages_check_deps_GetNumOfWaypoints: waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetNumOfWaypoints.dir/rule
+
+.PHONY : _waterplus_map_tools_generate_messages_check_deps_GetNumOfWaypoints
+
+# fast build rule for target.
+_waterplus_map_tools_generate_messages_check_deps_GetNumOfWaypoints/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetNumOfWaypoints.dir/build.make waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetNumOfWaypoints.dir/build
+.PHONY : _waterplus_map_tools_generate_messages_check_deps_GetNumOfWaypoints/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/waterplus_map_tools.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/waterplus_map_tools.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/waterplus_map_tools.dir/rule
+
+# Convenience name for target.
+waterplus_map_tools: waterplus_map_tools/CMakeFiles/waterplus_map_tools.dir/rule
+
+.PHONY : waterplus_map_tools
+
+# fast build rule for target.
+waterplus_map_tools/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/waterplus_map_tools.dir/build.make waterplus_map_tools/CMakeFiles/waterplus_map_tools.dir/build
+.PHONY : waterplus_map_tools/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_py.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_py.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_py.dir/rule
+
+# Convenience name for target.
+visualization_msgs_generate_messages_py: waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_py.dir/rule
+
+.PHONY : visualization_msgs_generate_messages_py
+
+# fast build rule for target.
+visualization_msgs_generate_messages_py/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_py.dir/build.make waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_py.dir/build
+.PHONY : visualization_msgs_generate_messages_py/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_py.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_py.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_py.dir/rule
+
+# Convenience name for target.
+waterplus_map_tools_generate_messages_py: waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_py.dir/rule
+
+.PHONY : waterplus_map_tools_generate_messages_py
+
+# fast build rule for target.
+waterplus_map_tools_generate_messages_py/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_py.dir/build.make waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_py.dir/build
+.PHONY : waterplus_map_tools_generate_messages_py/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_nodejs.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_nodejs.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_nodejs.dir/rule
+
+# Convenience name for target.
+visualization_msgs_generate_messages_nodejs: waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_nodejs.dir/rule
+
+.PHONY : visualization_msgs_generate_messages_nodejs
+
+# fast build rule for target.
+visualization_msgs_generate_messages_nodejs/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_nodejs.dir/build.make waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_nodejs.dir/build
+.PHONY : visualization_msgs_generate_messages_nodejs/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_eus.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_eus.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_eus.dir/rule
+
+# Convenience name for target.
+visualization_msgs_generate_messages_eus: waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_eus.dir/rule
+
+.PHONY : visualization_msgs_generate_messages_eus
+
+# fast build rule for target.
+visualization_msgs_generate_messages_eus/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_eus.dir/build.make waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_eus.dir/build
+.PHONY : visualization_msgs_generate_messages_eus/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/rviz_generate_messages_py.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/rviz_generate_messages_py.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/rviz_generate_messages_py.dir/rule
+
+# Convenience name for target.
+rviz_generate_messages_py: waterplus_map_tools/CMakeFiles/rviz_generate_messages_py.dir/rule
+
+.PHONY : rviz_generate_messages_py
+
+# fast build rule for target.
+rviz_generate_messages_py/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/rviz_generate_messages_py.dir/build.make waterplus_map_tools/CMakeFiles/rviz_generate_messages_py.dir/build
+.PHONY : rviz_generate_messages_py/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/rviz_generate_messages_nodejs.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/rviz_generate_messages_nodejs.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/rviz_generate_messages_nodejs.dir/rule
+
+# Convenience name for target.
+rviz_generate_messages_nodejs: waterplus_map_tools/CMakeFiles/rviz_generate_messages_nodejs.dir/rule
+
+.PHONY : rviz_generate_messages_nodejs
+
+# fast build rule for target.
+rviz_generate_messages_nodejs/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/rviz_generate_messages_nodejs.dir/build.make waterplus_map_tools/CMakeFiles/rviz_generate_messages_nodejs.dir/build
+.PHONY : rviz_generate_messages_nodejs/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_lisp.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_lisp.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_lisp.dir/rule
+
+# Convenience name for target.
+visualization_msgs_generate_messages_lisp: waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_lisp.dir/rule
+
+.PHONY : visualization_msgs_generate_messages_lisp
+
+# fast build rule for target.
+visualization_msgs_generate_messages_lisp/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_lisp.dir/build.make waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_lisp.dir/build
+.PHONY : visualization_msgs_generate_messages_lisp/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_eus.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_eus.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_eus.dir/rule
+
+# Convenience name for target.
+map_msgs_generate_messages_eus: waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_eus.dir/rule
+
+.PHONY : map_msgs_generate_messages_eus
+
+# fast build rule for target.
+map_msgs_generate_messages_eus/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_eus.dir/build.make waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_eus.dir/build
+.PHONY : map_msgs_generate_messages_eus/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_cpp.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_cpp.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_cpp.dir/rule
+
+# Convenience name for target.
+visualization_msgs_generate_messages_cpp: waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_cpp.dir/rule
+
+.PHONY : visualization_msgs_generate_messages_cpp
+
+# fast build rule for target.
+visualization_msgs_generate_messages_cpp/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_cpp.dir/build.make waterplus_map_tools/CMakeFiles/visualization_msgs_generate_messages_cpp.dir/build
+.PHONY : visualization_msgs_generate_messages_cpp/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_Waypoint.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_Waypoint.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_Waypoint.dir/rule
+
+# Convenience name for target.
+_waterplus_map_tools_generate_messages_check_deps_Waypoint: waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_Waypoint.dir/rule
+
+.PHONY : _waterplus_map_tools_generate_messages_check_deps_Waypoint
+
+# fast build rule for target.
+_waterplus_map_tools_generate_messages_check_deps_Waypoint/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_Waypoint.dir/build.make waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_Waypoint.dir/build
+.PHONY : _waterplus_map_tools_generate_messages_check_deps_Waypoint/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_SaveWaypoints.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_SaveWaypoints.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_SaveWaypoints.dir/rule
+
+# Convenience name for target.
+_waterplus_map_tools_generate_messages_check_deps_SaveWaypoints: waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_SaveWaypoints.dir/rule
+
+.PHONY : _waterplus_map_tools_generate_messages_check_deps_SaveWaypoints
+
+# fast build rule for target.
+_waterplus_map_tools_generate_messages_check_deps_SaveWaypoints/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_SaveWaypoints.dir/build.make waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_SaveWaypoints.dir/build
+.PHONY : _waterplus_map_tools_generate_messages_check_deps_SaveWaypoints/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/rviz_generate_messages_eus.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/rviz_generate_messages_eus.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/rviz_generate_messages_eus.dir/rule
+
+# Convenience name for target.
+rviz_generate_messages_eus: waterplus_map_tools/CMakeFiles/rviz_generate_messages_eus.dir/rule
+
+.PHONY : rviz_generate_messages_eus
+
+# fast build rule for target.
+rviz_generate_messages_eus/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/rviz_generate_messages_eus.dir/build.make waterplus_map_tools/CMakeFiles/rviz_generate_messages_eus.dir/build
+.PHONY : rviz_generate_messages_eus/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/wp_edit_node.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/wp_edit_node.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/wp_edit_node.dir/rule
+
+# Convenience name for target.
+wp_edit_node: waterplus_map_tools/CMakeFiles/wp_edit_node.dir/rule
+
+.PHONY : wp_edit_node
+
+# fast build rule for target.
+wp_edit_node/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/wp_edit_node.dir/build.make waterplus_map_tools/CMakeFiles/wp_edit_node.dir/build
+.PHONY : wp_edit_node/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_cpp.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_cpp.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_cpp.dir/rule
+
+# Convenience name for target.
+move_base_msgs_generate_messages_cpp: waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_cpp.dir/rule
+
+.PHONY : move_base_msgs_generate_messages_cpp
+
+# fast build rule for target.
+move_base_msgs_generate_messages_cpp/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_cpp.dir/build.make waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_cpp.dir/build
+.PHONY : move_base_msgs_generate_messages_cpp/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_eus.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_eus.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_eus.dir/rule
+
+# Convenience name for target.
+move_base_msgs_generate_messages_eus: waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_eus.dir/rule
+
+.PHONY : move_base_msgs_generate_messages_eus
+
+# fast build rule for target.
+move_base_msgs_generate_messages_eus/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_eus.dir/build.make waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_eus.dir/build
+.PHONY : move_base_msgs_generate_messages_eus/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/waterplus_map_tools_gencpp.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/waterplus_map_tools_gencpp.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/waterplus_map_tools_gencpp.dir/rule
+
+# Convenience name for target.
+waterplus_map_tools_gencpp: waterplus_map_tools/CMakeFiles/waterplus_map_tools_gencpp.dir/rule
+
+.PHONY : waterplus_map_tools_gencpp
+
+# fast build rule for target.
+waterplus_map_tools_gencpp/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/waterplus_map_tools_gencpp.dir/build.make waterplus_map_tools/CMakeFiles/waterplus_map_tools_gencpp.dir/build
+.PHONY : waterplus_map_tools_gencpp/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_py.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_py.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_py.dir/rule
+
+# Convenience name for target.
+move_base_msgs_generate_messages_py: waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_py.dir/rule
+
+.PHONY : move_base_msgs_generate_messages_py
+
+# fast build rule for target.
+move_base_msgs_generate_messages_py/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_py.dir/build.make waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_py.dir/build
+.PHONY : move_base_msgs_generate_messages_py/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetWaypointByIndex.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetWaypointByIndex.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetWaypointByIndex.dir/rule
+
+# Convenience name for target.
+_waterplus_map_tools_generate_messages_check_deps_GetWaypointByIndex: waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetWaypointByIndex.dir/rule
+
+.PHONY : _waterplus_map_tools_generate_messages_check_deps_GetWaypointByIndex
+
+# fast build rule for target.
+_waterplus_map_tools_generate_messages_check_deps_GetWaypointByIndex/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetWaypointByIndex.dir/build.make waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetWaypointByIndex.dir/build
+.PHONY : _waterplus_map_tools_generate_messages_check_deps_GetWaypointByIndex/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_lisp.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_lisp.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_lisp.dir/rule
+
+# Convenience name for target.
+move_base_msgs_generate_messages_lisp: waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_lisp.dir/rule
+
+.PHONY : move_base_msgs_generate_messages_lisp
+
+# fast build rule for target.
+move_base_msgs_generate_messages_lisp/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_lisp.dir/build.make waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_lisp.dir/build
+.PHONY : move_base_msgs_generate_messages_lisp/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_nodejs.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_nodejs.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_nodejs.dir/rule
+
+# Convenience name for target.
+move_base_msgs_generate_messages_nodejs: waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_nodejs.dir/rule
+
+.PHONY : move_base_msgs_generate_messages_nodejs
+
+# fast build rule for target.
+move_base_msgs_generate_messages_nodejs/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_nodejs.dir/build.make waterplus_map_tools/CMakeFiles/move_base_msgs_generate_messages_nodejs.dir/build
+.PHONY : move_base_msgs_generate_messages_nodejs/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_nodejs.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_nodejs.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_nodejs.dir/rule
+
+# Convenience name for target.
+waterplus_map_tools_generate_messages_nodejs: waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_nodejs.dir/rule
+
+.PHONY : waterplus_map_tools_generate_messages_nodejs
+
+# fast build rule for target.
+waterplus_map_tools_generate_messages_nodejs/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_nodejs.dir/build.make waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_nodejs.dir/build
+.PHONY : waterplus_map_tools_generate_messages_nodejs/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_lisp.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_lisp.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_lisp.dir/rule
+
+# Convenience name for target.
+map_msgs_generate_messages_lisp: waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_lisp.dir/rule
+
+.PHONY : map_msgs_generate_messages_lisp
+
+# fast build rule for target.
+map_msgs_generate_messages_lisp/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_lisp.dir/build.make waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_lisp.dir/build
+.PHONY : map_msgs_generate_messages_lisp/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages.dir/rule
+
+# Convenience name for target.
+waterplus_map_tools_generate_messages: waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages.dir/rule
+
+.PHONY : waterplus_map_tools_generate_messages
+
+# fast build rule for target.
+waterplus_map_tools_generate_messages/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages.dir/build.make waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages.dir/build
+.PHONY : waterplus_map_tools_generate_messages/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/wp_nav_odom_report.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/wp_nav_odom_report.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/wp_nav_odom_report.dir/rule
+
+# Convenience name for target.
+wp_nav_odom_report: waterplus_map_tools/CMakeFiles/wp_nav_odom_report.dir/rule
+
+.PHONY : wp_nav_odom_report
+
+# fast build rule for target.
+wp_nav_odom_report/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/wp_nav_odom_report.dir/build.make waterplus_map_tools/CMakeFiles/wp_nav_odom_report.dir/build
+.PHONY : wp_nav_odom_report/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_AddNewWaypoint.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_AddNewWaypoint.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_AddNewWaypoint.dir/rule
+
+# Convenience name for target.
+_waterplus_map_tools_generate_messages_check_deps_AddNewWaypoint: waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_AddNewWaypoint.dir/rule
+
+.PHONY : _waterplus_map_tools_generate_messages_check_deps_AddNewWaypoint
+
+# fast build rule for target.
+_waterplus_map_tools_generate_messages_check_deps_AddNewWaypoint/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_AddNewWaypoint.dir/build.make waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_AddNewWaypoint.dir/build
+.PHONY : _waterplus_map_tools_generate_messages_check_deps_AddNewWaypoint/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetChargerByName.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetChargerByName.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetChargerByName.dir/rule
+
+# Convenience name for target.
+_waterplus_map_tools_generate_messages_check_deps_GetChargerByName: waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetChargerByName.dir/rule
+
+.PHONY : _waterplus_map_tools_generate_messages_check_deps_GetChargerByName
+
+# fast build rule for target.
+_waterplus_map_tools_generate_messages_check_deps_GetChargerByName/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetChargerByName.dir/build.make waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetChargerByName.dir/build
+.PHONY : _waterplus_map_tools_generate_messages_check_deps_GetChargerByName/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_py.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_py.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_py.dir/rule
+
+# Convenience name for target.
+map_msgs_generate_messages_py: waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_py.dir/rule
+
+.PHONY : map_msgs_generate_messages_py
+
+# fast build rule for target.
+map_msgs_generate_messages_py/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_py.dir/build.make waterplus_map_tools/CMakeFiles/map_msgs_generate_messages_py.dir/build
+.PHONY : map_msgs_generate_messages_py/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetWaypointByName.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetWaypointByName.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetWaypointByName.dir/rule
+
+# Convenience name for target.
+_waterplus_map_tools_generate_messages_check_deps_GetWaypointByName: waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetWaypointByName.dir/rule
+
+.PHONY : _waterplus_map_tools_generate_messages_check_deps_GetWaypointByName
+
+# fast build rule for target.
+_waterplus_map_tools_generate_messages_check_deps_GetWaypointByName/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetWaypointByName.dir/build.make waterplus_map_tools/CMakeFiles/_waterplus_map_tools_generate_messages_check_deps_GetWaypointByName.dir/build
+.PHONY : _waterplus_map_tools_generate_messages_check_deps_GetWaypointByName/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_cpp.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_cpp.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_cpp.dir/rule
+
+# Convenience name for target.
+waterplus_map_tools_generate_messages_cpp: waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_cpp.dir/rule
+
+.PHONY : waterplus_map_tools_generate_messages_cpp
+
+# fast build rule for target.
+waterplus_map_tools_generate_messages_cpp/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_cpp.dir/build.make waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_cpp.dir/build
+.PHONY : waterplus_map_tools_generate_messages_cpp/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/wp_navi_server_autogen.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/wp_navi_server_autogen.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/wp_navi_server_autogen.dir/rule
+
+# Convenience name for target.
+wp_navi_server_autogen: waterplus_map_tools/CMakeFiles/wp_navi_server_autogen.dir/rule
+
+.PHONY : wp_navi_server_autogen
+
+# fast build rule for target.
+wp_navi_server_autogen/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/wp_navi_server_autogen.dir/build.make waterplus_map_tools/CMakeFiles/wp_navi_server_autogen.dir/build
+.PHONY : wp_navi_server_autogen/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/charger_get_position_autogen.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/charger_get_position_autogen.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/charger_get_position_autogen.dir/rule
+
+# Convenience name for target.
+charger_get_position_autogen: waterplus_map_tools/CMakeFiles/charger_get_position_autogen.dir/rule
+
+.PHONY : charger_get_position_autogen
+
+# fast build rule for target.
+charger_get_position_autogen/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/charger_get_position_autogen.dir/build.make waterplus_map_tools/CMakeFiles/charger_get_position_autogen.dir/build
+.PHONY : charger_get_position_autogen/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/wp_nav_remote_autogen.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/wp_nav_remote_autogen.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/wp_nav_remote_autogen.dir/rule
+
+# Convenience name for target.
+wp_nav_remote_autogen: waterplus_map_tools/CMakeFiles/wp_nav_remote_autogen.dir/rule
+
+.PHONY : wp_nav_remote_autogen
+
+# fast build rule for target.
+wp_nav_remote_autogen/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/wp_nav_remote_autogen.dir/build.make waterplus_map_tools/CMakeFiles/wp_nav_remote_autogen.dir/build
+.PHONY : wp_nav_remote_autogen/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/wp_saver_autogen.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/wp_saver_autogen.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/wp_saver_autogen.dir/rule
+
+# Convenience name for target.
+wp_saver_autogen: waterplus_map_tools/CMakeFiles/wp_saver_autogen.dir/rule
+
+.PHONY : wp_saver_autogen
+
+# fast build rule for target.
+wp_saver_autogen/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/wp_saver_autogen.dir/build.make waterplus_map_tools/CMakeFiles/wp_saver_autogen.dir/build
+.PHONY : wp_saver_autogen/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/wp_nav_test_autogen.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/wp_nav_test_autogen.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/wp_nav_test_autogen.dir/rule
+
+# Convenience name for target.
+wp_nav_test_autogen: waterplus_map_tools/CMakeFiles/wp_nav_test_autogen.dir/rule
+
+.PHONY : wp_nav_test_autogen
+
+# fast build rule for target.
+wp_nav_test_autogen/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/wp_nav_test_autogen.dir/build.make waterplus_map_tools/CMakeFiles/wp_nav_test_autogen.dir/build
+.PHONY : wp_nav_test_autogen/fast
+
+# Convenience name for target.
+waterplus_map_tools/CMakeFiles/wp_manager_autogen.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/wp_manager_autogen.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/wp_manager_autogen.dir/rule
+
+# Convenience name for target.
+wp_manager_autogen: waterplus_map_tools/CMakeFiles/wp_manager_autogen.dir/rule
+
+.PHONY : wp_manager_autogen
+
+# fast build rule for target.
+wp_manager_autogen/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/wp_manager_autogen.dir/build.make waterplus_map_tools/CMakeFiles/wp_manager_autogen.dir/build
+.PHONY : wp_manager_autogen/fast
 
 # Convenience name for target.
 waterplus_map_tools/CMakeFiles/pose_navi_server_autogen.dir/rule:
@@ -1083,6 +997,21 @@ waterplus_map_tools_autogen/fast:
 .PHONY : waterplus_map_tools_autogen/fast
 
 # Convenience name for target.
+waterplus_map_tools/CMakeFiles/wp_edit_node_autogen.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/wp_edit_node_autogen.dir/rule
+.PHONY : waterplus_map_tools/CMakeFiles/wp_edit_node_autogen.dir/rule
+
+# Convenience name for target.
+wp_edit_node_autogen: waterplus_map_tools/CMakeFiles/wp_edit_node_autogen.dir/rule
+
+.PHONY : wp_edit_node_autogen
+
+# fast build rule for target.
+wp_edit_node_autogen/fast:
+	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/wp_edit_node_autogen.dir/build.make waterplus_map_tools/CMakeFiles/wp_edit_node_autogen.dir/build
+.PHONY : wp_edit_node_autogen/fast
+
+# Convenience name for target.
 waterplus_map_tools/CMakeFiles/wp_nav_odom_report_autogen.dir/rule:
 	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/wp_nav_odom_report_autogen.dir/rule
 .PHONY : waterplus_map_tools/CMakeFiles/wp_nav_odom_report_autogen.dir/rule
@@ -1096,96 +1025,6 @@ wp_nav_odom_report_autogen: waterplus_map_tools/CMakeFiles/wp_nav_odom_report_au
 wp_nav_odom_report_autogen/fast:
 	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/wp_nav_odom_report_autogen.dir/build.make waterplus_map_tools/CMakeFiles/wp_nav_odom_report_autogen.dir/build
 .PHONY : wp_nav_odom_report_autogen/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/wp_manager_autogen.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/wp_manager_autogen.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/wp_manager_autogen.dir/rule
-
-# Convenience name for target.
-wp_manager_autogen: waterplus_map_tools/CMakeFiles/wp_manager_autogen.dir/rule
-
-.PHONY : wp_manager_autogen
-
-# fast build rule for target.
-wp_manager_autogen/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/wp_manager_autogen.dir/build.make waterplus_map_tools/CMakeFiles/wp_manager_autogen.dir/build
-.PHONY : wp_manager_autogen/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/wp_nav_test_autogen.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/wp_nav_test_autogen.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/wp_nav_test_autogen.dir/rule
-
-# Convenience name for target.
-wp_nav_test_autogen: waterplus_map_tools/CMakeFiles/wp_nav_test_autogen.dir/rule
-
-.PHONY : wp_nav_test_autogen
-
-# fast build rule for target.
-wp_nav_test_autogen/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/wp_nav_test_autogen.dir/build.make waterplus_map_tools/CMakeFiles/wp_nav_test_autogen.dir/build
-.PHONY : wp_nav_test_autogen/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/wp_saver_autogen.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/wp_saver_autogen.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/wp_saver_autogen.dir/rule
-
-# Convenience name for target.
-wp_saver_autogen: waterplus_map_tools/CMakeFiles/wp_saver_autogen.dir/rule
-
-.PHONY : wp_saver_autogen
-
-# fast build rule for target.
-wp_saver_autogen/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/wp_saver_autogen.dir/build.make waterplus_map_tools/CMakeFiles/wp_saver_autogen.dir/build
-.PHONY : wp_saver_autogen/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/wp_nav_remote_autogen.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/wp_nav_remote_autogen.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/wp_nav_remote_autogen.dir/rule
-
-# Convenience name for target.
-wp_nav_remote_autogen: waterplus_map_tools/CMakeFiles/wp_nav_remote_autogen.dir/rule
-
-.PHONY : wp_nav_remote_autogen
-
-# fast build rule for target.
-wp_nav_remote_autogen/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/wp_nav_remote_autogen.dir/build.make waterplus_map_tools/CMakeFiles/wp_nav_remote_autogen.dir/build
-.PHONY : wp_nav_remote_autogen/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/charger_get_position_autogen.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/charger_get_position_autogen.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/charger_get_position_autogen.dir/rule
-
-# Convenience name for target.
-charger_get_position_autogen: waterplus_map_tools/CMakeFiles/charger_get_position_autogen.dir/rule
-
-.PHONY : charger_get_position_autogen
-
-# fast build rule for target.
-charger_get_position_autogen/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/charger_get_position_autogen.dir/build.make waterplus_map_tools/CMakeFiles/charger_get_position_autogen.dir/build
-.PHONY : charger_get_position_autogen/fast
-
-# Convenience name for target.
-waterplus_map_tools/CMakeFiles/wp_navi_server_autogen.dir/rule:
-	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 waterplus_map_tools/CMakeFiles/wp_navi_server_autogen.dir/rule
-.PHONY : waterplus_map_tools/CMakeFiles/wp_navi_server_autogen.dir/rule
-
-# Convenience name for target.
-wp_navi_server_autogen: waterplus_map_tools/CMakeFiles/wp_navi_server_autogen.dir/rule
-
-.PHONY : wp_navi_server_autogen
-
-# fast build rule for target.
-wp_navi_server_autogen/fast:
-	cd /home/lzh/test/build && $(MAKE) -f waterplus_map_tools/CMakeFiles/wp_navi_server_autogen.dir/build.make waterplus_map_tools/CMakeFiles/wp_navi_server_autogen.dir/build
-.PHONY : wp_navi_server_autogen/fast
 
 charger_get_position_autogen/mocs_compilation.o: charger_get_position_autogen/mocs_compilation.cpp.o
 
@@ -1814,81 +1653,70 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... rebuild_cache"
-	@echo "... edit_cache"
-	@echo "... move_base_msgs_generate_messages_lisp"
-	@echo "... move_base_msgs_generate_messages_eus"
-	@echo "... std_srvs_generate_messages_py"
-	@echo "... test"
-	@echo "... std_srvs_generate_messages_nodejs"
-	@echo "... _waterplus_map_tools_generate_messages_check_deps_Waypoint"
-	@echo "... std_srvs_generate_messages_lisp"
-	@echo "... rviz_generate_messages_lisp"
-	@echo "... std_srvs_generate_messages_cpp"
-	@echo "... nav_msgs_generate_messages_lisp"
-	@echo "... move_base_msgs_generate_messages_cpp"
-	@echo "... wp_edit_node"
-	@echo "... visualization_msgs_generate_messages_cpp"
-	@echo "... map_msgs_generate_messages_eus"
-	@echo "... std_srvs_generate_messages_eus"
-	@echo "... move_base_msgs_generate_messages_nodejs"
-	@echo "... visualization_msgs_generate_messages_lisp"
-	@echo "... rviz_generate_messages_py"
-	@echo "... nav_msgs_generate_messages_cpp"
-	@echo "... visualization_msgs_generate_messages_eus"
-	@echo "... install/local"
-	@echo "... nav_msgs_generate_messages_eus"
-	@echo "... pose_navi_server"
-	@echo "... visualization_msgs_generate_messages_py"
-	@echo "... waterplus_map_tools"
-	@echo "... waterplus_map_tools_geneus"
-	@echo "... rviz_generate_messages_cpp"
-	@echo "... map_msgs_generate_messages_lisp"
-	@echo "... install"
-	@echo "... map_msgs_generate_messages_py"
-	@echo "... waterplus_map_tools_generate_messages"
-	@echo "... visualization_msgs_generate_messages_nodejs"
-	@echo "... waterplus_map_tools_generate_messages_nodejs"
 	@echo "... install/strip"
-	@echo "... move_base_msgs_generate_messages_py"
-	@echo "... map_msgs_generate_messages_nodejs"
-	@echo "... _waterplus_map_tools_generate_messages_check_deps_GetWaypointByIndex"
-	@echo "... waterplus_map_tools_gencpp"
-	@echo "... _waterplus_map_tools_generate_messages_check_deps_SaveWaypoints"
-	@echo "... rviz_generate_messages_nodejs"
-	@echo "... wp_nav_odom_report"
-	@echo "... nav_msgs_generate_messages_py"
-	@echo "... rviz_generate_messages_eus"
-	@echo "... _waterplus_map_tools_generate_messages_check_deps_GetNumOfWaypoints"
-	@echo "... waterplus_map_tools_genpy"
-	@echo "... _waterplus_map_tools_generate_messages_check_deps_GetChargerByName"
-	@echo "... waterplus_map_tools_generate_messages_cpp"
-	@echo "... list_install_components"
-	@echo "... _waterplus_map_tools_generate_messages_check_deps_AddNewWaypoint"
-	@echo "... waterplus_map_tools_generate_messages_eus"
-	@echo "... waterplus_map_tools_generate_messages_lisp"
-	@echo "... waterplus_map_tools_genlisp"
-	@echo "... nav_msgs_generate_messages_nodejs"
-	@echo "... waterplus_map_tools_gennodejs"
-	@echo "... wp_manager"
-	@echo "... waterplus_map_tools_generate_messages_py"
-	@echo "... _waterplus_map_tools_generate_messages_check_deps_GetWaypointByName"
-	@echo "... wp_nav_test"
-	@echo "... wp_saver"
-	@echo "... wp_nav_remote"
-	@echo "... map_msgs_generate_messages_cpp"
-	@echo "... charger_get_position"
+	@echo "... install/local"
+	@echo "... edit_cache"
+	@echo "... rebuild_cache"
 	@echo "... wp_navi_server"
-	@echo "... wp_edit_node_autogen"
+	@echo "... charger_get_position"
+	@echo "... wp_nav_remote"
+	@echo "... wp_saver"
+	@echo "... wp_nav_test"
+	@echo "... wp_manager"
+	@echo "... waterplus_map_tools_gennodejs"
+	@echo "... waterplus_map_tools_genlisp"
+	@echo "... waterplus_map_tools_generate_messages_lisp"
+	@echo "... waterplus_map_tools_generate_messages_eus"
+	@echo "... rviz_generate_messages_cpp"
+	@echo "... pose_navi_server"
+	@echo "... rviz_generate_messages_lisp"
+	@echo "... map_msgs_generate_messages_nodejs"
+	@echo "... waterplus_map_tools_geneus"
+	@echo "... map_msgs_generate_messages_cpp"
+	@echo "... waterplus_map_tools_genpy"
+	@echo "... _waterplus_map_tools_generate_messages_check_deps_GetNumOfWaypoints"
+	@echo "... install"
+	@echo "... waterplus_map_tools"
+	@echo "... visualization_msgs_generate_messages_py"
+	@echo "... list_install_components"
+	@echo "... waterplus_map_tools_generate_messages_py"
+	@echo "... visualization_msgs_generate_messages_nodejs"
+	@echo "... visualization_msgs_generate_messages_eus"
+	@echo "... rviz_generate_messages_py"
+	@echo "... rviz_generate_messages_nodejs"
+	@echo "... visualization_msgs_generate_messages_lisp"
+	@echo "... map_msgs_generate_messages_eus"
+	@echo "... visualization_msgs_generate_messages_cpp"
+	@echo "... _waterplus_map_tools_generate_messages_check_deps_Waypoint"
+	@echo "... _waterplus_map_tools_generate_messages_check_deps_SaveWaypoints"
+	@echo "... rviz_generate_messages_eus"
+	@echo "... wp_edit_node"
+	@echo "... move_base_msgs_generate_messages_cpp"
+	@echo "... move_base_msgs_generate_messages_eus"
+	@echo "... waterplus_map_tools_gencpp"
+	@echo "... move_base_msgs_generate_messages_py"
+	@echo "... _waterplus_map_tools_generate_messages_check_deps_GetWaypointByIndex"
+	@echo "... move_base_msgs_generate_messages_lisp"
+	@echo "... move_base_msgs_generate_messages_nodejs"
+	@echo "... waterplus_map_tools_generate_messages_nodejs"
+	@echo "... map_msgs_generate_messages_lisp"
+	@echo "... waterplus_map_tools_generate_messages"
+	@echo "... wp_nav_odom_report"
+	@echo "... _waterplus_map_tools_generate_messages_check_deps_AddNewWaypoint"
+	@echo "... _waterplus_map_tools_generate_messages_check_deps_GetChargerByName"
+	@echo "... map_msgs_generate_messages_py"
+	@echo "... _waterplus_map_tools_generate_messages_check_deps_GetWaypointByName"
+	@echo "... waterplus_map_tools_generate_messages_cpp"
+	@echo "... wp_navi_server_autogen"
+	@echo "... charger_get_position_autogen"
+	@echo "... wp_nav_remote_autogen"
+	@echo "... wp_saver_autogen"
+	@echo "... wp_nav_test_autogen"
+	@echo "... wp_manager_autogen"
 	@echo "... pose_navi_server_autogen"
 	@echo "... waterplus_map_tools_autogen"
+	@echo "... wp_edit_node_autogen"
 	@echo "... wp_nav_odom_report_autogen"
-	@echo "... wp_manager_autogen"
-	@echo "... wp_nav_test_autogen"
-	@echo "... wp_saver_autogen"
-	@echo "... wp_nav_remote_autogen"
-	@echo "... charger_get_position_autogen"
-	@echo "... wp_navi_server_autogen"
 	@echo "... charger_get_position_autogen/mocs_compilation.o"
 	@echo "... charger_get_position_autogen/mocs_compilation.i"
 	@echo "... charger_get_position_autogen/mocs_compilation.s"

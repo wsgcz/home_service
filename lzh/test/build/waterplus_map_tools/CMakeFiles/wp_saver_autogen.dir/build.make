@@ -55,7 +55,7 @@ include waterplus_map_tools/CMakeFiles/wp_saver_autogen.dir/progress.make
 
 waterplus_map_tools/CMakeFiles/wp_saver_autogen:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/lzh/test/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Automatic MOC for target wp_saver"
-	cd /home/lzh/test/build/waterplus_map_tools && /usr/bin/cmake -E cmake_autogen /home/lzh/test/build/waterplus_map_tools/CMakeFiles/wp_saver_autogen.dir/AutogenInfo.json ""
+	cd /home/lzh/test/build/waterplus_map_tools && /usr/bin/cmake -E cmake_autogen /home/lzh/test/build/waterplus_map_tools/CMakeFiles/wp_saver_autogen.dir/AutogenInfo.json Release
 
 wp_saver_autogen: waterplus_map_tools/CMakeFiles/wp_saver_autogen
 wp_saver_autogen: waterplus_map_tools/CMakeFiles/wp_saver_autogen.dir/build.make

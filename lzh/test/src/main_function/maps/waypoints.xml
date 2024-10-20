@@ -1,23 +1,52 @@
 <Waterplus>
     <Waypoint>
         <Name>wait_position</Name>
-        <Pos_x>1.66315</Pos_x>
-        <Pos_y>0.745624</Pos_y>
+        <Pos_x>0.856848</Pos_x>
+        <Pos_y>0.204697</Pos_y>
         <Pos_z>0</Pos_z>
         <Ori_x>0</Ori_x>
         <Ori_y>0</Ori_y>
-        <Ori_z>-0.0483523</Ori_z>
-        <Ori_w>0.99883</Ori_w>
+        <Ori_z>0.016499</Ori_z>
+        <Ori_w>0.999864</Ori_w>
     </Waypoint>
-
     <Waypoint>
         <Name>kichen</Name>
-        <Pos_x>3.2</Pos_x>
-        <Pos_y>1.4</Pos_y>
+        <Pos_x>3.86529</Pos_x>
+        <Pos_y>1.20234</Pos_y>
         <Pos_z>0</Pos_z>
         <Ori_x>0</Ori_x>
         <Ori_y>0</Ori_y>
-        <Ori_z>-0.0483523</Ori_z>
-        <Ori_w>0.99883</Ori_w>
+        <Ori_z>-0.118449</Ori_z>
+        <Ori_w>0.99296</Ori_w>
+    </Waypoint>
+    <Waypoint>
+        <Name>bathroom</Name>
+        <Pos_x>3.94869</Pos_x>
+        <Pos_y>1.12653</Pos_y>
+        <Pos_z>0</Pos_z>
+        <Ori_x>0</Ori_x>
+        <Ori_y>0</Ori_y>
+        <Ori_z>-0.0391847</Ori_z>
+        <Ori_w>0.999232</Ori_w>
+    </Waypoint>
+    <Waypoint>
+        <Name>dinningroom</Name>
+        <Pos_x>3.5779</Pos_x>
+        <Pos_y>2.88888</Pos_y>
+        <Pos_z>0</Pos_z>
+        <Ori_x>0</Ori_x>
+        <Ori_y>0</Ori_y>
+        <Ori_z>-0.0239785</Ori_z>
+        <Ori_w>0.999712</Ori_w>
+    </Waypoint>
+    <Waypoint>
+        <Name>5</Name>
+        <Pos_x>1.93648</Pos_x>
+        <Pos_y>1.3145</Pos_y>
+        <Pos_z>0</Pos_z>
+        <Ori_x>0</Ori_x>
+        <Ori_y>0</Ori_y>
+        <Ori_z>-0.116167</Ori_z>
+        <Ori_w>0.99323</Ori_w>
     </Waypoint>
 </Waterplus>

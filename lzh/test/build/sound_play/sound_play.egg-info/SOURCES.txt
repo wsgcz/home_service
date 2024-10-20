@@ -1,0 +1,4 @@
+README.md
+setup.py
+src/sound_play/__init__.py
+src/sound_play/libsoundplay.py

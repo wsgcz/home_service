@@ -22,7 +22,10 @@ from sensor_msgs.msg import Image
 from std_msgs.msg import String
 from move_base_msgs.msg import MoveBaseGoal
 from move_base_msgs.msg import MoveBaseAction
-
+sys.path.insert(0,'/home/lzh/test/src/vis/scripts')
+from utils.datasets import letterbox
+from utils.general import non_max_suppression_kpt
+from utils.plots import output_to_keypoint, plot_skeleton_kpts,plot_one_box
 class GlobalVar:
     eps = 1e-2
     P_x = 479 
@@ -45,7 +48,6 @@ class GlobalVar:
     3:姿态识别
     4:识别是否有垃圾
     5:垃圾识别
-    1，2对应start_work == False, 3,4对应start_work == True
     '''
     rospy.init_node("pose3")
     tfBuffer = tf2_ros.Buffer()
@@ -175,6 +177,17 @@ class FaceRecognition:
             results.append(user_name)
         return results
 
+    def retrieve(self, addr):
+        GlobalVar.face_mutex.acquire()
+        face = cv2.imdecode(np.fromfile(addr,dtype=np.uint8),-1)
+        store_name = addr.split('/')[-1].split('.')[0] 
+        result = self.recognition(face)
+        try:
+            result=result[0]
+        except BaseException as e:
+            result="unknown"
+        GlobalVar.face_mutex.release()
+        return result
     # 特征比较
     @staticmethod
     def feature_compare(feature1, feature2, threshold):
@@ -210,8 +223,58 @@ class FaceRecognition:
         return "成功添加人脸"
 
 class Yolov8:
-    def __init__(self):
-        pass
+    def __init__(self,model_path="/home/lzh/test/src/vis/best.pt"):
+        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        weights = torch.load(model_path)
+        self.model = weights['model']
+        self.model = self.model.half().to(self.device)
+        self.model.eval()
+
+    def detect(self,image):
+        image = letterbox(image, 960, stride=64, auto=True)[0]
+        image = transforms.ToTensor()(image)
+        image = torch.tensor(np.array([image.numpy()]))
+        image = image.to(self.device)
+        image = image.half()
+        with torch.no_grad():
+            output, _ = self.model(image)
+            # output = non_max_suppression_kpt(output, 0.25, 0.65, nc=self.model.yaml['nc'], nkpt=self.model.yaml['nkpt'], kpt_label=True)
+            output = output_to_keypoint(output)
+        # 原图像nimg    
+        nimg = image[0].permute(1, 2, 0) * 255
+        nimg = nimg.cpu().numpy().astype(np.uint8)
+        nimg = cv2.cvtColor(nimg, cv2.COLOR_RGB2BGR)
+        
+        # 找到识别到的面积最大的4个人，并裁剪图片
+        area=[]
+        rec_name = yolov8.start_single_predict(yolo_model,image)
+        results = list()
+        if GlobalVar.reaction_flag == 1: #and rec_name == "people") or (GlobalVar.reaction_flag == 4 and rec_name != "people"):
+            for i in range(output.shape[0]) :
+                area.append((output[i,5]*output[i,4],i))
+            for i in range(output.shape[0]):
+                for j in range(i+1,output.shape[0],1):
+                    if (area[i]<area[j]):
+                        area[i],area[j]=area[j],area[i]
+                        output[i],output[j]=output[j],output[i]
+            length_area=1
+            idx_list=[]
+            for i in range(length_area):
+                idx_list.append(area[i][1])
+            idx_count=0
+            results = list()
+            for idx in idx_list:
+                # idx=area[idx][1]
+                # plot_skeleton_kpts(nimg, output[idx, 7:].T, 3)
+                idx_count+=1
+                x_center=int(output[idx][2])
+                y_center=int(output[idx][3])
+                half_w=int(output[idx][4]/2)
+                half_h=int(output[idx][5]/2)
+                cv2.rectangle(nimg,(int(output[idx][2]-output[idx][4]/2),int(output[idx][3]-output[idx][5]/2)),(int(output[idx][4]/2+output[idx][2]),int(output[idx][5]/2+output[idx][3])),color=(0,0,0),thickness=2)
+                change_image=nimg[y_center-half_h:y_center+half_h,x_center-half_w:x_center+half_w]      
+                results.append((change_image,half_w*2,half_h*2,x_center,y_center,idx))
+        return results
 
     def start_single_predict(self, yolo_model, img_path):
         model = YOLO(yolo_model)
@@ -543,18 +606,22 @@ class Mediapipe:
             if d < GlobalVar.eps:
                 length -= 1
         average_depth = sum(depths) / length
-        real_person = Mediapipe.real_pose(x_mid, y_mid, average_depth)
+        real_person = mediapipe.real_pose(x_mid, y_mid, average_depth)
         rospy.loginfo(f"this is the relative pos of person: {real_person}")
         if real_person[2] < GlobalVar.eps:
             return
         # 接下来是坐标转换
-        alpha = Mediapipe.get_alpha(results)
+        alpha = mediapipe.get_alpha(results)
         robot_states = GlobalVar.get_map_pose_theta()
         rospy.loginfo(f"this is robot position:{robot_states}")
         rpy = GlobalVar.ori_to_rpy(0.0, 0.0, robot_states[2], robot_states[3])
-        # 人前1.5m位置
-        z_second = real_person[2] - 1.5 * cos(alpha)
-        x_second = real_person[0] + 1.5 * sin(alpha)
+        # 如果是人，就到人前2m，如果是垃圾，就到垃圾前1m
+        if GlobalVar.reaction_flag == 1:
+            dist = 2
+        elif GlobalVar.reaction_flag == 4:
+            dist = 1
+        z_second = real_person[2] - dist * cos(alpha)
+        x_second = real_person[0] + dist * sin(alpha)
         # if alpha == 0.5 * pi or alpha == 1.5 * pi:
         #     z_second -= 0.2
         if alpha >= 0.8 * pi and alpha <= 1.2 * pi:
@@ -580,19 +647,17 @@ class Mediapipe:
     def main1_mediapipe(self, image):
         pose_str = self.process_frame(image)
         return pose_str
-    
-    def main2_mediapipe(self, image):
-        goal = self.detect(image)
-        return goal
 
 image,depth = None, None
-yolo_model = ""
+# yolo_model = "/home/zzy/vision/src/vis/scripts/best.pt"
 #flag=0
+yolo_model = "yolov10n.pt"
 
 def image_callback(image_rgb,image_depth):
     global image, depth, flag
     image = GlobalVar.bridge.imgmsg_to_cv2(
             image_rgb, desired_encoding='passthrough')
+    image = np.rot90(image, -1)
     depth = GlobalVar.bridge.imgmsg_to_cv2(
             image_depth, desired_encoding='passthrough')
     last_detection_time = 0
@@ -601,12 +666,16 @@ def image_callback(image_rgb,image_depth):
     if time.time() - last_detection_time > detection_interval:
         last_detection_time = time.time()
         GlobalVar.cb_mutex.acquire()
+        human_detect_result = yolov8.detect(image)
+        store_path=f"/home/lzh/vision/src/vis/data_face/{GlobalVar.last_person}.jpg"
+        cv2.imwrite(store_path,image)
+        face_feature = face.retrieve(store_path)
         if GlobalVar.reaction_flag == 0:
             rospy.loginfo(f"Now the task is 0")
-            results = face.recognition(image)
+            _ , results = yolov8.start_single_predict(yolo_model,image)
             num = 0
             for result in results:
-                if result != "unknown":
+                if result == "person":
                     num += 1
                     break
             if num > 0 and flag==1:
@@ -622,10 +691,11 @@ def image_callback(image_rgb,image_depth):
 
         elif GlobalVar.reaction_flag == 1:
             rospy.loginfo(f"Now the task is 1")
-            goal = mediapipe.main2_mediapipe(image,depth)
+            goal = mediapipe.Mediapipe_thread(mediapipe.detect,*human_detect_result[:5],store_path,depth)
+            # pub_msg = goal
+            # pub_thread = threading.Thread(target=GlobalVar.put_data_into_quene, args=(pub_msg,))
+            # pub_thread.start()
             orient_angle_pub.publish(goal)
-            GlobalVar.reaction_flag = -1
-
         elif GlobalVar.reaction_flag == 2:
             rospy.loginfo(f"Now the task is 2")
             results = face.recognition(image)

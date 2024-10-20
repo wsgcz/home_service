@@ -72,6 +72,7 @@ class Params:
         self.finish=0           #lzh add,for each time recognize finish ,this is 1
         self.people_exist=0      #lzh add,for each time recognize finish ,if exist people or robbish,this is 1
         self.people_sum=0       #now we have recog * people
+        self.people_goal=MoveBaseGoal()
 #####################
 # # 用于前往人的一些参数 #
 # #####################
@@ -473,13 +474,18 @@ class sub:
     def collect_robbish_reply_callback(self,msg:String):
         global Robbish_det
         Robbish_det.recog_msg=msg.data
+        rospy.loginfo(f"collect_robbish_reply_callback receive :{Robbish_det.recog_msg}")
+
     
     def get_robbish_pos_reply_callback(self,msg:MoveBaseGoal):
         global Robbish_det
         Robbish_det.pos=msg
         
     def orient_angle_reply_callback(self,msg:MoveBaseGoal):
-        rospy.loginfo(f"havent write yet {msg}")
+        global params
+        params.people_goal=msg
+        rospy.loginfo(f"orient_angle_reply_callback receive ")
+
 
     def move_robot_arm_reply_callback(self,msg:String):
         global params
@@ -608,10 +614,10 @@ if __name__ =="__main__":
     # waypoints_posz=waypoints['waypoints_posz']
     # index= np.where(waypoins_name=='wait_pos')
     #error here
-    waypoints_index=1        ###error here, unknow the first waypoint index
+    waypoints_index=4       ###error here, unknow the first waypoint index
     Collect_index=0
     Collect_robbish_index=0
-    Robbish_waypoints_index=0
+    Robbish_waypoints_index=1
     rate=rospy.Rate(40.0)
     rospy.Rate(1).sleep()    
     rospy.loginfo("节点main_service启动")
@@ -622,7 +628,7 @@ if __name__ =="__main__":
     #params.wait_position=Puber.Init_Pose()
     #PDW=PreDefinedWaypoints(params.gate_name,params.targets_waypoint)
     rospy.loginfo("初始位置设置完毕")
-    fsm=Status.Collect
+    fsm=Status.Find
 
     # test_i=1 # Put test
     # fsm=Status.Grab#Grab test
@@ -662,6 +668,7 @@ if __name__ =="__main__":
             #data=pd.read_xml('/home/linxi/ServiceRobot-General/src/general_service_2022/maps/waypoints.xml')
             # Name=data['Name']
             index=waypoints_index
+            rospy.loginfo(f"waypoints_index:{waypoints_index}")
             success=Gotopoint(waypoints_name[index])
             rospy.loginfo(f"going {waypoints_name[index]}")
             if success==True:
@@ -671,7 +678,7 @@ if __name__ =="__main__":
                 Puber.over_speaking(f"go {waypoints_name[index]} successfully")
                 rospy.sleep(3)
             else:
-                rospy.ERROR(f"Cannot goto {waypoints_name[index]}")
+                rospy.loginfo(f"Cannot goto {waypoints_name[index]}")
 
         elif fsm==Status.Find:
             rospy.loginfo("Find!")
@@ -724,7 +731,14 @@ if __name__ =="__main__":
                     rospy.loginfo("No people here!")
                     Puber.over_speaking("no people here!")
                     rospy.sleep(2)
-                    fsm==Status.Explore
+                    if waypoints_index==5:
+                        rospy.loginfo("Finished recognizing people, enter Robbish Explore")
+                        pose_data.data="enter Robbish Explore"
+                        Puber.over_speaking(pose_data)
+                        rospy.sleep(2)
+                        fsm=Status.Robbish_Explore
+                    else:
+                        fsm=Status.Explore
 
 
         elif fsm==Status.Collect:
@@ -732,6 +746,10 @@ if __name__ =="__main__":
             du1=rospy.Duration(1)
             rospy.loginfo(" Enter Collect!")
             Puber.over_speaking("Enter Collect!")
+            # go to zheng face
+            Puber.orient_angleing("OK")
+            rospy.sleep(2)
+            Gotogoal(params.people_goal)
             # face
             rospy.sleep(3)
             Puber.facial_deting()
@@ -757,8 +775,8 @@ if __name__ =="__main__":
             Puber.over_speaking(pose_data)
             rospy.sleep(3)
             params.people_sum+=1
-            if params.people_sum==3 or waypoints_index==4:
-                rospy.loginfo("Finished recognizing people, enter Robbish_Explore")
+            if params.people_sum==3 or waypoints_index==5:
+                rospy.loginfo("Finished recognizing people, enter Robbish Explore")
                 pose_data.data="enter Robbish Explore"
                 Puber.over_speaking(pose_data)
                 rospy.sleep(du)
@@ -771,6 +789,8 @@ if __name__ =="__main__":
         #robbish, similiar to face and pose recog
         elif fsm==Status.Robbish_Explore:
             rospy.loginfo("Robbish_Explore!")
+            Puber.over_speaking("Robbish Explore")
+            rospy.sleep(2)
             # msg=Pose()
             # msg.header.stamp=rospy.Time.now()
             # msg.header.frame_id="map"
@@ -782,56 +802,75 @@ if __name__ =="__main__":
             #data=pd.read_xml('/home/linxi/ServiceRobot-General/src/general_service_2022/maps/waypoints.xml')
             # Name=data['Name']
             index=Robbish_waypoints_index
-            success=Gotopoint(waypoints_name(index))
-            rospy.loginfo(f"going {waypoints_name(index)}")
+            rospy.loginfo(f"Robbish_waypoints_index:{Robbish_waypoints_index}")
+            success=Gotopoint(waypoints_name[index])
+            rospy.loginfo(f"going {waypoints_name[index]}")
             if success==True:
                 fsm=Status.Find_Robbish
                 Robbish_waypoints_index+=1
             else:
                 rospy.ERROR(f"Cannot goto {waypoints_name(Robbish_waypoints_index)}")
-        elif fsm==Status.Find_Robbish:
-            have_robbish=0 # useless
-            goal_rotate=MoveBaseGoal()
-            # for i in range(1,20):
-                # goal_rotate.target_pose.header.frame_id = "map"
-                # goal_rotate.target_pose.header.stamp =rospy.Time.now()
-                # goal_rotate.target_pose.pose.position.x = waypoints_posx[waypoints_index]
-                # goal_rotate.target_pose.pose.position.y = waypoints_posy[waypoints_index]
-                # goal_rotate.target_pose.pose.position.z = waypoints_posz[waypoints_index]
-                # # bu hui suan
-                # goal_rotate.target_pose.pose.orientation.x =  0.995
-                # goal_rotate.target_pose.pose.orientation.y =  0.000
-                # goal_rotate.target_pose.pose.orientation.z = 0.000
-                # goal_rotate.target_pose.pose.orientation.w =  0.105
-                # Client.ac.wait_for_server()
-                # Client.ac.send_goal(goal_rotate)
-                # Client.ac.wait_for_result()
-                # if Client.ac.get_state() == actionlib.SimpleGoalState.DONE:
-                #     Puber.start_recognize_robbishing()
-                #     rospy.loginfo("start_recognizing_robbish...")
-                #     while params.finish==0:  #waiting for recognize
-                #         pass
-                #     params.finish=0
-                #     if params.people_exist==1:#exist robbish , exter Collect
-                #         fsm=Status.Collect_Robbish
-                #         params.people_exist=0
-                #         rospy.loginfo(f"Find robbish {Collect_index+1}")
-                #         Collect_robbish_index+=1
-                #         have_robbish=1
-                #         break
-                #     elif params.people_exist==0:
-                #         continue
-                # else:
-            #     #     rospy.loginfo("error occer! cannot rotate!")
-            # if have_robbish==0:
-            #     rospy.ERROR("Have not find robbish in this room, rocognize again")
         
+        elif fsm==Status.Find_Robbish:
+            rospy.loginfo("Find_Robbish")
+            Puber.over_speaking("Find Robbish")
+            rospy.sleep(2)
+            if params.people_exist==1:#exist people , exter Collect
+                fsm=Status.Collect_Robbish
+                params.people_exist=0
+                rospy.loginfo(f"Find robbish {Collect_index+1}")
+                Puber.over_speaking(f"Find robbish {Collect_index+1}")
+                rospy.sleep(3)
+                Collect_robbish_index+=1
+            else:
+                Puber.over_speaking("no robbish here!")
+                rospy.sleep(1)
+                cmdvel=Twist()
+                rospy.loginfo("start rotate")
+                Puber.over_speaking("start rotate!")
+                rospy.sleep(1)
+                cmdvel.linear.x=0
+                cmdvel.linear.y=0
+                cmdvel.linear.z=0
+                cmdvel.angular.x=0
+                cmdvel.angular.y=0
+                cmdvel.angular.z=1
+                Puber.vel_pubing(cmdvel)
+                rospy.sleep(3.14)
+                cmdvel.angular.z=0
+                Puber.vel_pubing(cmdvel)
+                rospy.sleep(2)
+                Puber.start_recognizing()
+                rospy.loginfo("start_recognizing...")
+                rospy.sleep(3)
+                rospy.loginfo(f"Robbish exist:{params.people_exist}")
+                if params.people_exist==1:#exist people , exter Collect
+                    fsm=Status.Collect_Robbish
+                    params.people_exist=0
+                    rospy.loginfo(f"Find robbish {Collect_index+1}")
+                    Puber.over_speaking(f"Find robbish {Collect_index+1}")
+                    rospy.sleep(2)
+                    Collect_robbish_index+=1
+                else:
+                    rospy.loginfo("No robbish here!")
+                    Puber.over_speaking("no robbish here!")
+                    rospy.sleep(2)
+                    if Robbish_waypoints_index==5:
+                        fsm=Status.Quit
+                    else:
+                        fsm=Status.Robbish_Explore
         elif fsm==Status.Collect_Robbish:
+            rospy.loginfo("Collect_Robbish")
+            Puber.over_speaking("Collect Robbish")
+            rospy.sleep(2)
             Puber.collect_robbishing()
+            rospy.sleep(2)
             robbish_data=String()
             robbish_data.data=f"this robbish is {Robbish_det.recog_msg}"
-            Puber.over_speak(robbish_data)
+            Puber.over_speaking(robbish_data)
+            rospy.sleep(2)
             Puber.get_robbish_posing()
+            rospy.sleep(2)
             Client.ac.wait_for_server()
             Client.ac.send_goal(Robbish_det.pos)
             Client.ac.wait_for_result()
@@ -844,13 +883,7 @@ if __name__ =="__main__":
                 rospy.sleep(20)
                 Puber.close_robot_arming()
             else:
-                rospy.ERROR("cannot rotate!")
-            rospy.sleep(5)
-            rospy.loginfo("start sending")
-            fsm=Status.Send
-
-
-
+                rospy.loginfo("cannot go to robbish pos!")
 
         elif fsm==Status.Send:
             index=Robbish_waypoints_index

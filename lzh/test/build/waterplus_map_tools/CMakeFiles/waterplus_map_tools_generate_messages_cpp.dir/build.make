@@ -64,8 +64,8 @@ waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_cpp: /home/
 
 /home/lzh/test/devel/include/waterplus_map_tools/Waypoint.h: /opt/ros/noetic/lib/gencpp/gen_cpp.py
 /home/lzh/test/devel/include/waterplus_map_tools/Waypoint.h: /home/lzh/test/src/waterplus_map_tools/msg/Waypoint.msg
-/home/lzh/test/devel/include/waterplus_map_tools/Waypoint.h: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
 /home/lzh/test/devel/include/waterplus_map_tools/Waypoint.h: /opt/ros/noetic/share/geometry_msgs/msg/Pose.msg
+/home/lzh/test/devel/include/waterplus_map_tools/Waypoint.h: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
 /home/lzh/test/devel/include/waterplus_map_tools/Waypoint.h: /opt/ros/noetic/share/geometry_msgs/msg/Point.msg
 /home/lzh/test/devel/include/waterplus_map_tools/Waypoint.h: /opt/ros/noetic/share/gencpp/msg.h.template
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/lzh/test/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating C++ code from waterplus_map_tools/Waypoint.msg"
@@ -80,8 +80,8 @@ waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_cpp: /home/
 
 /home/lzh/test/devel/include/waterplus_map_tools/AddNewWaypoint.h: /opt/ros/noetic/lib/gencpp/gen_cpp.py
 /home/lzh/test/devel/include/waterplus_map_tools/AddNewWaypoint.h: /home/lzh/test/src/waterplus_map_tools/srv/AddNewWaypoint.srv
-/home/lzh/test/devel/include/waterplus_map_tools/AddNewWaypoint.h: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
 /home/lzh/test/devel/include/waterplus_map_tools/AddNewWaypoint.h: /opt/ros/noetic/share/geometry_msgs/msg/Pose.msg
+/home/lzh/test/devel/include/waterplus_map_tools/AddNewWaypoint.h: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
 /home/lzh/test/devel/include/waterplus_map_tools/AddNewWaypoint.h: /opt/ros/noetic/share/geometry_msgs/msg/Point.msg
 /home/lzh/test/devel/include/waterplus_map_tools/AddNewWaypoint.h: /opt/ros/noetic/share/gencpp/msg.h.template
 /home/lzh/test/devel/include/waterplus_map_tools/AddNewWaypoint.h: /opt/ros/noetic/share/gencpp/srv.h.template
@@ -97,8 +97,8 @@ waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_cpp: /home/
 
 /home/lzh/test/devel/include/waterplus_map_tools/GetWaypointByIndex.h: /opt/ros/noetic/lib/gencpp/gen_cpp.py
 /home/lzh/test/devel/include/waterplus_map_tools/GetWaypointByIndex.h: /home/lzh/test/src/waterplus_map_tools/srv/GetWaypointByIndex.srv
-/home/lzh/test/devel/include/waterplus_map_tools/GetWaypointByIndex.h: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
 /home/lzh/test/devel/include/waterplus_map_tools/GetWaypointByIndex.h: /opt/ros/noetic/share/geometry_msgs/msg/Pose.msg
+/home/lzh/test/devel/include/waterplus_map_tools/GetWaypointByIndex.h: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
 /home/lzh/test/devel/include/waterplus_map_tools/GetWaypointByIndex.h: /opt/ros/noetic/share/geometry_msgs/msg/Point.msg
 /home/lzh/test/devel/include/waterplus_map_tools/GetWaypointByIndex.h: /opt/ros/noetic/share/gencpp/msg.h.template
 /home/lzh/test/devel/include/waterplus_map_tools/GetWaypointByIndex.h: /opt/ros/noetic/share/gencpp/srv.h.template
@@ -107,8 +107,8 @@ waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_cpp: /home/
 
 /home/lzh/test/devel/include/waterplus_map_tools/GetWaypointByName.h: /opt/ros/noetic/lib/gencpp/gen_cpp.py
 /home/lzh/test/devel/include/waterplus_map_tools/GetWaypointByName.h: /home/lzh/test/src/waterplus_map_tools/srv/GetWaypointByName.srv
-/home/lzh/test/devel/include/waterplus_map_tools/GetWaypointByName.h: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
 /home/lzh/test/devel/include/waterplus_map_tools/GetWaypointByName.h: /opt/ros/noetic/share/geometry_msgs/msg/Pose.msg
+/home/lzh/test/devel/include/waterplus_map_tools/GetWaypointByName.h: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
 /home/lzh/test/devel/include/waterplus_map_tools/GetWaypointByName.h: /opt/ros/noetic/share/geometry_msgs/msg/Point.msg
 /home/lzh/test/devel/include/waterplus_map_tools/GetWaypointByName.h: /opt/ros/noetic/share/gencpp/msg.h.template
 /home/lzh/test/devel/include/waterplus_map_tools/GetWaypointByName.h: /opt/ros/noetic/share/gencpp/srv.h.template
@@ -117,8 +117,8 @@ waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_cpp: /home/
 
 /home/lzh/test/devel/include/waterplus_map_tools/GetChargerByName.h: /opt/ros/noetic/lib/gencpp/gen_cpp.py
 /home/lzh/test/devel/include/waterplus_map_tools/GetChargerByName.h: /home/lzh/test/src/waterplus_map_tools/srv/GetChargerByName.srv
-/home/lzh/test/devel/include/waterplus_map_tools/GetChargerByName.h: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
 /home/lzh/test/devel/include/waterplus_map_tools/GetChargerByName.h: /opt/ros/noetic/share/geometry_msgs/msg/Pose.msg
+/home/lzh/test/devel/include/waterplus_map_tools/GetChargerByName.h: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
 /home/lzh/test/devel/include/waterplus_map_tools/GetChargerByName.h: /opt/ros/noetic/share/geometry_msgs/msg/Point.msg
 /home/lzh/test/devel/include/waterplus_map_tools/GetChargerByName.h: /opt/ros/noetic/share/gencpp/msg.h.template
 /home/lzh/test/devel/include/waterplus_map_tools/GetChargerByName.h: /opt/ros/noetic/share/gencpp/srv.h.template
