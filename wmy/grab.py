@@ -38,18 +38,19 @@ control_arm_data.name.append("lift")
 control_arm_data.name.append("gripper")
 control_arm_data.position.extend(arm_postion_init)
 control_arm_data.velocity.extend(arm_postion_init)
-# begin_open = 1
-# begin_close = 0
+
+begin_open = 0
+begin_close = 0
 
 #启动
 def start_open(msg):
     global begin_open
-    begin_open=1   
+    begin_open = 1   
     rospy.loginfo("ok I will start")
 
 def start_close(msg):
     global begin_close
-    begin_close=0   
+    begin_close = 1   
     rospy.loginfo("ok I will close")
 
   
@@ -67,25 +68,30 @@ def open():
         control_arm_data.position[1]=0.5
         control_arm_data.velocity[1]=2
         arm_action_pub.publish(control_arm_data)
-        rospy.sleep(10)
+        rospy.sleep(20)
         rospy.set_param("params_finish", 1)
         
 
 #抓取
 def close():
     global begin_close,control_arm_data
-    if (begin_close == 0):
-        control_arm_data.position[1]=0
+    if (begin_close == 1):
+        control_arm_data.position[1]=0.03
         control_arm_data.velocity[1]=1
         arm_action_pub.publish(control_arm_data)
         rospy.sleep(10)
         rospy.loginfo("Close!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         rospy.set_param("params_finish", 1)
+        # control_arm_data.position[0]=0
+        # control_arm_data.velocity[1]=1
+        # arm_action_pub.publish(control_arm_data)
+        # rospy.sleep(5)
+
 
 def reset():
     global begin_close,begin_open,control_arm_data
     begin_open = 0
-    begin_close = 1
+    begin_close = 0
     rospy.loginfo("reset!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     rospy.sleep(2)
 

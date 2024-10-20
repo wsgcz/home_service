@@ -1,5 +1,4 @@
 #! /home/wmy/anaconda3/envs/grabb/bin/python
-
 from multiprocessing import Process,Pool
 from random import randrange
 from re import S
@@ -19,8 +18,6 @@ from sensor_msgs.msg import JointState
 import math
 import message_filters
 import time
-import cv_bridge
-import cv2
 from actionlib_msgs.msg import GoalID
 from sensor_msgs.msg import Image, CameraInfo
 from geometry_msgs.msg import Twist
@@ -32,21 +29,18 @@ import actionlib
 from actionlib_msgs.msg import *
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 # from waterplus_map_tools.srv import GetWaypointByName, GetWaypointByNameRequest, GetWaypointByNameResponse
-import tf2_ros
-from tf2_geometry_msgs import PointStamped, PoseStamped
+#import tf2_ros
+#from tf2_geometry_msgs import PointStamped, PoseStamped
 from sensor_msgs.msg import LaserScan
 import asyncio
-image,depth=None,None
-import threading
-import tf
-import tf.transformations as transformations
-import pyrealsense2 as rs
-import numpy as np
-import cv2
-from cv_bridge import CvBridge
-from std_msgs.msg import Float32
-from ultralytics import YOLO
+#image,depth=None,None
+#import threading
+#import tf
+#import tf.transformations as transformations
+#import numpy as np
+#from std_msgs.msg import Float32
 
+#参数
 control_arm_data=JointState()
 arm_postion_init=[0,0]
 control_arm_data.name.append("lift")
@@ -54,41 +48,39 @@ control_arm_data.name.append("gripper")
 control_arm_data.position.extend(arm_postion_init)
 control_arm_data.velocity.extend(arm_postion_init)
 
-
-#参数
-begin_find_trashbase = 0
-have_left=0.56
-begin_to_confirm_all_position_data=1
-have_known_the_angle=0
-#have_set_the_height=0
-have_set_everything=0
-final_position_y=0
 machine_speed=Twist()
 
+have_known_the_angle=0
+have_set_everything=0
 have_set_height = 0
+begin_everything = 0
+begin_to_confirm_all_position_data=0
+
 
 #???huoqu
-now_time_position_x = 0
-now_time_position_y = 0
+have_left=0.56
+now_time_position_x = 0.31
+now_time_position_y = 0.2
 
 def start_find(msg):
-    global begin_throw,begin_find_trashbase
-    begin_find_trashbase = 1   
+    global begin_to_confirm_all_position_data,begin_everything
+    begin_to_confirm_all_position_data = 1   
+    begin_everything = 1
     rospy.loginfo("ok I will find the trashbase")
 
 
 #调整角度使x吻合
 def control_angle_speed():# 设定旋转角度   ####ke dong tai ping hua gai jin
     global now_angle_speed,now_time_position_x
-    if now_time_postion_x>0.8:
+    if now_time_position_x>0.8:
         now_angle_speed=-0.6
-    elif 0.4<abs(now_time_postion_x)<0.8:
-        now_angle_speed=-now_time_postion_x*0.7
-    elif 0.1<abs(now_time_postion_x)<0.4:
-            now_angle_speed=-now_time_postion_x*0.5
-    elif 0<abs(now_time_postion_x)<0.1:
-            now_angle_speed=-now_time_postion_x*0.3
-    elif now_time_postion_x<-0.8:
+    elif 0.4<abs(now_time_position_x)<0.8:
+        now_angle_speed=-now_time_position_x*0.7
+    elif 0.1<abs(now_time_position_x)<0.4:
+            now_angle_speed=-now_time_position_x*0.5
+    elif 0<abs(now_time_position_x)<0.1:
+            now_angle_speed=-now_time_position_x*0.3
+    elif now_time_position_x<-0.8:
         now_angle_speed=0.6
 
     if now_angle_speed>0.6:
@@ -96,8 +88,9 @@ def control_angle_speed():# 设定旋转角度   ####ke dong tai ping hua gai ji
     elif now_angle_speed<-0.6:
         now_angle_speed=-0.6
     # time.sleep(0.02)
+
 def know_target_and_go_ahead():
-    global machine_speed,have_known_the_angle,begin_to_confirm_all_position_data,final_position_y,begin_set_height
+    global machine_speed,have_known_the_angle,begin_to_confirm_all_position_data,now_time_position_x
     machine_speed.linear.x=0
     machine_speed.linear.y=0
     machine_speed.linear.z=0
@@ -105,8 +98,10 @@ def know_target_and_go_ahead():
     machine_speed.angular.y=0
     machine_speed.angular.z=now_angle_speed
     # print("this is machine_speed.z %f,now x %f"%(machine_speed.angular.z,now_time_postion_x))
-    if (abs(now_time_postion_x)>0.02):
+    if (abs(now_time_position_x)>0.02):
         speed_of_pub.publish(machine_speed)
+        rospy.sleep(3)
+        now_time_position_x = now_time_position_x - 0.1
     else :
         reset_speed()
         speed_of_pub.publish(machine_speed)
@@ -114,7 +109,6 @@ def know_target_and_go_ahead():
         rospy.loginfo("spin succeed!!!!")
         begin_to_confirm_all_position_data=0
         have_known_the_angle=1
-        begin_set_height = 1
 # def control_angle_reset():
 #     global now_map_pose_x,now_map_pose_y,machine_odom_now_x,machine_odom_now_y,grab_corner,grab_room,machine_angle_set
 #     global machine_speed
@@ -139,7 +133,7 @@ def know_target_and_go_ahead():
 #     reset_speed()
 
 def set_height():
-    global now_time_postion_y,control_arm_data,have_set_height
+    global now_time_position_y,control_arm_data,have_set_height,have_known_the_angle
     # rospy.loginfo("this is final_y %f",final_position_y)
     if (now_time_position_y>0.7):
         control_arm_data.position[0]=now_time_position_y + 0.1
@@ -147,12 +141,15 @@ def set_height():
         arm_action_pub.publish(control_arm_data)
         rospy.sleep(4)
         have_set_height = 1
+        have_known_the_angle = 0
+        rospy.loginfo("set height over!!!")
     else:
         have_set_height = 1
+        have_known_the_angle = 0
     
 #移动到目标位置
 def calculate_ahead_speed():  ### gaijin
-    global now_time_postion_z,now_ahead_speed,have_left,have_known_the_angle
+    global now_ahead_speed,have_left,have_known_the_angle
     rospy.loginfo("this is have_left %f",have_left)
     if have_left>0.8:
         now_ahead_speed=0.2
@@ -168,7 +165,7 @@ def calculate_ahead_speed():  ### gaijin
         now_ahead_speed=0  
     # print("this is now_time_position_z(正在计算速度时) ",now_time_postion_z)
 def set_the_speed_of_ahead_action():
-    global machine_speed,have_known_the_angle,have_set_everything,have_set_the_height,have_left
+    global machine_speed,have_known_the_angle,have_set_everything,have_set_height,have_left
     machine_speed.linear.x=now_ahead_speed # 在机器人坐标中，x为面前的方向；在摄像头中为左右的方向
     machine_speed.linear.y=0
     machine_speed.linear.z=0
@@ -177,14 +174,16 @@ def set_the_speed_of_ahead_action():
     machine_speed.angular.z=0
     # rospy.loginfo("this is left %f",)
     if (abs(have_left)<0.015):
-        rospy.loginfo("this is over")
+        rospy.loginfo("arrive!!!")
         reset_speed()
         time.sleep(0.5)
-        have_set_the_height=0
+        have_set_height=0
         have_set_everything=1
     else :
-        rospy.loginfo("continue pub vel_message ")
+        rospy.loginfo("continue move to the destination~")
         speed_of_pub.publish(machine_speed)
+        rospy.sleep(1)
+        have_left = have_left - 0.186
 # def to_get_odom_position_data(odom:Odometry):
 #     global odom_px,odom_py,odom_pz,odom_ow,odom_oz,odom_oy,odom_ox
 #     odom_px=odom.pose.pose.position.x
@@ -215,12 +214,21 @@ def set_the_speed_of_ahead_action():
 
 
 def throw_the_object():
-    global now_time_postion_y,have_set_everything,begin_back,over_yolo,object_need_to_grab
+    global have_set_everything,control_arm_data
     # rospy.loginfo("this is final_y %f",final_position_y)
     control_arm_data.position[1]=0.5
     control_arm_data.velocity[1]=1
     arm_action_pub.publish(control_arm_data)
-    rospy.sleep(4)
+    rospy.sleep(9)
+    machine_speed.linear.x=-0.1 # 在机器人坐标中，x为面前的方向；在摄像头中为左右的方向
+    machine_speed.linear.y=0
+    machine_speed.linear.z=0
+    machine_speed.angular.x=0
+    machine_speed.angular.y=0
+    machine_speed.angular.z=0
+    speed_of_pub.publish(machine_speed)
+    rospy.sleep(5)
+    reset_speed()
     control_arm_data.position[0]= 0 #下降且闭合
     # rospy.loginfo("this is final_y %f",final_position_y)
     control_arm_data.position[1]=0
@@ -228,12 +236,13 @@ def throw_the_object():
     control_arm_data.velocity[0]=1
     arm_action_pub.publish(control_arm_data)
     rospy.sleep(4)
+    rospy.loginfo("finish throw the trash!!!")
     rospy.set_param("params_finish", 1)
    
 def control_all_the_action_of_machine_throw():
-    global begin_to_confirm_all_position_data,have_known_the_angle,have_set_everything,have_set_the_height,begin_ahead_function,begin_back,begin_everything
+    global begin_to_confirm_all_position_data,have_known_the_angle,have_set_everything,have_set_height,begin_everything,control_arm_data,have_left
     # print(rospy.is_shutdown())
-    global not_have_catch_target,machine_speed,sleep_count
+    global machine_speed,now_ahead_speed,now_angle_speed,now_time_position_x,now_time_position_y
     while not rospy.is_shutdown():
         if begin_everything==0:
             rospy.sleep(0.02)
@@ -261,24 +270,23 @@ def control_all_the_action_of_machine_throw():
 
 
 #重置
-def reset_parameter():
-    global have_left,machine_odom_last_x,machine_odom_last_y,machine_odom_now_x,machine_odom_now_y,machine_speed
-    global machine_odom_distance,target_position_z,begin_back,have_known_the_angle,have_set_the_height,have_set_everything
-    global final_position_y,d_x,d_y,now_pixel_x,last_pixel_x,d_z,d_pixel_x,begin_ahead_function,can_not_know_the_deepth
-    global object_need_to_grab,odom_px,odom_py,odom_pz,odom_ox,odom_ow,odom_oz,last_time_postion_x,last_time_postion_y,last_time_postion_z
-    global now_time_postion_x,now_time_postion_y,now_time_postion_z,now_ahead_speed,now_angle_speed,color_image,depth_image,depth_intrin,aligned_depth_frame,begin_everything
-    global over_yolo,not_have_catch_target,odom_oy,begin_to_confirm_all_position_data,sleep_count
+# def reset_parameter():
+#     global have_left,machine_odom_last_x,machine_odom_last_y,machine_odom_now_x,machine_odom_now_y,machine_speed
+#     global machine_odom_distance,target_position_z,begin_back,have_known_the_angle,have_set_height,have_set_everything
+#     global final_position_y,d_x,d_y,now_pixel_x,last_pixel_x,d_z,d_pixel_x,begin_ahead_function,can_not_know_the_deepth
+#     global object_need_to_grab,odom_px,odom_py,odom_pz,odom_ox,odom_ow,odom_oz,last_time_postion_x,last_time_postion_y,last_time_postion_z
+#     global now_time_postion_x,now_time_postion_y,now_time_postion_z,now_ahead_speed,now_angle_speed,color_image,depth_image,depth_intrin,aligned_depth_frame,begin_everything
+#     global over_yolo,not_have_catch_target,odom_oy,begin_to_confirm_all_position_data,sleep_count
 
-    have_left=0.56
-    begin_to_confirm_all_position_data=1
-    have_known_the_angle=0
-    #have_set_the_height=0
-    have_set_everything=0
-    final_position_y=0
+#     have_left=0.56
+#     begin_to_confirm_all_position_data=1
+#     have_known_the_angle=0
+#     #have_set_the_height=0
+#     have_set_everything=0
     
-    machine_speed=Twist()
-    have_set_height = 0
-    # begin_everything=1
+#     machine_speed=Twist()
+#     have_set_height = 0
+#     # begin_everything=1
 def reset_speed():
     global machine_speed
     machine_speed.linear.x=0
@@ -364,8 +372,8 @@ if __name__=="__main__":
     #close_sub=rospy.Subscriber("move_robot_arm",String,start_close,queue_size=10)
     arm_action_pub=rospy.Publisher("/wpb_home/mani_ctrl",JointState,queue_size=30) #控制机器人机械臂
     
-    tfBuffer = tf2_ros.Buffer()
-    tfSub = tf2_ros.TransformListener(tfBuffer)
+    # tfBuffer = tf2_ros.Buffer()
+    # tfSub = tf2_ros.TransformListener(tfBuffer)
     
     time1=time.time()
 
