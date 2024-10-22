@@ -1,12 +1,10 @@
 import torch
 from ultralytics import YOLO
 import cv2 as cv
-import matplotlib.pyplot as plt
 
-model_path = "/home/zzy/vision/src/vis/scripts/yolov10n.pt"
+model_path = "yolov10n.pt"
 model = YOLO(model_path)
-
-image_path = "/home/zzy/beishen.jpeg"
+image_path = "/home/gcz/home_service/zzy/test/beishen.jpeg"
 results = model(image_path)
 for result in results : 
     boxes = result.boxes  # Boxes object for bounding box outputs
@@ -17,6 +15,6 @@ for result in results :
     #result.show()  # display to screen
     #result.save(filename="result.jpg")  # save to disk
 cv_image = cv.imread(image_path)
-plt.subplot(121)
-plt.imshow(cv_image[187:509,112:1125,:])
+cv.imshow("hhh",cv_image[0:1199,0:771,:])
+cv.waitKey(5000)
 print(boxes)
