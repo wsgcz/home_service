@@ -115,7 +115,7 @@ class FaceRecognition:
     def __init__(self, gpu_id=0, face_db='/home/cch/general_service/src/pose_estimate/face_db', threshold=1.24, det_thresh=0.50, det_size=(640, 640)):
         """
         人脸识别工具类
-        :param gpu_id: 正数为GPU的ID，负数为使用CPU
+        :param gpu_id: 正数为GPU的ID,负数为使用CPU
         :param face_db: 人脸库文件夹
         :param threshold: 人脸识别阈值
         :param det_thresh: 检测阈值
