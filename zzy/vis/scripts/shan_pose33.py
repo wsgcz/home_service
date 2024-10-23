@@ -223,7 +223,7 @@ class FaceRecognition:
         return "成功添加人脸"
 
 class Yolov8:
-    def __init__(self,model_path="/home/zzy/vision/src/vis/scripts/best.pt"):
+    def __init__(self,model_path="/home/zzy/vision/src/vis/scripts/yolov10n.pt"):
         self.model = YOLO(model_path)
 ###detect函数，对图像进行检测，并返回裁剪后的图像
 ###输入：图片
@@ -252,9 +252,9 @@ class Yolov8:
             half_w = int(xywh[i][2]/2)
             half_h = int(xywh[i][3]/2)
             change_image=nimg[y_center-half_h:y_center+half_h,x_center-half_w:x_center+half_w]#裁减之后的框
+            image_name = f"/home/zzy/{name[i]}.jpg"
+            cv2.imwrite(image_name,change_image)
             results.append((change_image,half_w*2,half_h*2,x_center,y_center,name[i]))
-        for res in results :
-            print(res[3],res[4])
         return results
 
     def start_single_predict(self, yolo_model, img_path):
@@ -522,6 +522,7 @@ class Mediapipe:
     
     def detect(self, image, width, height, mid_x, mid_y, name, depth):
         GlobalVar.mediapipe_mutex.acquire()
+        print("man now i looking at you!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         results = self.pose.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
         print(f'result is :{results.pose_world_landmarks}')
         if not results.pose_world_landmarks:
@@ -531,6 +532,7 @@ class Mediapipe:
         print("this is alpha ",alpha ,"and name is ",name)
         goal = self.convert_machine_axis_to_world(results,width,height,mid_x,mid_y,name,depth)
         GlobalVar.mediapipe_mutex.release()
+        #ac.send_goal(goal)
         return goal
         
     @staticmethod
@@ -633,7 +635,7 @@ class Mediapipe:
         return pose_str
 
 image,depth = None, None
-yolo_model = "/home/zzy/vision/src/vis/scripts/best.pt"
+yolo_model = "/home/zzy/vision/src/vis/scripts/yolov10n.pt"
 #yolo_model = "yolov10n.pt"
 #flag=0
 
@@ -649,9 +651,9 @@ def image_callback(image_rgb,image_depth):
     
     # TODO
 #改成只看第一帧
-    if time.time() - last_detection_time > detection_interval:
-        last_detection_time = time.time()
+    if GlobalVar.frame == 0 :
         GlobalVar.cb_mutex.acquire()
+        print(f"frame number is {GlobalVar.frame}")
         human_detect_result = yolov8.detect(image)
         for person in human_detect_result:
             store_path=f"/home/zzy/vision/src/vis/data_face/{GlobalVar.last_person}.jpg"
@@ -679,12 +681,16 @@ def image_callback(image_rgb,image_depth):
 
             elif GlobalVar.reaction_flag == 1:
                 rospy.loginfo(f"Now the task is 1")
-                goal = mediapipe.detect(image, *person[:5],depth)
-                # pub_msg = goal
-                # pub_thread = threading.Thread(target=GlobalVar.put_data_into_quene, args=(pub_msg,))
-                # pub_thread.start()
-                orient_angle_pub.publish(goal)
-                cv2.imwrite(store_path,image)
+                if person[5] == 'person':
+                    goal = mediapipe.detect(person[0],person[1],person[2],person[3],person[4],person[5],depth)
+                    # pub_msg = goal
+                    # pub_thread = threading.Thread(target=GlobalVar.put_data_into_quene, args=(pub_msg,))
+                    # pub_thread.start()
+                    orient_angle_pub.publish(goal)
+                    cv2.imwrite(store_path,image)
+                    GlobalVar.reaction_flag == -1
+                else:
+                    GlobalVar.reaction_flag == -1
                 GlobalVar.last_person += 1
             elif GlobalVar.reaction_flag == 2:
                 rospy.loginfo(f"Now the task is 2")
@@ -737,7 +743,8 @@ def image_callback(image_rgb,image_depth):
                 cv2.imwrite(store_path,image)
                 GlobalVar.last_person += 1
 
-            GlobalVar.frame+=1
+        GlobalVar.frame = 1
+        print(GlobalVar.frame)
         GlobalVar.cb_mutex.release()
 
 
@@ -779,6 +786,7 @@ def collect_robbish_callback(msg:String):
 flag=0
 if __name__ == '__main__':
     # flag=0
+    GlobalVar.reaction_flag = 1
     face = FaceRecognition()
     yolov8 = Yolov8()
     mediapipe = Mediapipe()
@@ -797,8 +805,8 @@ if __name__ == '__main__':
     start_recognize_robbish_pub = rospy.Publisher("start_recognize_robbish_reply", String, queue_size=10)
     collect_robbish_pub = rospy.Publisher("collect_robbish_reply", String, queue_size=10)
 
-    # ac = actionlib.SimpleActionClient('move_base', MoveBaseAction)
-    # ac.wait_for_server()
+    #ac = actionlib.SimpleActionClient('move_base', MoveBaseAction)
+    #ac.wait_for_server()
 
     rgb_sub = message_filters.Subscriber('/kinect2/qhd/image_color', Image)
     depth_sub = message_filters.Subscriber('/kinect2/qhd/image_depth_rect', Image)
