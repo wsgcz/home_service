@@ -6,18 +6,19 @@ model_path = "yolov10n.pt"
 model = YOLO(model_path)
 image_path = "/home/zzy/home_service/zzy/test/beishen.jpeg"
 results = model(image_path)
-# for result in results : 
-#     boxes = result.boxes  # Boxes object for bounding box outputs
-#     masks = result.masks  # Masks object for segmentation masks outputs
-#     keypoints = result.keypoints  # Keypoints object for pose outputs
-#     probs = result.probs  # Probs object for classification outputs
-#     obb = result.obb  # Oriented boxes object for OBB outputs
-    #result.show()  # display to screen
-    #result.save(filename="result.jpg")  # save to disk
-# cv_image = cv.imread(image_path)
-# cv.imshow("hhh",cv_image[0:1199,0:771,:])
+for result in results : 
+    boxes = result.boxes  # Boxes object for bounding box outputs
+    print(boxes)
+    masks = result.masks  # Masks object for segmentation masks outputs
+    keypoints = result.keypoints  # Keypoints object for pose outputs
+    probs = result.probs  # Probs object for classification outputs
+    obb = result.obb  # Oriented boxes object for OBB outputs
+    result.show()  # display to screen
+    result.save(filename="result.jpg")  # save to disk
+cv_image = cv.imread(image_path)
+cv.imwrite('/home/zzy/output.jpg',cv_image[0:1199,187:510,:])
 # cv.waitKey(5000)
-# print(boxes)
+
 # import matplotlib.pyplot as plt
 # import numpy
 

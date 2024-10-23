@@ -22,10 +22,7 @@ from sensor_msgs.msg import Image
 from std_msgs.msg import String
 from move_base_msgs.msg import MoveBaseGoal
 from move_base_msgs.msg import MoveBaseAction
-sys.path.insert(0,'/home/zzy/vision/src/vis')
-from utils.datasets import letterbox
-from utils.general import non_max_suppression_kpt
-from utils.plots import output_to_keypoint, plot_skeleton_kpts,plot_one_box
+sys.path.insert(0,'/home/zzy/test/src/vis')
 class GlobalVar:
     eps = 1e-2
     P_x = 479 
@@ -115,7 +112,7 @@ class GlobalVar:
         _,_,GlobalVar.mathince_theta=transformations.euler_from_quaternion([odom_ox,odom_oy,odom_oz,odom_ow])
 
 class FaceRecognition:
-    def __init__(self, gpu_id=0, face_db='/home/zzy/vision/src/vis/face_db', threshold=1.24, det_thresh=0.50, det_size=(640, 640)):
+    def __init__(self, gpu_id=0, face_db='/home/zzy/test/src/vis/face_db', threshold=1.24, det_thresh=0.50, det_size=(640, 640)):
         """
         人脸识别工具类
         :param gpu_id: 正数为GPU的ID，负数为使用CPU
@@ -223,7 +220,7 @@ class FaceRecognition:
         return "成功添加人脸"
 
 class Yolov8:
-    def __init__(self,model_path="/home/zzy/vision/src/vis/scripts/yolov10n.pt"):
+    def __init__(self,model_path="/home/zzy/vision/src/vis/best.pt"):
         self.model = YOLO(model_path)
 ###detect函数，对图像进行检测，并返回裁剪后的图像
 ###输入：图片
@@ -246,7 +243,7 @@ class Yolov8:
             if len(boxes) == 0:
                 continue
         for i in range (len(name)):
-            xywh = boxes.xywh.detach().numpy()
+            xywh = boxes.cpu().xywh.detach().numpy()
             x_center = int(xywh[i][0])
             y_center = int(xywh[i][1])
             half_w = int(xywh[i][2]/2)
@@ -256,6 +253,43 @@ class Yolov8:
             cv2.imwrite(image_name,change_image)
             results.append((change_image,half_w*2,half_h*2,x_center,y_center,name[i]))
         return results
+    def rubbish_goal(self,width, height, mid_x, mid_y, name, depth):
+        GlobalVar.mediapipe_mutex.acquire()
+        x_center = int(2*mid_x-0.5*width)
+        y_center = int(2*mid_y-0.5*height)
+        #use kinect2 timely,change to realsense finally
+        if x_center > 960: x_center=959
+        if y_center > 540: y_center=539
+        average_depth = depth[y_center][x_center]
+        rubbish_pos = mediapipe.real_pose(x_center, y_center, average_depth)
+        rospy.loginfo(f"rubbish_pos is :{rubbish_pos[0]},{rubbish_pos[1]}")
+        #rubbish's position in robot axis
+        if rubbish_pos[2] < GlobalVar.eps:
+            return
+        robot_states = GlobalVar.get_map_pose_theta()
+        rospy.loginfo(f"this is robot position:{robot_states}")
+        rpy = GlobalVar.ori_to_rpy(0.0, 0.0, robot_states[2], robot_states[3])
+        dist = 0.55
+        z_second = rubbish_pos[2] - dist
+        x_second = rubbish_pos[0] + dist
+        x1, y1 = GlobalVar.get_map_pose(x_second, z_second)
+        rospy.loginfo(f"ultimate pos in the coordinate:{x1},{y1}")
+        goal = MoveBaseGoal()
+        goal.target_pose.header.frame_id = 'map'
+        goal.target_pose.pose.position.x = y1
+        goal.target_pose.pose.position.y = -x1
+        xyzw = GlobalVar.rpy2quaternion(0.0, 0.0, -pi)
+        goal.target_pose.pose.orientation.x = 0.0
+        goal.target_pose.pose.orientation.y = 0.0
+        goal.target_pose.pose.orientation.z = xyzw[2]
+        goal.target_pose.pose.orientation.w = xyzw[3]
+        goal.target_pose.header.stamp = rospy.Time.now()
+        GlobalVar.mediapipe_mutex.release()
+        print("---------i will sent a goal----------")
+        ac.send_goal(goal)
+        print("-----------i have sent a goal-----")
+        ac.wait_for_result()
+        return goal
 
     def start_single_predict(self, yolo_model, img_path):
         model = YOLO(yolo_model)
@@ -532,8 +566,12 @@ class Mediapipe:
         print("this is alpha ",alpha ,"and name is ",name)
         goal = self.convert_machine_axis_to_world(results,width,height,mid_x,mid_y,name,depth)
         GlobalVar.mediapipe_mutex.release()
-        #ac.send_goal(goal)
+        print("---------i will sent a goal----------")
+        ac.send_goal(goal)
+        print("-----------i have sent a goal-----")
+        ac.wait_for_result()
         return goal
+    
         
     @staticmethod
     def get_alpha(results):
@@ -599,13 +637,8 @@ class Mediapipe:
         robot_states = GlobalVar.get_map_pose_theta()
         rospy.loginfo(f"this is robot position:{robot_states}")
         rpy = GlobalVar.ori_to_rpy(0.0, 0.0, robot_states[2], robot_states[3])
-        # 如果是人，就到人前2m，如果是垃圾，就到垃圾前1m
+        # ren qian 1.5m
         dist = 1.5
-        if name == 'person':
-            dist = 1.5
-        else:
-        #机械臂的长度
-            dist = 0.55
         z_second = real_person[2] - dist * cos(alpha)
         x_second = real_person[0] + dist * sin(alpha)
         # if alpha == 0.5 * pi or alpha == 1.5 * pi:
@@ -635,11 +668,12 @@ class Mediapipe:
         return pose_str
 
 image,depth = None, None
-yolo_model = "/home/zzy/vision/src/vis/scripts/yolov10n.pt"
+yolo_model = "//home/zzy/vision/src/vis/best.pt"
 #yolo_model = "yolov10n.pt"
 #flag=0
 
 def image_callback(image_rgb,image_depth):
+    #print("--------------i am in image-callback------------")
     global image, depth, flag
     image = GlobalVar.bridge.imgmsg_to_cv2(
             image_rgb, desired_encoding='passthrough')
@@ -653,19 +687,19 @@ def image_callback(image_rgb,image_depth):
 #改成只看第一帧
     if GlobalVar.frame == 0 :
         GlobalVar.cb_mutex.acquire()
-        print(f"frame number is {GlobalVar.frame}")
+        print(f"-------------frame number is {GlobalVar.frame}---------------")
         human_detect_result = yolov8.detect(image)
+        cv2.imwrite(f"/home/zzy/{GlobalVar.last_person}.jpg",image)
         for person in human_detect_result:
-            store_path=f"/home/zzy/vision/src/vis/data_face/{GlobalVar.last_person}.jpg"
+            #rospy.loginfo(f"person:{human_detect_result[i-1]}")
+            store_path=f"/home/zzy/{GlobalVar.last_person}.jpg"
+
             if GlobalVar.reaction_flag == 0:
                 rospy.loginfo(f"Now the task is 0")
-                _ , results = yolov8.start_single_predict(yolo_model,image)
+                result = person[5]
                 num = 0
-                for result in results:
-                    rospy.loginfo(result)
-                    if result == "person":
-                        num += 1
-                        break
+                if result == "person":
+                    num += 1
                 if num > 0 and flag==1:
                     rospy.loginfo("find people")
                     start_recognize_pub.publish("1")
@@ -742,7 +776,19 @@ def image_callback(image_rgb,image_depth):
                 GlobalVar.reaction_flag = -1
                 cv2.imwrite(store_path,image)
                 GlobalVar.last_person += 1
-
+            elif GlobalVar.reaction_flag == 6:
+                rospy.loginfo(f"Now the task is 6")
+                if person[5] != 'person':
+                    goal = yolov8.rubbish_goal(person[1],person[2],person[3],person[4],person[5],depth)
+                    # pub_msg = goal
+                    # pub_thread = threading.Thread(target=GlobalVar.put_data_into_quene, args=(pub_msg,))
+                    # pub_thread.start()
+                    robbish_pos_pub.publish(goal)
+                    cv2.imwrite(store_path,image)
+                    GlobalVar.reaction_flag == -1
+                else:
+                    GlobalVar.reaction_flag == -1
+                GlobalVar.last_person += 1
         GlobalVar.frame = 1
         print(GlobalVar.frame)
         GlobalVar.cb_mutex.release()
@@ -753,7 +799,7 @@ def start_recognize_callback(msg:String):
     if msg.data == 'OK':
         GlobalVar.reaction_flag=0
         flag = 1
-        rospy.loginfo(f"start_recognize_callback flag:{flag}")
+        rospy.loginfo(f"start_recognize_callback flag:{flag} GlobalVar.reaction_flag:{GlobalVar.reaction_flag}")
 
 def orient_angle_callback(msg:String):
     if msg.data == 'OK':
@@ -783,13 +829,22 @@ def collect_robbish_callback(msg:String):
     if msg.data == 'OK':
         GlobalVar.reaction_flag=5
         rospy.loginfo(f"collect_robbish_callback flag:{flag}")
-flag=0
+
+def rubbish_pos_callback(msg:String):
+    if msg.data == 'OK':
+        GlobalVar.reaction_flag=6
+        rospy.loginfo(f"rubbish_pos_callback flag:{flag}")
+flag=1
 if __name__ == '__main__':
     # flag=0
-    GlobalVar.reaction_flag = 1
+    GlobalVar.reaction_flag = 6
+    print("----------------i am in 0 ---------------")
     face = FaceRecognition()
+    print("----------------i am in 1 ---------------")
     yolov8 = Yolov8()
+    print("----------------i am in 2 ---------------")
     mediapipe = Mediapipe()
+    print("----------------i am in 3 ---------------")
 
     orient_angle_sub = rospy.Subscriber("orient_angle",String,orient_angle_callback)
     start_recognize_sub = rospy.Subscriber("start_recognize",String,start_recognize_callback)
@@ -797,6 +852,7 @@ if __name__ == '__main__':
     pose_det = rospy.Subscriber("pose_det",String,pose_det_callback)
     start_recognize_robbish = rospy.Subscriber("start_recognize_robbish",String,start_recognize_robbish_callback)
     collect_robbish = rospy.Subscriber("collect_robbish",String,collect_robbish_callback)
+    robbish_pos = rospy.Subscriber("robbish_pos",String,rubbish_pos_callback)
 
     orient_angle_pub = rospy.Publisher("orient_angle_reply",MoveBaseGoal,queue_size=10)
     start_recognize_pub = rospy.Publisher("start_recognize_reply", String, queue_size=10)
@@ -804,9 +860,12 @@ if __name__ == '__main__':
     pose_det_pub = rospy.Publisher("pose_det_reply", String, queue_size=10)
     start_recognize_robbish_pub = rospy.Publisher("start_recognize_robbish_reply", String, queue_size=10)
     collect_robbish_pub = rospy.Publisher("collect_robbish_reply", String, queue_size=10)
+    robbish_pos_pub = rospy.Publisher("robbish_pos_reply",MoveBaseGoal,queue_size=10)
 
-    #ac = actionlib.SimpleActionClient('move_base', MoveBaseAction)
-    #ac.wait_for_server()
+    ac = actionlib.SimpleActionClient('move_base', MoveBaseAction)
+    ac.wait_for_server()
+    print("----------------i am in ac ---------------")
+
 
     rgb_sub = message_filters.Subscriber('/kinect2/qhd/image_color', Image)
     depth_sub = message_filters.Subscriber('/kinect2/qhd/image_depth_rect', Image)
