@@ -64,8 +64,8 @@ waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_lisp: /home
 
 /home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/msg/Waypoint.lisp: /opt/ros/noetic/lib/genlisp/gen_lisp.py
 /home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/msg/Waypoint.lisp: /home/lzh/test/src/waterplus_map_tools/msg/Waypoint.msg
-/home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/msg/Waypoint.lisp: /opt/ros/noetic/share/geometry_msgs/msg/Pose.msg
 /home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/msg/Waypoint.lisp: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
+/home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/msg/Waypoint.lisp: /opt/ros/noetic/share/geometry_msgs/msg/Pose.msg
 /home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/msg/Waypoint.lisp: /opt/ros/noetic/share/geometry_msgs/msg/Point.msg
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/lzh/test/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating Lisp code from waterplus_map_tools/Waypoint.msg"
 	cd /home/lzh/test/build/waterplus_map_tools && ../catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genlisp/cmake/../../../lib/genlisp/gen_lisp.py /home/lzh/test/src/waterplus_map_tools/msg/Waypoint.msg -Iwaterplus_map_tools:/home/lzh/test/src/waterplus_map_tools/msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -p waterplus_map_tools -o /home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/msg
@@ -77,8 +77,8 @@ waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_lisp: /home
 
 /home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/srv/AddNewWaypoint.lisp: /opt/ros/noetic/lib/genlisp/gen_lisp.py
 /home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/srv/AddNewWaypoint.lisp: /home/lzh/test/src/waterplus_map_tools/srv/AddNewWaypoint.srv
-/home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/srv/AddNewWaypoint.lisp: /opt/ros/noetic/share/geometry_msgs/msg/Pose.msg
 /home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/srv/AddNewWaypoint.lisp: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
+/home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/srv/AddNewWaypoint.lisp: /opt/ros/noetic/share/geometry_msgs/msg/Pose.msg
 /home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/srv/AddNewWaypoint.lisp: /opt/ros/noetic/share/geometry_msgs/msg/Point.msg
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/lzh/test/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Generating Lisp code from waterplus_map_tools/AddNewWaypoint.srv"
 	cd /home/lzh/test/build/waterplus_map_tools && ../catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genlisp/cmake/../../../lib/genlisp/gen_lisp.py /home/lzh/test/src/waterplus_map_tools/srv/AddNewWaypoint.srv -Iwaterplus_map_tools:/home/lzh/test/src/waterplus_map_tools/msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -p waterplus_map_tools -o /home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/srv
@@ -90,24 +90,24 @@ waterplus_map_tools/CMakeFiles/waterplus_map_tools_generate_messages_lisp: /home
 
 /home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/srv/GetWaypointByIndex.lisp: /opt/ros/noetic/lib/genlisp/gen_lisp.py
 /home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/srv/GetWaypointByIndex.lisp: /home/lzh/test/src/waterplus_map_tools/srv/GetWaypointByIndex.srv
-/home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/srv/GetWaypointByIndex.lisp: /opt/ros/noetic/share/geometry_msgs/msg/Pose.msg
 /home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/srv/GetWaypointByIndex.lisp: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
+/home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/srv/GetWaypointByIndex.lisp: /opt/ros/noetic/share/geometry_msgs/msg/Pose.msg
 /home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/srv/GetWaypointByIndex.lisp: /opt/ros/noetic/share/geometry_msgs/msg/Point.msg
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/lzh/test/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Generating Lisp code from waterplus_map_tools/GetWaypointByIndex.srv"
 	cd /home/lzh/test/build/waterplus_map_tools && ../catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genlisp/cmake/../../../lib/genlisp/gen_lisp.py /home/lzh/test/src/waterplus_map_tools/srv/GetWaypointByIndex.srv -Iwaterplus_map_tools:/home/lzh/test/src/waterplus_map_tools/msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -p waterplus_map_tools -o /home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/srv
 
 /home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/srv/GetWaypointByName.lisp: /opt/ros/noetic/lib/genlisp/gen_lisp.py
 /home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/srv/GetWaypointByName.lisp: /home/lzh/test/src/waterplus_map_tools/srv/GetWaypointByName.srv
-/home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/srv/GetWaypointByName.lisp: /opt/ros/noetic/share/geometry_msgs/msg/Pose.msg
 /home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/srv/GetWaypointByName.lisp: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
+/home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/srv/GetWaypointByName.lisp: /opt/ros/noetic/share/geometry_msgs/msg/Pose.msg
 /home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/srv/GetWaypointByName.lisp: /opt/ros/noetic/share/geometry_msgs/msg/Point.msg
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/lzh/test/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Generating Lisp code from waterplus_map_tools/GetWaypointByName.srv"
 	cd /home/lzh/test/build/waterplus_map_tools && ../catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genlisp/cmake/../../../lib/genlisp/gen_lisp.py /home/lzh/test/src/waterplus_map_tools/srv/GetWaypointByName.srv -Iwaterplus_map_tools:/home/lzh/test/src/waterplus_map_tools/msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -p waterplus_map_tools -o /home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/srv
 
 /home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/srv/GetChargerByName.lisp: /opt/ros/noetic/lib/genlisp/gen_lisp.py
 /home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/srv/GetChargerByName.lisp: /home/lzh/test/src/waterplus_map_tools/srv/GetChargerByName.srv
-/home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/srv/GetChargerByName.lisp: /opt/ros/noetic/share/geometry_msgs/msg/Pose.msg
 /home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/srv/GetChargerByName.lisp: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
+/home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/srv/GetChargerByName.lisp: /opt/ros/noetic/share/geometry_msgs/msg/Pose.msg
 /home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/srv/GetChargerByName.lisp: /opt/ros/noetic/share/geometry_msgs/msg/Point.msg
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/lzh/test/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Generating Lisp code from waterplus_map_tools/GetChargerByName.srv"
 	cd /home/lzh/test/build/waterplus_map_tools && ../catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genlisp/cmake/../../../lib/genlisp/gen_lisp.py /home/lzh/test/src/waterplus_map_tools/srv/GetChargerByName.srv -Iwaterplus_map_tools:/home/lzh/test/src/waterplus_map_tools/msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -p waterplus_map_tools -o /home/lzh/test/devel/share/common-lisp/ros/waterplus_map_tools/srv

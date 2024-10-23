@@ -57,6 +57,7 @@ class Statu:
         self.Robbish_grab=16448,
         self.Send=32896,
         self.Quit=65792,
+        self.Go_to_people=111,
 ################
 # 初始的一些参数 #
 ################
@@ -72,6 +73,7 @@ class Params:
         self.finish=0           #lzh add,for each time recognize finish ,this is 1
         self.people_exist=0      #lzh add,for each time recognize finish ,if exist people or robbish,this is 1
         self.people_sum=0       #now we have recog * people
+        self.people_goal=MoveBaseGoal()
 #####################
 # # 用于前往人的一些参数 #
 # #####################
@@ -195,6 +197,7 @@ class pub:
         self.move_robot_arm=rospy.Publisher("move_robot_arm",String,queue_size=10)  # not writing suber yet
         self.orient_angle=rospy.Publisher("orient_angle",String,queue_size=10)  # not writing suber yet
         self.vel_pub=rospy.Publisher("/cmd_vel",Twist,queue_size=10)
+        self.orient_anlge=rospy.Publisher("orient_anlge",String,queue_size=10)
         # self.urgency=rospy.Publisher("")
 ###################################
 #### lzh delete gate name because there is only one wait position
@@ -326,6 +329,9 @@ class pub:
     
     def vel_pubing(self,msg:Twist):
         self.vel_pub.publish(msg)
+    
+    def orient_anlgeing(self):
+        self.orient_anlge.publish("OK")
 
 #########################
 # 用于Gotogoal的客户端操作#
@@ -481,7 +487,10 @@ class sub:
         Robbish_det.pos=msg
         
     def orient_angle_reply_callback(self,msg:MoveBaseGoal):
-        rospy.loginfo(f"havent write yet {msg}")
+        global params
+        params.people_goal=msg
+        rospy.loginfo(f"orient_angle_reply_callback receive ")
+
 
     def move_robot_arm_reply_callback(self,msg:String):
         global params
@@ -624,7 +633,7 @@ if __name__ =="__main__":
     #params.wait_position=Puber.Init_Pose()
     #PDW=PreDefinedWaypoints(params.gate_name,params.targets_waypoint)
     rospy.loginfo("初始位置设置完毕")
-    fsm=Status.Collect
+    fsm=Status.Find
 
     # test_i=1 # Put test
     # fsm=Status.Grab#Grab test
@@ -686,7 +695,7 @@ if __name__ =="__main__":
             rospy.loginfo(f'people_exist:{params.people_exist}')
             #rospy.loginfo("params.people_exist")
             if params.people_exist==1:#exist people , exter Collect
-                fsm=Status.Collect
+                fsm=Status.Go_to_people
                 params.people_exist=0
                 have_people=0
                 rospy.loginfo(f"Find people {Collect_index+1}")
@@ -717,7 +726,7 @@ if __name__ =="__main__":
                 rospy.sleep(3)
                 rospy.loginfo(f"people_exist:{params.people_exist}")
                 if params.people_exist==1:#exist people , exter Collect
-                    fsm=Status.Collect
+                    fsm=Status.Go_to_people
                     params.people_exist=0
                     rospy.loginfo(f"Find people {Collect_index+1}")
                     Puber.over_speaking(f"Find people {Collect_index+1}")
@@ -736,12 +745,29 @@ if __name__ =="__main__":
                     else:
                         fsm=Status.Explore
 
+        elif fsm==Status.Go_to_people:
+            rospy.loginfo("Go to people")
+            Puber.over_speaking("go to people")
+            rospy.sleep(1)
+            Puber.orient_angleing()
+            rospy.sleep(1)
+            e=Gotogoal(params.people_goal)
+            if e==True:
+                rospy.loginfo("go people sucessfully")
+                fsm=Status.Collect
+            else:
+                rospy.loginfo("cannot go to people")
+
 
         elif fsm==Status.Collect:
             du=rospy.Duration(3)
             du1=rospy.Duration(1)
             rospy.loginfo(" Enter Collect!")
             Puber.over_speaking("Enter Collect!")
+            # go to zheng face
+            Puber.orient_angleing("OK")
+            rospy.sleep(2)
+            Gotogoal(params.people_goal)
             # face
             rospy.sleep(3)
             Puber.facial_deting()

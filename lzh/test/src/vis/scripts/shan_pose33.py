@@ -22,10 +22,7 @@ from sensor_msgs.msg import Image
 from std_msgs.msg import String
 from move_base_msgs.msg import MoveBaseGoal
 from move_base_msgs.msg import MoveBaseAction
-sys.path.insert(0,'/home/lzh/test/src/vis/scripts')
-from utils.datasets import letterbox
-from utils.general import non_max_suppression_kpt
-from utils.plots import output_to_keypoint, plot_skeleton_kpts,plot_one_box
+sys.path.insert(0,'/home/lzh/test/src/vis')
 class GlobalVar:
     eps = 1e-2
     P_x = 479 
@@ -223,64 +220,83 @@ class FaceRecognition:
         return "成功添加人脸"
 
 class Yolov8:
-    def __init__(self,model_path="/home/lzh/test/src/vis/best.pt"):
-        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        weights = torch.load(model_path)
-        self.model = weights['model']
-        self.model = self.model.half().to(self.device)
-        self.model.eval()
-
+    def __init__(self,model_path="/home/lzh/test/src/yolov10n.pt"):
+        self.model = YOLO(model_path)
+###detect函数，对图像进行检测，并返回裁剪后的图像
+###输入：图片
+###输出：裁剪后的图片，框的宽度和高度，框的中心点，标签
     def detect(self,image):
-        image = letterbox(image, 960, stride=64, auto=True)[0]
-        image = transforms.ToTensor()(image)
-        image = torch.tensor(np.array([image.numpy()]))
-        image = image.to(self.device)
-        image = image.half()
-        with torch.no_grad():
-            output, _ = self.model(image)
-            # output = non_max_suppression_kpt(output, 0.25, 0.65, nc=self.model.yaml['nc'], nkpt=self.model.yaml['nkpt'], kpt_label=True)
-            output = output_to_keypoint(output)
-        # 原图像nimg    
-        nimg = image[0].permute(1, 2, 0) * 255
-        nimg = nimg.cpu().numpy().astype(np.uint8)
-        nimg = cv2.cvtColor(nimg, cv2.COLOR_RGB2BGR)
-        
-        # 找到识别到的面积最大的4个人，并裁剪图片
-        area=[]
-        rec_name = yolov8.start_single_predict(yolo_model,image)
         results = list()
-        if GlobalVar.reaction_flag == 1: #and rec_name == "people") or (GlobalVar.reaction_flag == 4 and rec_name != "people"):
-            for i in range(output.shape[0]) :
-                area.append((output[i,5]*output[i,4],i))
-            for i in range(output.shape[0]):
-                for j in range(i+1,output.shape[0],1):
-                    if (area[i]<area[j]):
-                        area[i],area[j]=area[j],area[i]
-                        output[i],output[j]=output[j],output[i]
-            length_area=1
-            idx_list=[]
-            for i in range(length_area):
-                idx_list.append(area[i][1])
-            idx_count=0
-            results = list()
-            for idx in idx_list:
-                # idx=area[idx][1]
-                # plot_skeleton_kpts(nimg, output[idx, 7:].T, 3)
-                idx_count+=1
-                x_center=int(output[idx][2])
-                y_center=int(output[idx][3])
-                half_w=int(output[idx][4]/2)
-                half_h=int(output[idx][5]/2)
-                cv2.rectangle(nimg,(int(output[idx][2]-output[idx][4]/2),int(output[idx][3]-output[idx][5]/2)),(int(output[idx][4]/2+output[idx][2]),int(output[idx][5]/2+output[idx][3])),color=(0,0,0),thickness=2)
-                change_image=nimg[y_center-half_h:y_center+half_h,x_center-half_w:x_center+half_w]      
-                results.append((change_image,half_w*2,half_h*2,x_center,y_center,idx))
+        nimg = image
+        # plot_skeleton_kpts(nimg, output[idx, 7:].T, 3)
+        output = self.model(image)
+        name = list()
+        for o in output:
+            boxes = o.boxes
+            names = o.names
+            for box in boxes:
+                # 获取类别索引
+                class_id = int(box.cls[0])
+                # 获取类别名称
+                name.append(names[class_id])
+            # 如果没有检测到任何对象
+            if len(boxes) == 0:
+                continue
+        for i in range (len(name)):
+            xywh = boxes.cpu().xywh.detach().numpy()
+            x_center = int(xywh[i][0])
+            y_center = int(xywh[i][1])
+            half_w = int(xywh[i][2]/2)
+            half_h = int(xywh[i][3]/2)
+            change_image=nimg[y_center-half_h:y_center+half_h,x_center-half_w:x_center+half_w]#裁减之后的框
+            image_name = f"/home/lzh/{name[i]}.jpg"
+            cv2.imwrite(image_name,change_image)
+            results.append((change_image,half_w*2,half_h*2,x_center,y_center,name[i]))
         return results
+    def rubbish_goal(self, mid_x, mid_y, name, depth):
+        GlobalVar.mediapipe_mutex.acquire()
+        x_center = int(mid_x)
+        y_center = int(mid_y)
+        #use kinect2 timely,change to realsense finally
+        if x_center > 960: x_center=959
+        if y_center > 540: y_center=539
+        average_depth = depth[y_center][x_center]
+        rubbish_pos = mediapipe.real_pose(x_center, y_center, average_depth)
+        rospy.loginfo(f"rubbish_pos is :{rubbish_pos[0]},{rubbish_pos[1]}")
+        #rubbish's position in robot axis
+        if rubbish_pos[2] < GlobalVar.eps:
+            return
+        robot_states = GlobalVar.get_map_pose_theta()
+        rospy.loginfo(f"this is robot position:{robot_states}")
+        rpy = GlobalVar.ori_to_rpy(0.0, 0.0, robot_states[2], robot_states[3])
+        dist = 0.55
+        z_second = rubbish_pos[2] - dist
+        x_second = rubbish_pos[0] + dist
+        x1, y1 = GlobalVar.get_map_pose(x_second, z_second)
+        rospy.loginfo(f"ultimate pos in the coordinate:{x1},{y1}")
+        goal = MoveBaseGoal()
+        goal.target_pose.header.frame_id = 'map'
+        goal.target_pose.pose.position.x = y1
+        goal.target_pose.pose.position.y = -x1
+        xyzw = GlobalVar.rpy2quaternion(0.0, 0.0, -pi)
+        goal.target_pose.pose.orientation.x = 0.0
+        goal.target_pose.pose.orientation.y = 0.0
+        goal.target_pose.pose.orientation.z = xyzw[2]
+        goal.target_pose.pose.orientation.w = xyzw[3]
+        goal.target_pose.header.stamp = rospy.Time.now()
+        GlobalVar.mediapipe_mutex.release()
+        print("---------i will sent a goal----------")
+        ac.send_goal(goal)
+        print("-----------i have sent a goal-----")
+        ac.wait_for_result()
+        return goal
 
     def start_single_predict(self, yolo_model, img_path):
         model = YOLO(yolo_model)
         results = model(img_path)
         confidence_max = -1
         class_name_max = ""
+        class_name = list()
         # 获取类别名称字典
         for r in results:
             # 获取类别名称字典
@@ -290,22 +306,21 @@ class Yolov8:
                 # 获取类别索引
                 class_id = int(box.cls[0])
                 # 获取类别名称
-                class_name = names[class_id]
+                class_name.append = names[class_id]
                 # 获取置信度
                 confidence = float(box.conf[0])
-                if confidence > confidence_max:
-                    confidence_max = confidence
-                    class_name_max = class_name
             # 如果没有检测到任何对象
             if len(r.boxes) == 0:
                 continue
-        return confidence_max, class_name_max
+        return confidence, class_name
     
 class Mediapipe:
     def __init__(self):
         self.mp_pose = mp.solutions.pose
         self.mp_drawing = mp.solutions.drawing_utils
-        self.pose = self.mp_pose.Pose(static_image_mode=True)
+        self.pose = self.mp_pose.Pose(static_image_mode=True,model_complexity=1,
+                                 enable_segmentation=True,
+                                 min_detection_confidence=0.5, min_tracking_confidence=0.7)
     class Mediapipe_thread(threading.Thread):
         def __init__(self,target,image,width,height,mid_x,mid_y,path,depth):
                 self.target = target
@@ -541,7 +556,9 @@ class Mediapipe:
     
     def detect(self, image, width, height, mid_x, mid_y, name, depth):
         GlobalVar.mediapipe_mutex.acquire()
-        results = self.mp_pose.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+        print("man now i looking at you!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        results = self.pose.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+        print(f'result is :{results.pose_world_landmarks}')
         if not results.pose_world_landmarks:
             return None
         alpha = self.get_alpha(results)
@@ -549,7 +566,12 @@ class Mediapipe:
         print("this is alpha ",alpha ,"and name is ",name)
         goal = self.convert_machine_axis_to_world(results,width,height,mid_x,mid_y,name,depth)
         GlobalVar.mediapipe_mutex.release()
+        print("---------i will sent a goal----------")
+        ac.send_goal(goal)
+        print("-----------i have sent a goal-----")
+        ac.wait_for_result()
         return goal
+    
         
     @staticmethod
     def get_alpha(results):
@@ -615,11 +637,8 @@ class Mediapipe:
         robot_states = GlobalVar.get_map_pose_theta()
         rospy.loginfo(f"this is robot position:{robot_states}")
         rpy = GlobalVar.ori_to_rpy(0.0, 0.0, robot_states[2], robot_states[3])
-        # 如果是人，就到人前2m，如果是垃圾，就到垃圾前1m
-        if GlobalVar.reaction_flag == 1:
-            dist = 2
-        elif GlobalVar.reaction_flag == 4:
-            dist = 1
+        # ren qian 1.5m
+        dist = 1.5
         z_second = real_person[2] - dist * cos(alpha)
         x_second = real_person[0] + dist * sin(alpha)
         # if alpha == 0.5 * pi or alpha == 1.5 * pi:
@@ -649,104 +668,138 @@ class Mediapipe:
         return pose_str
 
 image,depth = None, None
-# yolo_model = "/home/zzy/vision/src/vis/scripts/best.pt"
+yolo_model = "/home/lzh/test/src/vis/best.pt"
+#yolo_model = "yolov10n.pt"
 #flag=0
-yolo_model = "yolov10n.pt"
 
 def image_callback(image_rgb,image_depth):
+    #print("--------------i am in image-callback------------")
     global image, depth, flag
     image = GlobalVar.bridge.imgmsg_to_cv2(
             image_rgb, desired_encoding='passthrough')
-    image = np.rot90(image, -1)
+    #image = np.rot90(image, -1)
     depth = GlobalVar.bridge.imgmsg_to_cv2(
             image_depth, desired_encoding='passthrough')
     last_detection_time = 0
-    detection_interval = 0.5  # 每0.5秒执行一次检测
-
-    if time.time() - last_detection_time > detection_interval:
-        last_detection_time = time.time()
+    detection_interval = 10  # 每0.5秒执行一次检测
+    
+    # TODO
+#改成只看第一帧
+    if GlobalVar.frame == 0 :
         GlobalVar.cb_mutex.acquire()
+        print(f"-------------frame number is {GlobalVar.frame}---------------")
         human_detect_result = yolov8.detect(image)
-        store_path=f"/home/lzh/vision/src/vis/data_face/{GlobalVar.last_person}.jpg"
-        cv2.imwrite(store_path,image)
-        face_feature = face.retrieve(store_path)
-        if GlobalVar.reaction_flag == 0:
-            rospy.loginfo(f"Now the task is 0")
-            _ , results = yolov8.start_single_predict(yolo_model,image)
-            num = 0
-            for result in results:
+        cv2.imwrite(f"/home/lzh/{GlobalVar.last_person}.jpg",image)
+        for person in human_detect_result:
+            #rospy.loginfo(f"person:{human_detect_result[i-1]}")
+            store_path=f"/home/lzh/{GlobalVar.last_person}.jpg"
+
+            if GlobalVar.reaction_flag == 0:
+                rospy.loginfo(f"Now the task is 0")
+                result = person[5]
+                num = 0
                 if result == "person":
                     num += 1
-                    break
-            if num > 0 and flag==1:
-                rospy.loginfo("find people")
-                start_recognize_pub.publish("1")
-                flag=0
-            elif num==0 and flag ==1:
-                rospy.loginfo("no people")
-                start_recognize_pub.publish("0")
-                flag=0
-            GlobalVar.reaction_flag = -1
-            rospy.loginfo(f'GlobalVar.reaction_flag:{GlobalVar.reaction_flag}')
+                if num > 0 and flag==1:
+                    rospy.loginfo("find people")
+                    start_recognize_pub.publish("1")
+                    flag=0
+                elif num==0 and flag ==1:
+                    rospy.loginfo("no people")
+                    start_recognize_pub.publish("0")
+                    flag=0
+                cv2.imwrite(store_path,image)
+                GlobalVar.last_person += 1
+                GlobalVar.reaction_flag = -1
+                rospy.loginfo(f'GlobalVar.reaction_flag:{GlobalVar.reaction_flag}')
 
-        elif GlobalVar.reaction_flag == 1:
-            rospy.loginfo(f"Now the task is 1")
-            goal = mediapipe.Mediapipe_thread(mediapipe.detect,*human_detect_result[:5],store_path,depth)
-            # pub_msg = goal
-            # pub_thread = threading.Thread(target=GlobalVar.put_data_into_quene, args=(pub_msg,))
-            # pub_thread.start()
-            orient_angle_pub.publish(goal)
-        elif GlobalVar.reaction_flag == 2:
-            rospy.loginfo(f"Now the task is 2")
-            results = face.recognition(image)
-            rospy.loginfo(f"results={results}")
-            temp = "unknown"
-            for result in results:
-                if result != "unknown":
-                    temp = result
-                    break
-            if flag == 1:
-                rospy.loginfo(f"this people is {temp}")
-                facial_det_pub.publish(temp)
-                flag=0
-            GlobalVar.reaction_flag = -1
+            elif GlobalVar.reaction_flag == 1:
+                rospy.loginfo(f"Now the task is 1")
+                if person[5] == 'person':
+                    goal = mediapipe.detect(person[0],person[1],person[2],person[3],person[4],person[5],depth)
+                    # pub_msg = goal
+                    # pub_thread = threading.Thread(target=GlobalVar.put_data_into_quene, args=(pub_msg,))
+                    # pub_thread.start()
+                    orient_angle_pub.publish(goal)
+                    cv2.imwrite(store_path,image)
+                    GlobalVar.reaction_flag == -1
+                else:
+                    GlobalVar.reaction_flag == -1
+                GlobalVar.last_person += 1
+            elif GlobalVar.reaction_flag == 2:
+                rospy.loginfo(f"Now the task is 2")
+                results = face.recognition(image)
+                rospy.loginfo(f"results={results}")
+                temp = "unknown"
+                for result in results:
+                    if result != "unknown":
+                        temp = result
+                        break
+                if flag == 1:
+                    rospy.loginfo(f"this people is {temp}")
+                    facial_det_pub.publish(temp)
+                    flag=0
+                GlobalVar.reaction_flag = -1
+                cv2.imwrite(store_path,image)
+                GlobalVar.last_person += 1
 
-        elif GlobalVar.reaction_flag == 3:
-            rospy.loginfo(f"Now the task is 3")
-            pose_str = mediapipe.main1_mediapipe(image)
-            rospy.loginfo(f"任务3检测到{pose_str}")
-            rospy.loginfo(f"flag:{flag}")
-            if flag==1:
-                pose_det_pub.publish(pose_str)
-                flag=0
-            GlobalVar.reaction_flag = -1
+            elif GlobalVar.reaction_flag == 3:
+                rospy.loginfo(f"Now the task is 3")
+                pose_str = mediapipe.main1_mediapipe(image)
+                rospy.loginfo(f"任务3检测到{pose_str}")
+                rospy.loginfo(f"flag:{flag}")
+                if flag==1:
+                    pose_det_pub.publish(pose_str)
+                    flag=0
+                GlobalVar.reaction_flag = -1
+                cv2.imwrite(store_path,image)
+                GlobalVar.last_person += 1
 
-        elif GlobalVar.reaction_flag == 4:
-            rospy.loginfo(f"Now the task is 4")
-            confidence, result = yolov8.start_single_predict(yolo_model, image)
-            if confidence > 0.5:
-                rospy.loginfo("任务4检测到有垃圾")
-                start_recognize_robbish_pub.publish("1")
-            else:
-                rospy.loginfo("任务4检测到no垃圾")
-                start_recognize_robbish_pub.publish("0")
-            GlobalVar.reaction_flag = -1
-        elif GlobalVar.reaction_flag == 5:
-            rospy.loginfo(f"Now the task is 5")
-            confidence, result = yolov8.start_single_predict(yolo_model, image)
-            rospy.loginfo(f"任务5检测到{result}")
-            collect_robbish_pub.publish(result)
-            GlobalVar.reaction_flag = -1
-        GlobalVar.frame+=1
+            elif GlobalVar.reaction_flag == 4:
+                rospy.loginfo(f"Now the task is 4")
+                confidence, result = yolov8.start_single_predict(yolo_model, image)
+                if confidence > 0.5:
+                    rospy.loginfo("任务4检测到有垃圾")
+                    start_recognize_robbish_pub.publish("1")
+                else:
+                    rospy.loginfo("任务4检测到no垃圾")
+                    start_recognize_robbish_pub.publish("0")
+                GlobalVar.reaction_flag = -1
+                cv2.imwrite(store_path,image)
+                GlobalVar.last_person += 1
+
+            elif GlobalVar.reaction_flag == 5:
+                rospy.loginfo(f"Now the task is 5")
+                confidence, result = yolov8.start_single_predict(yolo_model, image)
+                rospy.loginfo(f"任务5检测到{result}")
+                collect_robbish_pub.publish(result)
+                GlobalVar.reaction_flag = -1
+                cv2.imwrite(store_path,image)
+                GlobalVar.last_person += 1
+            elif GlobalVar.reaction_flag == 6:
+                rospy.loginfo(f"Now the task is 6")
+                if person[5] != 'person':
+                    goal = yolov8.rubbish_goal(person[3],person[4],person[5],depth)
+                    # pub_msg = goal
+                    # pub_thread = threading.Thread(target=GlobalVar.put_data_into_quene, args=(pub_msg,))
+                    # pub_thread.start()
+                    robbish_pos_pub.publish(goal)
+                    cv2.imwrite(store_path,image)
+                    GlobalVar.reaction_flag == -1
+                else:
+                    GlobalVar.reaction_flag == -1
+                GlobalVar.last_person += 1
+        GlobalVar.frame = 1
+        print(GlobalVar.frame)
         GlobalVar.cb_mutex.release()
-        GlobalVar.reaction_flag = -1
+
 
 def start_recognize_callback(msg:String):
     global flag
     if msg.data == 'OK':
         GlobalVar.reaction_flag=0
         flag = 1
-        rospy.loginfo(f"start_recognize_callback flag:{flag}")
+        rospy.loginfo(f"start_recognize_callback flag:{flag} GlobalVar.reaction_flag:{GlobalVar.reaction_flag}")
 
 def orient_angle_callback(msg:String):
     if msg.data == 'OK':
@@ -776,12 +829,22 @@ def collect_robbish_callback(msg:String):
     if msg.data == 'OK':
         GlobalVar.reaction_flag=5
         rospy.loginfo(f"collect_robbish_callback flag:{flag}")
-flag=0
+
+def rubbish_pos_callback(msg:String):
+    if msg.data == 'OK':
+        GlobalVar.reaction_flag=6
+        rospy.loginfo(f"rubbish_pos_callback flag:{flag}")
+flag=1
 if __name__ == '__main__':
     # flag=0
+    GlobalVar.reaction_flag = 1
+    print("----------------i am in 0 ---------------")
     face = FaceRecognition()
+    print("----------------i am in 1 ---------------")
     yolov8 = Yolov8()
+    print("----------------i am in 2 ---------------")
     mediapipe = Mediapipe()
+    print("----------------i am in 3 ---------------")
 
     orient_angle_sub = rospy.Subscriber("orient_angle",String,orient_angle_callback)
     start_recognize_sub = rospy.Subscriber("start_recognize",String,start_recognize_callback)
@@ -789,6 +852,7 @@ if __name__ == '__main__':
     pose_det = rospy.Subscriber("pose_det",String,pose_det_callback)
     start_recognize_robbish = rospy.Subscriber("start_recognize_robbish",String,start_recognize_robbish_callback)
     collect_robbish = rospy.Subscriber("collect_robbish",String,collect_robbish_callback)
+    robbish_pos = rospy.Subscriber("robbish_pos",String,rubbish_pos_callback)
 
     orient_angle_pub = rospy.Publisher("orient_angle_reply",MoveBaseGoal,queue_size=10)
     start_recognize_pub = rospy.Publisher("start_recognize_reply", String, queue_size=10)
@@ -796,9 +860,12 @@ if __name__ == '__main__':
     pose_det_pub = rospy.Publisher("pose_det_reply", String, queue_size=10)
     start_recognize_robbish_pub = rospy.Publisher("start_recognize_robbish_reply", String, queue_size=10)
     collect_robbish_pub = rospy.Publisher("collect_robbish_reply", String, queue_size=10)
+    robbish_pos_pub = rospy.Publisher("robbish_pos_reply",MoveBaseGoal,queue_size=10)
 
     ac = actionlib.SimpleActionClient('move_base', MoveBaseAction)
     ac.wait_for_server()
+    print("----------------i am in ac ---------------")
+
 
     rgb_sub = message_filters.Subscriber('/kinect2/qhd/image_color', Image)
     depth_sub = message_filters.Subscriber('/kinect2/qhd/image_depth_rect', Image)

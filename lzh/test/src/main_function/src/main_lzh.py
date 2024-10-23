@@ -57,6 +57,7 @@ class Statu:
         self.Robbish_grab=16448,
         self.Send=32896,
         self.Quit=65792,
+        self.Go_to_people=111,
 ################
 # 初始的一些参数 #
 ################
@@ -196,6 +197,7 @@ class pub:
         self.move_robot_arm=rospy.Publisher("move_robot_arm",String,queue_size=10)  # not writing suber yet
         self.orient_angle=rospy.Publisher("orient_angle",String,queue_size=10)  # not writing suber yet
         self.vel_pub=rospy.Publisher("/cmd_vel",Twist,queue_size=10)
+        self.orient_anlge=rospy.Publisher("orient_anlge",String,queue_size=10)
         # self.urgency=rospy.Publisher("")
 ###################################
 #### lzh delete gate name because there is only one wait position
@@ -327,6 +329,9 @@ class pub:
     
     def vel_pubing(self,msg:Twist):
         self.vel_pub.publish(msg)
+    
+    def orient_anlgeing(self):
+        self.orient_anlge.publish("OK")
 
 #########################
 # 用于Gotogoal的客户端操作#
@@ -614,7 +619,7 @@ if __name__ =="__main__":
     # waypoints_posz=waypoints['waypoints_posz']
     # index= np.where(waypoins_name=='wait_pos')
     #error here
-    waypoints_index=4       ###error here, unknow the first waypoint index
+    waypoints_index=1       ###error here, unknow the first waypoint index
     Collect_index=0
     Collect_robbish_index=0
     Robbish_waypoints_index=1
@@ -628,7 +633,7 @@ if __name__ =="__main__":
     #params.wait_position=Puber.Init_Pose()
     #PDW=PreDefinedWaypoints(params.gate_name,params.targets_waypoint)
     rospy.loginfo("初始位置设置完毕")
-    fsm=Status.Find
+    fsm=Status.Explore
 
     # test_i=1 # Put test
     # fsm=Status.Grab#Grab test
@@ -690,7 +695,7 @@ if __name__ =="__main__":
             rospy.loginfo(f'people_exist:{params.people_exist}')
             #rospy.loginfo("params.people_exist")
             if params.people_exist==1:#exist people , exter Collect
-                fsm=Status.Collect
+                fsm=Status.Go_to_people
                 params.people_exist=0
                 have_people=0
                 rospy.loginfo(f"Find people {Collect_index+1}")
@@ -721,7 +726,7 @@ if __name__ =="__main__":
                 rospy.sleep(3)
                 rospy.loginfo(f"people_exist:{params.people_exist}")
                 if params.people_exist==1:#exist people , exter Collect
-                    fsm=Status.Collect
+                    fsm=Status.Go_to_people
                     params.people_exist=0
                     rospy.loginfo(f"Find people {Collect_index+1}")
                     Puber.over_speaking(f"Find people {Collect_index+1}")
@@ -739,6 +744,19 @@ if __name__ =="__main__":
                         fsm=Status.Robbish_Explore
                     else:
                         fsm=Status.Explore
+
+        elif fsm==Status.Go_to_people:
+            rospy.loginfo("Go to people")
+            Puber.over_speaking("go to people")
+            rospy.sleep(1)
+            Puber.orient_angleing()
+            rospy.sleep(1)
+            e=Gotogoal(params.people_goal)
+            if e==True:
+                rospy.loginfo("go people sucessfully")
+                fsm=Status.Collect
+            else:
+                rospy.loginfo("cannot go to people")
 
 
         elif fsm==Status.Collect:

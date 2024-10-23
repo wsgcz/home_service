@@ -6,13 +6,16 @@ conda install -c conda-forge empy
 
 explore：按照waypoints.xml的顺序进入点，进入find
 
-find：旋转角度，每次旋转后开始识别，识别结束需要返回值，有无人需要返回值，找到人后退出旋转进入collect，没找到进入explore
+find：旋转角度，每次旋转后开始识别，识别结束需要返回值，有无人需要返回值，找到人后退出旋转进入orient_anlge，没找到进入explore
+
+orient_anlge:send "OK" (return MoveBaseGoal)
 
 collect：进行一次人脸识别和两次姿势识别并播报，识别结束进入Robbish_explore，否则进入explore
 
 robbish_explore：同explore，但是索引不同，进入find_robbish
 
 find_robbish：同find，找到垃圾进入collect_robbish，找不到就重来
+
 
 collect_robbish：开始识别垃圾种类，after find robbish,start getting pos,movebase to robbish pos,speaking "give me robbish",and open the robot arm,waiting 20s(unsure),close robot arm,进入send模式
 
