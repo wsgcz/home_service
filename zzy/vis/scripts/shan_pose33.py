@@ -30,6 +30,7 @@ class GlobalVar:
     P_y = 269 
     f_x = 540.68603515625
     f_y = 540.68603515625
+    followflag = 0
     machine_odom_now_x = 0
     machine_odom_now_y = 0
     machine_theta = 0
@@ -96,21 +97,21 @@ class GlobalVar:
         return ps_new.point.x, ps_new.point.y
 
     # 将待传输数据放入队列中
-    def put_data_into_quene(data):
-        GlobalVar.queue_mutex.acquire()
-        GlobalVar.pub_queue.put(data)
-        rospy.loginfo("put into queue")
-        GlobalVar.queue_mutex.release()
+    # def put_data_into_quene(data):
+    #     GlobalVar.queue_mutex.acquire()
+    #     GlobalVar.pub_queue.put(data)
+    #     rospy.loginfo("put into queue")
+    #     GlobalVar.queue_mutex.release()
 
-    def get_odom_message(odom:Odometry):
-        GlobalVar.machine_odom_now_x= odom.pose.pose.position.x
-        GlobalVar.machine_odom_now_y=odom.pose.pose.position.y 
+    # def get_odom_message(odom:Odometry):
+    #     GlobalVar.machine_odom_now_x= odom.pose.pose.position.x
+    #     GlobalVar.machine_odom_now_y=odom.pose.pose.position.y 
 
-        odom_ox=odom.pose.pose.orientation.x
-        odom_oy=odom.pose.pose.orientation.y
-        odom_oz=odom.pose.pose.orientation.z
-        odom_ow=odom.pose.pose.orientation.w
-        _,_,GlobalVar.mathince_theta=transformations.euler_from_quaternion([odom_ox,odom_oy,odom_oz,odom_ow])
+    #     odom_ox=odom.pose.pose.orientation.x
+    #     odom_oy=odom.pose.pose.orientation.y
+    #     odom_oz=odom.pose.pose.orientation.z
+    #     odom_ow=odom.pose.pose.orientation.w
+    #     _,_,GlobalVar.mathince_theta=transformations.euler_from_quaternion([odom_ox,odom_oy,odom_oz,odom_ow])
 
 class FaceRecognition:
     def __init__(self, gpu_id=0, face_db='/home/zzy/test/src/vis/face_db', threshold=1.24, det_thresh=0.50, det_size=(640, 640)):
@@ -762,15 +763,14 @@ yolo_model = "/home/zzy/vision/src/vis/scripts/yolov10n.pt"
 def image_callback(image_rgb,image_depth):
     #print("--------------i am in image-callback------------")
     print("--------i am in the callback--------------")
-    print(f"frame is {GlobalVar.frame}")
     global image, depth, flag, last_detection_time
     image = GlobalVar.bridge.imgmsg_to_cv2(
             image_rgb, desired_encoding='passthrough')
     #image = np.rot90(image, -1)
     depth = GlobalVar.bridge.imgmsg_to_cv2(
             image_depth, desired_encoding='passthrough')
-    last_detection_time = 0
-    detection_interval = 10  # 每0.5秒执行一次检测
+    # last_detection_time = 0
+    # detection_interval = 10  # 每0.5秒执行一次检测
     
     # TODO
     #改成只看第一帧
@@ -811,10 +811,10 @@ def image_callback(image_rgb,image_depth):
                     # pub_thread.start()
                     orient_angle_pub.publish(goal)
                     cv2.imwrite(store_path,image)
-                    GlobalVar.reaction_flag == -1
-                else:
-                    GlobalVar.reaction_flag == -1
+                
+                GlobalVar.reaction_flag = -1
                 GlobalVar.last_person += 1
+
             elif GlobalVar.reaction_flag == 2:
                 rospy.loginfo(f"Now the task is 2")
                 results = face.recognition(image)
@@ -833,6 +833,8 @@ def image_callback(image_rgb,image_depth):
                 GlobalVar.last_person += 1
 
             elif GlobalVar.reaction_flag == 3:
+                #TODO
+                #让lizehui发布取消follow
                 rospy.loginfo(f"Now the task is 3")
                 pose_str = mediapipe.main1_mediapipe(image)
                 rospy.loginfo(f"任务3检测到{pose_str}")
@@ -878,29 +880,16 @@ def image_callback(image_rgb,image_depth):
                 else:
                     GlobalVar.reaction_flag == -1
                 GlobalVar.last_person += 1
-            if GlobalVar.reaction_flag == 7:
-                rospy.loginfo(f"Now the task is 7")
-                person2 = yolov8.detect(image)
-                i = 0
-                for personn in person2:
-                    if personn[5]=='person':
-                        break
-                    i += 1
-                while abs(person2[i][3]- 480)>10:
-                    if time.time() - last_detection_time > 0.5:
-                        last_detection_time = time.time()
-                        print("------------i am in the while loop--------")
-                        image1 = GlobalVar.bridge.imgmsg_to_cv2(
-                                image_rgb, desired_encoding='passthrough')
-                        depth1 = GlobalVar.bridge.imgmsg_to_cv2(
-                                image_depth, desired_encoding='passthrough')
+            if GlobalVar.followflag == 1:
+                rospy.loginfo(f"Now the task is follow")
+                if (person[5]=="person"):
+                    if (abs(person[1] - 480) < 48):
+                        GlobalVar.followflag = 0
+                    else:
                         cv2.imwrite("/home/zzy/rotate.jpg", image)
-                        mediapipe.rotate(image, 960,540,person2[i][3],person2[i][4],person2[i][5],depth1)
-                        person2 = yolov8.detect(image1)
-                        
-                GlobalVar.reaction_flag = 7
-        GlobalVar.frame = 0
-        print(GlobalVar.frame)
+                        mediapipe.rotate(image, 960,540,person[3],person[4],person[5],depth)
+        if (GlobalVar.followflag == 0):            
+            GlobalVar.frame = 1
         GlobalVar.cb_mutex.release()
 
 
@@ -908,47 +897,50 @@ def start_recognize_callback(msg:String):
     global flag
     if msg.data == 'OK':
         GlobalVar.reaction_flag=0
-        flag = 1
+        GlobalVar.frame = 0
         rospy.loginfo(f"start_recognize_callback flag:{flag} GlobalVar.reaction_flag:{GlobalVar.reaction_flag}")
 
 def orient_angle_callback(msg:String):
     if msg.data == 'OK':
         GlobalVar.reaction_flag=1
+        GlobalVar.frame = 0
+
 
 def facial_det_callback(msg:String):
     global flag
     if msg.data == 'OK':
+        GlobalVar.frame = 0
         GlobalVar.reaction_flag=2
-        flag=1
         rospy.loginfo(f"facial_det_callback flag:{flag}")
 
 def pose_det_callback(msg:String):
-    global flag
     if msg.data == 'OK':
+        GlobalVar.frame = 0
         GlobalVar.reaction_flag=3
-        flag=1
         rospy.loginfo(f"pose_det_callback flag:{flag}")
 
 def start_recognize_robbish_callback(msg:String):
-    global flag
     if msg.data == 'OK':
+        GlobalVar.frame = 0
         GlobalVar.reaction_flag=4
         rospy.loginfo(f"start_recognize_robbish_callback flag:{flag}")
 
 def collect_robbish_callback(msg:String):
     if msg.data == 'OK':
+        GlobalVar.frame = 0
         GlobalVar.reaction_flag=5
         rospy.loginfo(f"collect_robbish_callback flag:{flag}")
 
 def rubbish_pos_callback(msg:String):
     if msg.data == 'OK':
+        GlobalVar.frame = 0
         GlobalVar.reaction_flag=6
         rospy.loginfo(f"rubbish_pos_callback flag:{flag}")
 
-flag=1
 if __name__ == '__main__':
     # flag=0
-    GlobalVar.reaction_flag = 7
+    GlobalVar.reaction_flag = -1
+    GlobalVar.followflag = 1
     print("----------------i am in 0 ---------------")
     face = FaceRecognition()
     print("----------------i am in 1 ---------------")
