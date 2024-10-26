@@ -22,6 +22,7 @@ from sensor_msgs.msg import Image
 from std_msgs.msg import String
 from move_base_msgs.msg import MoveBaseGoal
 from move_base_msgs.msg import MoveBaseAction
+from geometry_msgs.msg import Twist
 sys.path.insert(0,'/home/zzy/test/src/vis')
 class GlobalVar:
     eps = 1e-2
@@ -44,7 +45,7 @@ class GlobalVar:
     2:识别人脸
     3:姿态识别
     4:识别是否有垃圾
-    5:垃圾识别
+    5:垃圾识别 
     '''
     rospy.init_node("pose3")
     tfBuffer = tf2_ros.Buffer()
@@ -220,7 +221,7 @@ class FaceRecognition:
         return "成功添加人脸"
 
 class Yolov8:
-    def __init__(self,model_path="/home/zzy/vision/src/vis/best.pt"):
+    def __init__(self,model_path="/home/zzy/vision/src/vis/scripts/yolov10n.pt"):
         self.model = YOLO(model_path)
 ###detect函数，对图像进行检测，并返回裁剪后的图像
 ###输入：图片
@@ -255,8 +256,8 @@ class Yolov8:
         return results
     def rubbish_goal(self,width, height, mid_x, mid_y, name, depth):
         GlobalVar.mediapipe_mutex.acquire()
-        x_center = int(2*mid_x-0.5*width)
-        y_center = int(2*mid_y-0.5*height)
+        x_center = int(mid_x)
+        y_center = int(mid_y)
         #use kinect2 timely,change to realsense finally
         if x_center > 960: x_center=959
         if y_center > 540: y_center=539
@@ -453,6 +454,16 @@ class Mediapipe:
         v1 = keypoints[12] - keypoints[14]
         v2 = keypoints[16] - keypoints[14]
         from_14_to_12_16 = mediapipe.get_angle(v1, v2)
+
+        # 肩膀
+        # 左
+        v1 = keypoints[11] - keypoints[13]
+        v2 = keypoints[11] - keypoints[23]
+        from_11_to_13_23 = mediapipe.get_angle(v1, v2)
+        # 右
+        v1 = keypoints[12] - keypoints[14]
+        v2 = keypoints[12] - keypoints[24]
+        from_12_to_14_24 = mediapipe.get_angle(v1, v2)
         
         ### 距离
         
@@ -471,54 +482,91 @@ class Mediapipe:
         # 右
         distance_20_8 = mediapipe.get_distance(keypoints[20],keypoints[8])
 
+        # 手肘和肩膀
+        # 左
+        distance_15_12 = mediapipe.get_distance(keypoints[15],keypoints[12])
+        # 右
+        distance_16_11 = mediapipe.get_distance(keypoints[16],keypoints[11])
+
         ### 姿态识别
 
         # 蹲起
-        if 20<abs(from_23_11_to_y)<60 and 20<abs(from_24_12_to_y)<60:
-            str_pose = "蹲起_1"
-            if 30<abs(from_25_to_23_27)<150 and 30<abs(from_26_to_24_28)<150:
+        # if 20<abs(from_23_11_to_y)<60 and 20<abs(from_24_12_to_y)<60:
+        #     str_pose = "蹲起_1"
+        #     if 30<abs(from_25_to_23_27)<150 and 30<abs(from_26_to_24_28)<150:
+        #         str_pose = "蹲起"
+        #         return str_pose
+        #     return str_pose
+
+        # 蹲起
+        if abs(from_23_11_to_y)<45 and abs(from_24_12_to_y)<45:
+            if abs(from_25_to_23_27)<90 or abs(from_26_to_24_28)<90:
                 str_pose = "蹲起"
                 return str_pose
-            return str_pose
+            if abs(from_23_to_11_25)<150 or abs(from_24_to_12_26)<150: 
+                if abs(from_25_to_23_27)<150 or abs(from_26_to_24_28)<150:
+                    str_pose = "蹲起"
+                    return str_pose
 
-        # 站立、走、躺、俯卧撑、吸烟、打电话
         if abs(from_23_11_to_y)<45 and abs(from_24_12_to_y)<45:
+            # 站立
             str_pose = "站立"
-            if distance_19_9<0.75*distance_11_12 or distance_20_10<0.75*distance_11_12 or distance_19_7<0.75*distance_11_12 or distance_20_8<0.75*distance_11_12:
-                distances = [distance_19_9,distance_20_10,distance_19_7,distance_20_8]
-                min_index, min_distance = min(enumerate(distances), key=lambda x: x[1])
-                if min_index==0 or min_index==1:
-                    str_pose = "吸烟"
-                    return str_pose
-                else:
-                    str_pose = "打电话"
-                    return str_pose
-            if abs(abs(from_23_to_11_25)-90)<45 or abs(abs(from_24_to_12_26)-90)<45:
-                str_pose = "坐"
+
+            # 双手交叉
+            if distance_15_12<0.75*distance_11_12 and distance_16_11<0.75*distance_11_12:
+                str_pose = "双手交叉"
                 return str_pose
+
+            # 吸烟、打电话
+            if abs(from_11_to_13_23)<90 and abs(from_12_to_14_24)<90:
+                if distance_19_9<0.75*distance_11_12 or distance_20_10<0.75*distance_11_12 or distance_19_7<0.75*distance_11_12 or distance_20_8<0.75*distance_11_12:
+                    distances = [distance_19_9,distance_20_10,distance_19_7,distance_20_8]
+                    min_index, min_distance = min(enumerate(distances), key=lambda x: x[1])
+                    if min_index==0 or min_index==1:
+                        str_pose = "吸烟"
+                        return str_pose
+                    else:
+                        str_pose = "打电话"
+                        return str_pose
+                
+            # if abs(abs(from_23_to_11_25)-90)<45 or abs(abs(from_24_to_12_26)-90)<45:
+            #     str_pose = "坐"
+            #     return str_pose
+
+            # 举手、举双手
+            # if abs(from_11_23_to_13_15)>100:
+            #     str_pose = "举左手"
+            #     if abs(from_12_24_to_14_16)>100:
+            #         str_pose = "举双手"
+            #     return str_pose
+            # if abs(from_12_24_to_14_16)>100:
+            #     str_pose = "举右手"
+            #     if abs(from_11_23_to_13_15)>100:
+            #         str_pose = "举双手"
+            #     return str_pose
+            
+            # 举手、举双手
+            if abs(from_11_to_13_23)>90 or abs(from_12_to_14_24)>90:
+                str_pose = "举手"
+                if abs(from_11_to_13_23)>90 and abs(from_12_to_14_24)>90:
+                    str_pose = "举双手"
+                return str_pose
+            
+            # 行走
             if abs(from_25_27_to_26_28)>20 or abs(from_23_25_to_24_26)>20:
                 str_pose = "行走"
                 return str_pose
-            if abs(from_11_23_to_13_15)>100:
-                str_pose = "举左手"
-                if abs(from_12_24_to_14_16)>100:
-                    str_pose = "举双手"
-                return str_pose
-            if abs(from_12_24_to_14_16)>100:
-                str_pose = "举右手"
-                if abs(from_11_23_to_13_15)>100:
-                    str_pose = "举双手"
-                return str_pose
             return str_pose
         else :
-            str_pose = "躺"
-            if 45<abs(from_11_23_to_13_15)<135 and 45<abs(from_12_24_to_14_16)<135:
-                str_pose = "俯卧撑"
-                return str_pose
+            # 平躺
+            str_pose = "平躺"
+            # if 45<abs(from_11_23_to_13_15)<135 and 45<abs(from_12_24_to_14_16)<135:
+            #     str_pose = "俯卧撑"
+            #     return str_pose
             return str_pose
         
     def process_frame(self, img):
-        # start_time = time.time()
+        start_time = time.time()
         h, w = img.shape[0], img.shape[1]               # 高和宽
         # 调整字体
         # tl = round(0.005 * (img.shape[0] + img.shape[1]) / 2) + 1
@@ -529,7 +577,7 @@ class Mediapipe:
         results = self.pose.process(img_RGB)
         keypoints = ['' for i in range(33)]
         if results.pose_landmarks:
-            # self.mp_drawing.draw_landmarks(img, results.pose_landmarks, self.mp_pose.POSE_CONNECTIONS)
+            self.mp_drawing.draw_landmarks(img, results.pose_landmarks, self.mp_pose.POSE_CONNECTIONS)
             for i in range(33):
                 cx = int(results.pose_landmarks.landmark[i].x * w)
                 cy = int(results.pose_landmarks.landmark[i].y * h)
@@ -537,17 +585,26 @@ class Mediapipe:
         else:
             # print("NO PERSON")
             struction = "NO PERSON"
-            # img = cv2.putText(img, struction, (25, 100), cv2.FONT_HERSHEY_SIMPLEX, 1.25, (255, 255, 0),6)
+            img = cv2.putText(img, struction, (25, 100), cv2.FONT_HERSHEY_SIMPLEX, 1.25, (255, 255, 0),6)
             return struction
-        # end_time = time.time()
-        # process_time = end_time - start_time            # 图片关键点预测时间
+        end_time = time.time()
+        process_time = end_time - start_time            # 图片关键点预测时间
+        fps = 1 / process_time                          # 帧率
+        colors = [[random.randint(0,255) for _ in range(3)] for _ in range(33)]
+        radius = [random.randint(8,15) for _ in range(33)]
+        for i in range(33):
+            cx, cy = keypoints[i]
+            # if i in range(33):        # end_time = time.time()
+        process_time = end_time - start_time            # 图片关键点预测时间
         # fps = 1 / process_time                          # 帧率
         # colors = [[random.randint(0,255) for _ in range(3)] for _ in range(33)]
         # radius = [random.randint(8,15) for _ in range(33)]
-        # for i in range(33):
-        #     cx, cy = keypoints[i]
-        #     #if i in range(33):
-        #     img = cv2.circle(img, (cx, cy), radius[i], colors[i], -1)
+        for i in range(33):
+            cx, cy = keypoints[i]
+            #if i in range(33):
+            # img = cv2.circle(img, (cx, cy), radius[i], colors[i], -1)
+            # img = cv2.circle(img, (cx, cy), radius[i], colors[i], -1)
+        print(keypoints)
         str_pose = self.get_pos(keypoints)            #获取姿态
         # cv2.putText(img, "POSE-{}".format(str_pose), (12, 100), cv2.FONT_HERSHEY_TRIPLEX,
         #             tl / 3, (255, 0, 0), thickness=tf)
@@ -571,8 +628,36 @@ class Mediapipe:
         print("-----------i have sent a goal-----")
         ac.wait_for_result()
         return goal
-    
-        
+    #确保人在视野的中心
+    def rotate(self, image, width, height, mid_x, mid_y, name, depth):
+        GlobalVar.mediapipe_mutex.acquire()
+        cmdvel = Twist()
+        results = self.pose.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+        if not results.pose_world_landmarks:
+            return None
+        sumx = 0
+        #print(len(results.pose_world_landmark))
+        for i in range(33):
+            sumx = sumx +int(results.pose_world_landmarks.landmark[i].x*width+ mid_x - 0.5 * width)
+        x_average = sumx / 33 + 480#以所有关键点的平均x坐标作为人在图中的位置
+        print(f"the x_average is {x_average}")
+        cmdvel.linear.x = 0
+        cmdvel.linear.y = 0
+        cmdvel.linear.z = 0
+        cmdvel.angular.x = 0
+        cmdvel.angular.y = 0
+        if x_average < width / 2 :
+            cmdvel.angular.z = 1
+        else:
+            cmdvel.angular.z = -1
+        vel_pub.publish(cmdvel)
+        rospy.sleep(0.5)#每次转0.5弧度试试
+        cmdvel.angular.z=0
+        vel_pub.publish(cmdvel)
+        rospy.sleep(1)
+        return None
+
+
     @staticmethod
     def get_alpha(results):
         z_left = results.pose_world_landmarks.landmark[11].z
@@ -584,7 +669,9 @@ class Mediapipe:
         alpha = pi + atan2(z_distance, x_distance)
         return alpha
     
-    # 返回物体在机器人坐标系下的真实距离
+    # 返回物体fps = 1 / process_time                          # 帧率
+        # colors = [[random.randint(0,255) for _ in range(3)] for _ in range(33)]
+        在机器人坐标系下的真实距离
     # 输入： 物体在图片中的像素位置u_img(x),v_img(y),d:深度，单位mm
     # 输出： 用米做单位的坐标，机器人坐标系
     @staticmethod
@@ -668,13 +755,15 @@ class Mediapipe:
         return pose_str
 
 image,depth = None, None
-yolo_model = "//home/zzy/vision/src/vis/best.pt"
+yolo_model = "/home/zzy/vision/src/vis/scripts/yolov10n.pt"
 #yolo_model = "yolov10n.pt"
 #flag=0
 
 def image_callback(image_rgb,image_depth):
     #print("--------------i am in image-callback------------")
-    global image, depth, flag
+    print("--------i am in the callback--------------")
+    print(f"frame is {GlobalVar.frame}")
+    global image, depth, flag, last_detection_time
     image = GlobalVar.bridge.imgmsg_to_cv2(
             image_rgb, desired_encoding='passthrough')
     #image = np.rot90(image, -1)
@@ -684,7 +773,7 @@ def image_callback(image_rgb,image_depth):
     detection_interval = 10  # 每0.5秒执行一次检测
     
     # TODO
-#改成只看第一帧
+    #改成只看第一帧
     if GlobalVar.frame == 0 :
         GlobalVar.cb_mutex.acquire()
         print(f"-------------frame number is {GlobalVar.frame}---------------")
@@ -751,10 +840,10 @@ def image_callback(image_rgb,image_depth):
                 if flag==1:
                     pose_det_pub.publish(pose_str)
                     flag=0
-                GlobalVar.reaction_flag = -1
+                GlobalVar.reaction_flag = 7
                 cv2.imwrite(store_path,image)
                 GlobalVar.last_person += 1
-
+                
             elif GlobalVar.reaction_flag == 4:
                 rospy.loginfo(f"Now the task is 4")
                 confidence, result = yolov8.start_single_predict(yolo_model, image)
@@ -789,7 +878,28 @@ def image_callback(image_rgb,image_depth):
                 else:
                     GlobalVar.reaction_flag == -1
                 GlobalVar.last_person += 1
-        GlobalVar.frame = 1
+            if GlobalVar.reaction_flag == 7:
+                rospy.loginfo(f"Now the task is 7")
+                person2 = yolov8.detect(image)
+                i = 0
+                for personn in person2:
+                    if personn[5]=='person':
+                        break
+                    i += 1
+                while abs(person2[i][3]- 480)>10:
+                    if time.time() - last_detection_time > 0.5:
+                        last_detection_time = time.time()
+                        print("------------i am in the while loop--------")
+                        image1 = GlobalVar.bridge.imgmsg_to_cv2(
+                                image_rgb, desired_encoding='passthrough')
+                        depth1 = GlobalVar.bridge.imgmsg_to_cv2(
+                                image_depth, desired_encoding='passthrough')
+                        cv2.imwrite("/home/zzy/rotate.jpg", image)
+                        mediapipe.rotate(image, 960,540,person2[i][3],person2[i][4],person2[i][5],depth1)
+                        person2 = yolov8.detect(image1)
+                        
+                GlobalVar.reaction_flag = 7
+        GlobalVar.frame = 0
         print(GlobalVar.frame)
         GlobalVar.cb_mutex.release()
 
@@ -834,10 +944,11 @@ def rubbish_pos_callback(msg:String):
     if msg.data == 'OK':
         GlobalVar.reaction_flag=6
         rospy.loginfo(f"rubbish_pos_callback flag:{flag}")
+
 flag=1
 if __name__ == '__main__':
     # flag=0
-    GlobalVar.reaction_flag = 6
+    GlobalVar.reaction_flag = 7
     print("----------------i am in 0 ---------------")
     face = FaceRecognition()
     print("----------------i am in 1 ---------------")
@@ -861,6 +972,7 @@ if __name__ == '__main__':
     start_recognize_robbish_pub = rospy.Publisher("start_recognize_robbish_reply", String, queue_size=10)
     collect_robbish_pub = rospy.Publisher("collect_robbish_reply", String, queue_size=10)
     robbish_pos_pub = rospy.Publisher("robbish_pos_reply",MoveBaseGoal,queue_size=10)
+    vel_pub=rospy.Publisher("/cmd_vel",Twist,queue_size=10)
 
     ac = actionlib.SimpleActionClient('move_base', MoveBaseAction)
     ac.wait_for_server()
