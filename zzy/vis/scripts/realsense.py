@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 import numpy as np
 from ultralytics import YOLO
-
+import pyrealsense2 as rs
 from sklearn import preprocessing
 from PIL import Image, ImageFont, ImageDraw
 from math import atan2,pi,sqrt,sin,cos
@@ -45,6 +45,22 @@ class GlobalVar:
     bridge = CvBridge()
     # goal_name = Goals_name()
 
+    width = 1040
+    height = 560
+
+    pipeline = rs.pipeline()  # 定义流程pipeline，创建一个管道
+    config = rs.config()  # 定义配置config
+
+    config.enable_stream(rs.stream.depth,  1280, 720, rs.format.z16, 30)
+    config.enable_stream(rs.stream.color, 1280, 720, rs.format.bgr8, 30)
+    
+    pipe_profile = pipeline.start(config)  # streaming流开始
+    
+    # 创建对齐对象与color流对齐
+    align_to = rs.stream.color  # align_to 是计划对齐深度帧的流类型
+    align = rs.align(align_to)  # rs.align 执行深度帧与其他帧的对齐
+
+    frame = 0
     pub_queue = Queue(10)
     cb_mutex = threading.Lock()
     face_mutex = threading.Lock()
@@ -87,6 +103,38 @@ class GlobalVar:
         ps_new = GlobalVar.tfBuffer.transform(ps, "map", rospy.Duration(1))
         return ps_new.point.x, ps_new.point.y
     
+def get_aligned_images():
+    frames = GlobalVar.pipeline.wait_for_frames()  # 等待获取图像帧，获取颜色和深度的框架集
+    aligned_frames = GlobalVar.align.process(frames)  # 获取对齐帧，将深度框与颜色框对齐
+
+    aligned_depth_frame = aligned_frames.get_depth_frame()  # 获取对齐帧中的的depth帧
+    aligned_color_frame = aligned_frames.get_color_frame()  # 获取对齐帧中的的color帧
+
+    #### 获取相机参数 ####
+    depth_intrin = aligned_depth_frame.profile.as_video_stream_profile().intrinsics  # 获取深度参数（像素坐标系转相机坐标系会用到）
+    color_intrin = aligned_color_frame.profile.as_video_stream_profile().intrinsics  # 获取相机内参
+
+    #### 将images转为numpy arrays ####
+    img_color = np.asanyarray(aligned_color_frame.get_data())  # RGB图
+    img_depth = np.asanyarray(aligned_depth_frame.get_data())  # 深度图（默认16位）
+
+    return color_intrin, depth_intrin, img_color, img_depth, aligned_depth_frame
+    
+    
+''' 
+获取随机点三维坐标
+'''
+
+def get_3d_camera_coordinate(depth_pixel, aligned_depth_frame, depth_intrin):
+    x = depth_pixel[0]
+    y = depth_pixel[1]
+    dis = aligned_depth_frame.get_distance(x, y)  # 获取该像素点对应的深度
+    # print ('depth: ',dis)       # 深度单位是m
+    camera_coordinate = rs.rs2_deproject_pixel_to_point(depth_intrin, depth_pixel, dis)
+    # print ('camera_coordinate: ',camera_coordinate)
+    return dis, camera_coordinate
+ 
+ 
 class Yolov8:
     def __init__(self,model_path="/home/zzy/vision/src/vis/scripts/best_rs.pt"):
         self.model = YOLO(model_path)
@@ -152,8 +200,15 @@ def image_callback(image_rgb):
     GlobalVar.cb_mutex.acquire()
     if GlobalVar.frame == 0 :
         result = yolov8.detect(image)
+        color_intrin, depth_intrin, img_color, img_depth, aligned_depth_frame = get_aligned_images()  # 获取对齐图像与相机参数
+ 
+        ''' 
+        获取随机点三维坐标
+        '''
         for res in result:
             if res[5] == 'bin':
+                depth_pixel = [res[1], res[2]]  # 设置随机点，以相机中心点为例
+                dis, camera_coordinate = get_3d_camera_coordinate(depth_pixel, aligned_depth_frame, depth_intrin)
                 GlobalVar.followflag = 1
         if GlobalVar.followflag == 1 and GlobalVar.reaction_flag == 1:
             #只有同时收到抓取的信息和识别到垃圾桶,才开始转
@@ -185,10 +240,13 @@ def spin_sub(msg:String):
         GlobalVar.reaction_flag = 1
 
 if __name__ == "__main__":
-    
+    ac = actionlib.SimpleActionClient('move_base', MoveBaseAction)
+    buffer = tf2_ros.Buffer()
+    listener = tf2_ros.TransformListener(buffer)
+
     yolov8 = Yolov8()
 
-    rgb_sub = rospy.Subscriber("/camera/color/image_raw",Image)
+    rgb_sub = rospy.Subscriber("/camera/color/image_raw",Image,image_callback)
     res_sub = rospy.Subscriber("/home_sevice/robot_spin",String,queue_size=10)
 
     vel_pub = rospy.Publisher("/cmd_vel",Twist,queue_size=10)
