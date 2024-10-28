@@ -45,13 +45,15 @@ begin_close = 0
 #启动
 def start_open(msg):
     global begin_open
-    begin_open = 1   
-    rospy.loginfo("ok I will start")
+    if (msg=="open"):
+        begin_open = 1   
+        rospy.loginfo("ok I will start")
 
 def start_close(msg):
     global begin_close
-    begin_close = 1   
-    rospy.loginfo("ok I will close")
+    if (msg=="close"):
+        begin_close = 1   
+        rospy.loginfo("ok I will close")
 
   
 #张开夹爪
@@ -68,7 +70,7 @@ def open():
         control_arm_data.position[1]=0.5
         control_arm_data.velocity[1]=2
         arm_action_pub.publish(control_arm_data)
-        rospy.sleep(20)
+        rospy.sleep(5)
         rospy.set_param("params_finish", 1)
         
 
@@ -76,7 +78,7 @@ def open():
 def close():
     global begin_close,control_arm_data
     if (begin_close == 1):
-        control_arm_data.position[1]=0.03
+        control_arm_data.position[1]=0
         control_arm_data.velocity[1]=1
         arm_action_pub.publish(control_arm_data)
         rospy.sleep(10)
@@ -99,8 +101,8 @@ def reset():
 #主体
 if __name__=="__main__":
     rospy.init_node("general_service_grab")
-    open_sub=rospy.Subscriber("move_robot_arm",String,start_open,queue_size=10)
-    close_sub=rospy.Subscriber("move_robot_arm",String,start_close,queue_size=10)
+    open_sub=rospy.Subscriber("/home_service/move_robot_arm",String,start_open,queue_size=10)
+    close_sub=rospy.Subscriber("/home_service/move_robot_arm",String,start_close,queue_size=10)
     arm_action_pub=rospy.Publisher("/wpb_home/mani_ctrl",JointState,queue_size=30) #控制机器人机械臂
     open()
     close()
