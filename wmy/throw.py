@@ -51,12 +51,12 @@ control_arm_data.velocity.extend(arm_postion_init)
 machine_speed=Twist()
 
 #???huoqu
-have_left=0.56
+# have_left=0.56
 begin_throw = 0
 
 def start_spin(msg):
     global begin_to_confirm_all_position_data,begin_throw
-    if (msg=="grab"):
+    if (msg=="throw"):
         start_spin_pub.publish("spin")
     rospy.loginfo("ok I will face the trashbase")
 
@@ -69,7 +69,7 @@ def start_forward(msg):
 def go_ahead(msg):
     global machine_speed,begin_throw,have_left
     have_left = msg
-    machine_speed.linear.x=have_left/2 # 在机器人坐标中，x为面前的方向；在摄像头中为左右的方向
+    machine_speed.linear.x=(have_left-0.55)/2 # 在机器人坐标中，x为面前的方向；在摄像头中为左右的方向
     machine_speed.linear.y=0
     machine_speed.linear.z=0
     machine_speed.angular.x=0
@@ -86,6 +86,10 @@ def go_ahead(msg):
 def throw_the_object():
     global control_arm_data
     # rospy.loginfo("this is final_y %f",final_position_y)
+    control_arm_data.position[0]=0.6
+    control_arm_data.velocity[1]=1
+    arm_action_pub.publish(control_arm_data)
+    rospy.sleep(9)
     control_arm_data.position[1]=0.5
     control_arm_data.velocity[1]=1
     arm_action_pub.publish(control_arm_data)
@@ -107,7 +111,8 @@ def throw_the_object():
     arm_action_pub.publish(control_arm_data)
     rospy.sleep(4)
     rospy.loginfo("finish throw the trash!!!")
-    rospy.set_param("params_finish", 1)
+    down_state_pub.publish("0")
+    #rospy.set_param("params_finish", 1)
    
 def control_all_the_action_of_machine_throw():
     global begin_to_confirm_all_position_data,have_known_the_angle,have_set_everything,have_set_height,begin_throw,control_arm_data,have_left
@@ -151,6 +156,8 @@ if __name__=="__main__":
     start_get_distance_pub=rospy.Publisher("/home_service/lidar_distance",String,queue_size=10) #begin to get distance
 
     get_distance_sub=rospy.Subscriber("/home_service/robot_getdistance",String,go_ahead,queue_size=10)#get distance and move
+    
+    down_state_pub=rospy.Publisher("/home_service/genenal_service_put_down_result",String,queue_size=10)#grab.py
     
     # tfBuffer = tf2_ros.Buffer()
     # tfSub = tf2_ros.TransformListener(tfBuffer)

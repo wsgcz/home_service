@@ -41,27 +41,13 @@ control_arm_data.velocity.extend(arm_postion_init)
 
 begin_open = 0
 begin_close = 0
-
-#启动
-def start_open(msg):
-    global begin_open
-    if (msg=="open"):
-        begin_open = 1   
-        rospy.loginfo("ok I will start")
-
-def start_close(msg):
-    global begin_close
-    if (msg=="close"):
-        begin_close = 1   
-        rospy.loginfo("ok I will close")
-
   
 #张开夹爪
-def open():
-    global begin_open,control_arm_data
-    if(begin_open == 1):
+def grab(msg:String):
+    global control_arm_data
+    if(msg == "1"):
         rospy.loginfo("Open!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-        control_arm_data.position[0]=0.7
+        control_arm_data.position[0]=0.6
         control_arm_data.velocity[0]=0.5
         control_arm_data.position[1]=0
         control_arm_data.velocity[1]=0
@@ -71,42 +57,45 @@ def open():
         control_arm_data.velocity[1]=2
         arm_action_pub.publish(control_arm_data)
         rospy.sleep(5)
-        rospy.set_param("params_finish", 1)
-        
-
-#抓取
-def close():
-    global begin_close,control_arm_data
-    if (begin_close == 1):
+        arm_state_pub.publish("1")
+    elif(msg == "0"): 
         control_arm_data.position[1]=0
         control_arm_data.velocity[1]=1
         arm_action_pub.publish(control_arm_data)
-        rospy.sleep(10)
+        rospy.sleep(7)
+        arm_state_pub.publish("1")
         rospy.loginfo("Close!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-        rospy.set_param("params_finish", 1)
+        control_arm_data.position[0]=0
+        control_arm_data.velocity[0]=1
+        arm_action_pub.publish(control_arm_data)
+        rospy.sleep(7)
+        get_state_pub.publish("0")
+        #rospy.set_param("params_finish", 1)
+    
+    
+        #rospy.set_param("params_finish", 1)
         # control_arm_data.position[0]=0
         # control_arm_data.velocity[1]=1
         # arm_action_pub.publish(control_arm_data)
         # rospy.sleep(5)
 
 
-def reset():
-    global begin_close,begin_open,control_arm_data
-    begin_open = 0
-    begin_close = 0
-    rospy.loginfo("reset!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-    rospy.sleep(2)
+# def reset():
+#     global begin_close,begin_open,control_arm_data
+#     begin_open = 0
+#     begin_close = 0
+#     rospy.loginfo("reset!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+#     rospy.sleep(2)
 
 
 #主体
 if __name__=="__main__":
     rospy.init_node("general_service_grab")
-    open_sub=rospy.Subscriber("/home_service/move_robot_arm",String,start_open,queue_size=10)
-    close_sub=rospy.Subscriber("/home_service/move_robot_arm",String,start_close,queue_size=10)
+    grab_sub=rospy.Subscriber("/home_service/move_robot_arm",String,grab,queue_size=10)
     arm_action_pub=rospy.Publisher("/wpb_home/mani_ctrl",JointState,queue_size=30) #控制机器人机械臂
-    open()
-    close()
-    reset()
+    arm_state_pub = rospy.Publisher("/home_service/move_robot_arm_reply",String,queue_size=10)
+    get_state_pub=rospy.Publisher("/home_service/genenal_service_get_it",String,queue_size=10)#grab.py
+    #reset()
     time1 = time.time()
     rospy.spin()
 
