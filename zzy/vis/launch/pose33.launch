@@ -1,6 +1,6 @@
 <launch>
 
-  <arg name="model" default="$(find wpb_home_bringup)/urdf/wpb_home_mani.urdf"/>
+  <arg name="model" default="$(find wpb_home_bringup)/urdf/wpb_home.urdf"/>
   <arg name="gui" default="false" />
   <arg name="rvizconfig" default="$(find wpb_home_tutorials)/rviz/obj_detect.rviz" />
 
@@ -13,8 +13,9 @@
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />
 
-  <node pkg="vis" type="pose33.py" name="vision" output="screen"/>
-
+  <node pkg="vis" type="shan_pose33.py" name="vision" output="screen"/>
+  <include file="$(find realsense2_camera)/launch/rs_camera.launch" />
+  
   <!--- Run Kinect -->
   <!--************************ kinect ************************-->
   <arg name="base_name"         default="kinect2"/>
@@ -108,5 +109,9 @@
     <param name="queue_size" type="int" value="$(arg queue_size)"/>
   </node>
   <!--************************ end ************************-->
-
+<!-- wpb_home core-->
+  <node pkg="wpb_home_bringup" type="wpb_home_core" name="wpb_home_core" output="screen">
+    <param name="serial_port" type="string" value="/dev/ftdi"/> 
+    <rosparam file="$(find wpb_home_bringup)/config/wpb_home.yaml" command="load" />
+  </node>
 </launch>
