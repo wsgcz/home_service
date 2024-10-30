@@ -11,7 +11,10 @@
   <rosparam command="load" file="$(find wpb_home_bringup)/config/wpb_home.yaml" />
   </node>
  
+
   <node pkg="vis" type="shan_pose33.py" name="vision" output="screen"/>
+  <node pkg="vis" type="realsense.py" name="vision2" output="screen"/>
+  <include file="$(find main_function)/launch/rs_camera.launch" />
 
   <!--- Run Kinect -->
   <!--************************ kinect ************************-->
@@ -51,6 +54,7 @@
  
 
    <!-- qhd point cloud (960 x 540) -->
+
   <!--************************ end ************************-->
 
 </launch>

@@ -25,7 +25,6 @@ int main(int argc, char** argv) {
     vel_pub = n.advertise<geometry_msgs::Twist>("/cmd_vel",10);
     
     ros::Rate rate = ros::Rate(0.4);
-    int nameofwaypoint = 0;
     geometry_msgs::Twist vel_cmd;
     vel_cmd.linear.x = 0;
     vel_cmd.linear.y = 0;
@@ -37,25 +36,28 @@ int main(int argc, char** argv) {
     while (ros::ok())
     {
         char c = getchar();
-        if (c == '1') {
-            vel_cmd.linear.x = 0.18;
-            vel_pub.publish(vel_cmd);
-        } else {
-            if (c == '2') {
+        switch (c)
+        {
+            case '1':
+                vel_cmd.linear.x = 0.18;
+                vel_pub.publish(vel_cmd);
+                break;
+            case '2':
                 vel_cmd.linear.x = -0.18;
                 vel_pub.publish(vel_cmd);
-            } else {
-                if (c == '3') {
-                    vel_cmd.angular.z= 0.3;
-                    vel_pub.publish(vel_cmd);    
-                } else {if (c == '4') {
-                    vel_cmd.angular.z = -0.3;
-                    vel_pub.publish(vel_cmd);
-                }
-            }
+                break;
+            case '3':
+                vel_cmd.angular.z= 0.3;
+                vel_pub.publish(vel_cmd);
+                break;
+            case '4':
+                vel_cmd.angular.z = -0.3;
+                vel_pub.publish(vel_cmd);
+                break;
+            default:
+                break;
         }
         rate.sleep();
         reset_vel(vel_cmd);
-        }    
-        }
+    }    
 }

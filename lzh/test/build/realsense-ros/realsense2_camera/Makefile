@@ -124,6 +124,17 @@ install/local/fast: preinstall/fast
 	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
 .PHONY : install/local/fast
 
+# Special rule for the target test
+test:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running tests..."
+	/usr/bin/ctest --force-new-ctest-process $(ARGS)
+.PHONY : test
+
+# Special rule for the target test
+test/fast: test
+
+.PHONY : test/fast
+
 # The main all target
 all: cmake_check_build_system
 	cd /home/lzh/test/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/lzh/test/build/CMakeFiles /home/lzh/test/build/realsense-ros/realsense2_camera/CMakeFiles/progress.marks
@@ -727,6 +738,7 @@ help:
 	@echo "... std_srvs_generate_messages_eus"
 	@echo "... diagnostic_msgs_generate_messages_eus"
 	@echo "... std_srvs_generate_messages_lisp"
+	@echo "... test"
 	@echo "... std_srvs_generate_messages_py"
 	@echo "... realsense2_camera_generate_messages_nodejs"
 	@echo "... diagnostic_msgs_generate_messages_nodejs"

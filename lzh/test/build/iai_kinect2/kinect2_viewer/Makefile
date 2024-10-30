@@ -124,6 +124,17 @@ edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
 
+# Special rule for the target test
+test:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running tests..."
+	/usr/bin/ctest --force-new-ctest-process $(ARGS)
+.PHONY : test
+
+# Special rule for the target test
+test/fast: test
+
+.PHONY : test/fast
+
 # The main all target
 all: cmake_check_build_system
 	cd /home/lzh/test/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/lzh/test/build/CMakeFiles /home/lzh/test/build/iai_kinect2/kinect2_viewer/CMakeFiles/progress.marks
@@ -226,6 +237,7 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... kinect2_viewer"
 	@echo "... edit_cache"
+	@echo "... test"
 	@echo "... additional_files_kinect2_viewer"
 	@echo "... src/viewer.o"
 	@echo "... src/viewer.i"

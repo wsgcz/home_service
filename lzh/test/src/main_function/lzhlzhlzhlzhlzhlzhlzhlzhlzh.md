@@ -56,4 +56,15 @@ move_robot_arm publish '1' to open,'0' to close,after finish change Params.finis
 
 orient_angle chao xiang jiao (return MoveBaseGoal)
 
+robot_spin (return String)
+
+follow_people "1" start "0"end(return None)
+
 other pkg only need to write puber to send msg,for example, to reply "start_recognize",the puber's theme is "start_recognize_reply"
+
+##############################
+waypoints.xml
+index 0 is enter waypoint
+index 1-4 is room waypoint
+index 5-8 is find_robbish waypoint
+index 9 is robbish can waypoint

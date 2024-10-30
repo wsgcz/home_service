@@ -3,13 +3,13 @@
 
 # compile C with /usr/bin/cc
 # compile CXX with /usr/bin/c++
-C_FLAGS = -O3 -DNDEBUG  
+C_FLAGS =  
 
 C_DEFINES = -DQT_NO_KEYWORDS -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\"waterplus_map_tools\"
 
 C_INCLUDES = -I/home/lzh/test/build/waterplus_map_tools/wp_nav_remote_autogen/include -I/home/lzh/test/devel/include -I/home/lzh/test/src/waterplus_map_tools/include -I/opt/ros/noetic/include -I/opt/ros/noetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp -I/usr/include/eigen3 -I/usr/include/OGRE/Overlay -I/usr/include/OGRE 
 
-CXX_FLAGS = -O3 -DNDEBUG  
+CXX_FLAGS =  
 
 CXX_DEFINES = -DQT_NO_KEYWORDS -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\"waterplus_map_tools\"
 
