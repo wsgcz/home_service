@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 import numpy as np
 from ultralytics import YOLO
-import pyrealsense2 as rs
+
 from sklearn import preprocessing
 from PIL import Image, ImageFont, ImageDraw
 from math import atan2,pi,sqrt,sin,cos
@@ -23,7 +23,7 @@ from std_msgs.msg import String
 from move_base_msgs.msg import MoveBaseGoal
 from move_base_msgs.msg import MoveBaseAction
 from geometry_msgs.msg import Twist
-sys.path.insert(0,'/home/zzy/test/src/vis')
+sys.path.insert(0,'/home/gcz/test/src/vis')
 
 class GlobalVar:
     eps = 1e-2
@@ -35,9 +35,9 @@ class GlobalVar:
     machine_odom_now_x = 0
     machine_odom_now_y = 0
     machine_theta = 0
-    frame = 0
+    frame = 1
     last_person = 0
-    reaction_flag = 0
+    reaction_flag = -1
     start_work = False
     rospy.init_node("realsense")
     tfBuffer = tf2_ros.Buffer()
@@ -45,22 +45,6 @@ class GlobalVar:
     bridge = CvBridge()
     # goal_name = Goals_name()
 
-    width = 1040
-    height = 560
-
-    pipeline = rs.pipeline()  # 定义流程pipeline，创建一个管道
-    config = rs.config()  # 定义配置config
-
-    config.enable_stream(rs.stream.depth,  1280, 720, rs.format.z16, 30)
-    config.enable_stream(rs.stream.color, 1280, 720, rs.format.bgr8, 30)
-    
-    pipe_profile = pipeline.start(config)  # streaming流开始
-    
-    # 创建对齐对象与color流对齐
-    align_to = rs.stream.color  # align_to 是计划对齐深度帧的流类型
-    align = rs.align(align_to)  # rs.align 执行深度帧与其他帧的对齐
-
-    frame = 0
     pub_queue = Queue(10)
     cb_mutex = threading.Lock()
     face_mutex = threading.Lock()
@@ -103,61 +87,58 @@ class GlobalVar:
         ps_new = GlobalVar.tfBuffer.transform(ps, "map", rospy.Duration(1))
         return ps_new.point.x, ps_new.point.y
     
-def get_aligned_images():
-    frames = GlobalVar.pipeline.wait_for_frames()  # 等待获取图像帧，获取颜色和深度的框架集
-    aligned_frames = GlobalVar.align.process(frames)  # 获取对齐帧，将深度框与颜色框对齐
 
-    aligned_depth_frame = aligned_frames.get_depth_frame()  # 获取对齐帧中的的depth帧
-    aligned_color_frame = aligned_frames.get_color_frame()  # 获取对齐帧中的的color帧
-
-    #### 获取相机参数 ####
-    depth_intrin = aligned_depth_frame.profile.as_video_stream_profile().intrinsics  # 获取深度参数（像素坐标系转相机坐标系会用到）
-    color_intrin = aligned_color_frame.profile.as_video_stream_profile().intrinsics  # 获取相机内参
-
-    #### 将images转为numpy arrays ####
-    img_color = np.asanyarray(aligned_color_frame.get_data())  # RGB图
-    img_depth = np.asanyarray(aligned_depth_frame.get_data())  # 深度图（默认16位）
-
-    return color_intrin, depth_intrin, img_color, img_depth, aligned_depth_frame
-    
-    
-''' 
-获取随机点三维坐标
-'''
-
-def get_3d_camera_coordinate(depth_pixel, aligned_depth_frame, depth_intrin):
-    x = depth_pixel[0]
-    y = depth_pixel[1]
-    dis = aligned_depth_frame.get_distance(x, y)  # 获取该像素点对应的深度
-    # print ('depth: ',dis)       # 深度单位是m
-    camera_coordinate = rs.rs2_deproject_pixel_to_point(depth_intrin, depth_pixel, dis)
-    # print ('camera_coordinate: ',camera_coordinate)
-    return dis, camera_coordinate
- 
- 
+# yolo_model = "/home/shanhe/demo/runs/detect/train2/weights/best.pt"
+yolo_model = "/home/shanhe/111111models/best_4rubbish.pt"
 class Yolov8:
-    def __init__(self,model_path="/home/zzy/vision/src/vis/scripts/best_rs.pt"):
-        self.model = YOLO(model_path)
+    def __init__(self,model_path1="/home/shanhe/111111models/best_4rubbish.pt",
+                 model_path2="/home/shanhe/111111models/best_bin_1.pt"):
+        self.model1 = YOLO(model_path1)
+        self.model2 = YOLO(model_path2)
+
 ###detect函数，对图像进行检测，并返回裁剪后的图像
 ###输入：图片
 ###输出：裁剪后的图片，框的宽度和高度，框的中心点，标签
-    def detect(self,image):
+    def detect(self,image,num):
         results = list()
         nimg = image
         # plot_skeleton_kpts(nimg, output[idx, 7:].T, 3)
-        output = self.model(image)
+        if num==1:
+            output = self.model1(image)
+        if num==2:
+            output = self.model2(image)
         name = list()
-        for o in output:
-            boxes = o.boxes
-            names = o.names
+        
+        # class_name_max = "nothing"
+        # name_max = ""
+        # class_id_max = 0
+        # 获取类别名称字典
+        for r in output:
+            names = r.names
+            boxes = r.boxes
             for box in boxes:
                 # 获取类别索引
                 class_id = int(box.cls[0])
                 # 获取类别名称
-                name.append(names[class_id])
+                class_name = names[class_id]
+                # 获取置信度
+                confidence = float(box.conf[0])
+                name.append((class_name, confidence))
+                # print(f"检测到: {class_name}, 置信度: {confidence:.2f}")
             # 如果没有检测到任何对象
-            if len(boxes) == 0:
+            if len(r.boxes) == 0:
                 continue
+        # for o in output:
+        #     boxes = o.boxes
+        #     names = o.names
+        #     for box in boxes:
+        #         # 获取类别索引
+        #         class_id = int(box.cls[0])
+        #         # 获取类别名称
+        #         name.append(names[class_id])
+        #     # 如果没有检测到任何对象
+        #     if len(boxes) == 0:
+        #         continue
         for i in range (len(name)):
             xywh = boxes.cpu().xywh.detach().numpy()
             x_center = int(xywh[i][0])
@@ -165,10 +146,55 @@ class Yolov8:
             half_w = int(xywh[i][2]/2)
             half_h = int(xywh[i][3]/2)
             change_image=nimg[y_center-half_h:y_center+half_h,x_center-half_w:x_center+half_w]#裁减之后的框
-            image_name = f"/home/zzy/{name[i]}.jpg"
-            cv2.imwrite(image_name,change_image)
-            results.append((change_image,half_w*2,half_h*2,x_center,y_center,name[i]))
-        return results
+            # image_name = f"/home/zzy/{name[i]}.jpg"
+            # cv2.imwrite(image_name,change_image)
+            # 宽 高 
+            results.append(change_image,half_w*2,half_h*2,x_center,y_center,name[i][0])
+        max_index = 0
+        confidence_max = -1
+        for i in range (len(name)):
+            if name[i][1] > confidence_max:
+                    confidence_max = name[i][1]
+                    max_index = i
+        max_result = list()
+        max_result.append(results[max_index])
+        return max_result
+
+
+# ###detect函数，对图像进行检测，并返回裁剪后的图像
+# ###输入：图片
+# ###输出：裁剪后的图片，框的宽度和高度，框的中心点，标签
+#     def detect(self,image,num):
+#         results = list()
+#         nimg = image
+#         # plot_skeleton_kpts(nimg, output[idx, 7:].T, 3)
+#         if num==1:
+#             output = self.model1(image)
+#         if num==2:
+#             output = self.model2(image)
+#         name = list()
+#         for o in output:
+#             boxes = o.boxes
+#             names = o.names
+#             for box in boxes:
+#                 # 获取类别索引
+#                 class_id = int(box.cls[0])
+#                 # 获取类别名称
+#                 name.append(names[class_id])
+#             # 如果没有检测到任何对象
+#             if len(boxes) == 0:
+#                 continue
+#         for i in range (len(name)):
+#             xywh = boxes.cpu().xywh.detach().numpy()
+#             x_center = int(xywh[i][0])
+#             y_center = int(xywh[i][1])
+#             half_w = int(xywh[i][2]/2)
+#             half_h = int(xywh[i][3]/2)
+#             change_image=nimg[y_center-half_h:y_center+half_h,x_center-half_w:x_center+half_w]#裁减之后的框
+#             image_name = f"/home/gcz/{name[i]}.jpg"
+#             # cv2.imwrite(image_name,change_image)
+#             results.append((change_image,half_w*2,half_h*2,x_center,y_center,name[i]))
+#         return results
   
     #确保人在视野的中心
     def rotate(self, image, width, height, mid_x, mid_y, name):
@@ -186,52 +212,67 @@ class Yolov8:
         else:
             cmdvel.angular.z = -1
         vel_pub.publish(cmdvel)
-        rospy.sleep(0.2)#每次转0.5弧度试试
+        rospy.sleep(0.5)#每次转0.5弧度试试
         cmdvel.angular.z=0
         vel_pub.publish(cmdvel)
         rospy.sleep(0.5)
         GlobalVar.mediapipe_mutex.release()
         return None
     
+# yolo_model = "/home/shanhe/demo/runs/detect/train2/weights/best.pt"
+last_detection_time = 0    
 def image_callback(image_rgb):
+    print("---------- i am in the callback --------------")
     global image, last_detection_time
     image = GlobalVar.bridge.imgmsg_to_cv2(
             image_rgb, desired_encoding='passthrough')
+
+    #cv::Mat
     GlobalVar.cb_mutex.acquire()
     if GlobalVar.frame == 0 :
-        result = yolov8.detect(image)
-        color_intrin, depth_intrin, img_color, img_depth, aligned_depth_frame = get_aligned_images()  # 获取对齐图像与相机参数
- 
-        ''' 
-        获取随机点三维坐标
-        '''
-        for res in result:
-            if res[5] == 'bin':
-                depth_pixel = [res[1], res[2]]  # 设置随机点，以相机中心点为例
-                dis, camera_coordinate = get_3d_camera_coordinate(depth_pixel, aligned_depth_frame, depth_intrin)
-                GlobalVar.followflag = 1
-        if GlobalVar.followflag == 1 and GlobalVar.reaction_flag == 1:
-            #只有同时收到抓取的信息和识别到垃圾桶,才开始转
-            if (time.time() - last_detection_time < 0.5):
-                print(114)
-            else:
+        if GlobalVar.reaction_flag == 5:
+            rospy.loginfo(f"Now the task is 5")
+            result = yolov8.detect(image, 1)
+            rospy.loginfo(f"任务5检测到{result}")
+            collect_robbish_pub.publish(result)
+            GlobalVar.reaction_flag = -1
+            # cv2.imwrite(store_path,image)
+            GlobalVar.last_person += 1
+
+        elif GlobalVar.reaction_flag == 1:
+            if (time.time() - last_detection_time > 2):
                 last_detection_time = time.time()
-                rospy.loginfo(f"Now the task is follow")
-                if (res[5]=="bin"):
-                    if (not(abs(res[3] - 640) < 50)):
-                        cv2.imwrite("/home/zzy/rotate.jpg", image)
-                        yolov8.rotate(image, 1280,720,res[3],res[4],res[5])
-                    else:
-                        GlobalVar.followflag = 0
+                print(last_detection_time)
+                r, b, g = cv2.split(image)
+                image = cv2.merge([g,b,r])
+                cv2.imwrite("/home/shanhe/rotate.jpg", image)
+                result = yolov8.detect(image, 2)
+                # cv2.imshow("jhh",image)
+                # cv2.waitKey(0)
+                # cv2.imwrite("/home/gcz/rotate.jpg", image)
+                for res in result:
+                    if res[5] == 'bin':
+                        GlobalVar.followflag = 1
+                if GlobalVar.followflag == 1 :
+                    #只有同时收到抓取的信息和识别到垃圾桶,才开始转
+                    rospy.loginfo(f"Now the task is follow")
+                    if (res[5]=="bin"):
+                        if (not(abs(res[3] - 640) < 50)):
+                            cv2.imwrite("/home/gcz/rotate.jpg", image)
+                            yolov8.rotate(image, 1280,720,res[3],res[4],res[5])
+                        else:
+                            GlobalVar.followflag = 0
+
         if (GlobalVar.followflag == 0):
             print("------------i am setting the followflag to 0----------")    
             res_pub.publish("spin ok")        
             GlobalVar.frame = 1
             GlobalVar.reaction_flag = 0
+    # else :
+    #     GlobalVar.frame += 1
     GlobalVar.cb_mutex.release()
 
-    rospy.loginfo(f"检测到{result[5]}")
-    GlobalVar.reaction_flag = 0
+    GlobalVar.reaction_flag = 1
     #cv2.imwrite(store_path,image)
     GlobalVar.last_person += 1
 
@@ -239,17 +280,30 @@ def spin_sub(msg:String):
     if msg.data == "spin":
         GlobalVar.reaction_flag = 1
 
+
+def collect_robbish_callback(msg:String):
+    if msg.data == 'OK':
+        GlobalVar.frame = 0
+        GlobalVar.reaction_flag=5
+        rospy.loginfo(f"reaction flag:{GlobalVar.reaction_flag}")
+
 if __name__ == "__main__":
-    ac = actionlib.SimpleActionClient('move_base', MoveBaseAction)
-    buffer = tf2_ros.Buffer()
-    listener = tf2_ros.TransformListener(buffer)
-
+    
+    GlobalVar.reaction_flag = 1
+    GlobalVar.frame = 0
     yolov8 = Yolov8()
-
+    print("-------------i am in 1----------------")
     rgb_sub = rospy.Subscriber("/camera/color/image_raw",Image,image_callback)
-    res_sub = rospy.Subscriber("/home_sevice/robot_spin",String,queue_size=10)
+
+    print("-------------i am in 2----------------")
+
+    res_sub = rospy.Subscriber("/home_sevice/robot_spin",String,spin_sub)
+    #print("-------------i am in 6----------------")
 
     vel_pub = rospy.Publisher("/cmd_vel",Twist,queue_size=10)
     res_pub = rospy.Publisher("/home_sevice/robot_spin_reply",String,queue_size=10)
+    #print("-------------i am in 7----------------")
+    collect_robbish = rospy.Subscriber("collect_robbish",String,collect_robbish_callback)
 
+    collect_robbish_pub = rospy.Publisher("collect_robbish_reply", String, queue_size=10)
     rospy.spin()
