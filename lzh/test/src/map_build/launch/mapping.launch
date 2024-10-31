@@ -1,5 +1,5 @@
 <launch>
-<arg name="model" default="$(find wpb_home_bringup)/urdf/wpb_home.urdf"/>
+<arg name="model" default="$(find wpb_home_bringup)/urdf/wpb_home_mani.urdf"/>
   <arg name="gui" default="false" />
 
   <param name="robot_description" command="$(find xacro)/xacro $(arg model)" />
@@ -39,8 +39,7 @@
   <param name="scale_linear" value="1" type="double"/>
   <param name="scale_angular" value="1" type="double"/>
   <node pkg="wpb_home_bringup" type="wpb_home_js_vel" name="teleop"/>
-
-     <!-- joy node -->
+  
   <node pkg="map_build" type="velocity_control" name="velocity_control" >
   </node>
 </launch>

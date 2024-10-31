@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import os,cv2,sys,time,torch,rospy,tf2_ros,threading,insightface,message_filters
 import numpy as np
 import mediapipe as mp
@@ -22,6 +23,7 @@ from sensor_msgs.msg import Image
 from std_msgs.msg import String
 from move_base_msgs.msg import MoveBaseGoal
 from move_base_msgs.msg import MoveBaseAction
+from geometry_msgs.msg import Twist
 sys.path.insert(0,'/home/lzh/test/src/vis')
 class GlobalVar:
     eps = 1e-2
@@ -29,6 +31,7 @@ class GlobalVar:
     P_y = 269 
     f_x = 540.68603515625
     f_y = 540.68603515625
+    followflag = 0
     machine_odom_now_x = 0
     machine_odom_now_y = 0
     machine_theta = 0
@@ -44,7 +47,7 @@ class GlobalVar:
     2:识别人脸
     3:姿态识别
     4:识别是否有垃圾
-    5:垃圾识别
+    5:垃圾识别 
     '''
     rospy.init_node("pose3")
     tfBuffer = tf2_ros.Buffer()
@@ -56,7 +59,7 @@ class GlobalVar:
     cb_mutex = threading.Lock()
     face_mutex = threading.Lock()
     queue_mutex = threading.Lock()
-    mediapipe_mutex = threading.Lock()
+    rotate_mutex = threading.Lock()
     def ori_to_rpy(x, y, z, w):
         (r, p, y) = transformations.euler_from_quaternion([x, y, z, w])
         return [r, p, y]
@@ -95,21 +98,21 @@ class GlobalVar:
         return ps_new.point.x, ps_new.point.y
 
     # 将待传输数据放入队列中
-    def put_data_into_quene(data):
-        GlobalVar.queue_mutex.acquire()
-        GlobalVar.pub_queue.put(data)
-        rospy.loginfo("put into queue")
-        GlobalVar.queue_mutex.release()
+    # def put_data_into_quene(data):
+    #     GlobalVar.queue_mutex.acquire()
+    #     GlobalVar.pub_queue.put(data)
+    #     rospy.loginfo("put into queue")
+    #     GlobalVar.queue_mutex.release()
 
-    def get_odom_message(odom:Odometry):
-        GlobalVar.machine_odom_now_x= odom.pose.pose.position.x
-        GlobalVar.machine_odom_now_y=odom.pose.pose.position.y 
+    # def get_odom_message(odom:Odometry):
+    #     GlobalVar.machine_odom_now_x= odom.pose.pose.position.x
+    #     GlobalVar.machine_odom_now_y=odom.pose.pose.position.y 
 
-        odom_ox=odom.pose.pose.orientation.x
-        odom_oy=odom.pose.pose.orientation.y
-        odom_oz=odom.pose.pose.orientation.z
-        odom_ow=odom.pose.pose.orientation.w
-        _,_,GlobalVar.mathince_theta=transformations.euler_from_quaternion([odom_ox,odom_oy,odom_oz,odom_ow])
+    #     odom_ox=odom.pose.pose.orientation.x
+    #     odom_oy=odom.pose.pose.orientation.y
+    #     odom_oz=odom.pose.pose.orientation.z
+    #     odom_ow=odom.pose.pose.orientation.w
+    #     _,_,GlobalVar.mathince_theta=transformations.euler_from_quaternion([odom_ox,odom_oy,odom_oz,odom_ow])
 
 class FaceRecognition:
     def __init__(self, gpu_id=0, face_db='/home/lzh/test/src/vis/face_db', threshold=1.24, det_thresh=0.50, det_size=(640, 640)):
@@ -212,7 +215,7 @@ class FaceRecognition:
         if is_exits:
             return '该用户已存在'
         
-        cv2.imwrite(os.path.join(self.face_db, f'{user_name}.jpg'), image)
+        # cv2.imwrite(os.path.join(self.face_db, f'{user_name}.jpg'), image)
         self.faces_embedding.append({
             "user_name": user_name,
             "feature": embedding
@@ -220,27 +223,123 @@ class FaceRecognition:
         return "成功添加人脸"
 
 class Yolov8:
-    def __init__(self,model_path="/home/lzh/test/src/yolov10n.pt"):
-        self.model = YOLO(model_path)
+    def __init__(self,model_path1="/home/lzh/test/src/main_function/models/yolov10n.pt", # 预训练
+                 model_path2="/home/lzh/test/src/main_function/models/best_3people_1.pt", # 三人
+                 model_path3="/home/lzh/test/src/main_function/models/yolov10n.pt"):
+        self.model_yuxunlian = YOLO(model_path1)
+        self.model_3people = YOLO(model_path2)
+        self.model_yuxunlian2 = YOLO(model_path3)
 ###detect函数，对图像进行检测，并返回裁剪后的图像
 ###输入：图片
 ###输出：裁剪后的图片，框的宽度和高度，框的中心点，标签
-    def detect(self,image):
+    def detect(self,image, choice):
         results = list()
         nimg = image
         # plot_skeleton_kpts(nimg, output[idx, 7:].T, 3)
-        output = self.model(image)
+        if(choice == 1):
+            output = self.model_yuxunlian(image)
+        elif(choice == 2):
+            output = self.model_3people(image)
+        elif(choice == 3):
+            output = self.model_yuxunlian2(image)
         name = list()
-        for o in output:
-            boxes = o.boxes
-            names = o.names
+        confidence_max = -1
+        # class_name_max = "nothing"
+        # name_max = ""
+        # class_id_max = 0
+        # 获取类别名称字典
+        for r in output:
+            names = r.names
+            boxes = r.boxes
             for box in boxes:
                 # 获取类别索引
                 class_id = int(box.cls[0])
                 # 获取类别名称
-                name.append(names[class_id])
+                class_name = names[class_id]
+                # 获取置信度
+                confidence = float(box.conf[0])
+                name.append((class_name, confidence))
+                # print(f"检测到: {class_name}, 置信度: {confidence:.2f}")
             # 如果没有检测到任何对象
-            if len(boxes) == 0:
+            if len(r.boxes) == 0:
+                continue
+        
+        for i in range (len(name)):
+            xywh = boxes.cpu().xywh.detach().numpy()
+            x_center = int(xywh[i][0])
+            y_center = int(xywh[i][1])
+            half_w = int(xywh[i][2]/2)
+            half_h = int(xywh[i][3]/2)
+            change_image=nimg[y_center-half_h:y_center+half_h,x_center-half_w:x_center+half_w]#裁减之后的框
+            cv2.imwrite(f"/home/lzh/peopel_{i}.jpg", change_image)
+            # image_name = f"/home/lzh/{name[i]}.jpg"
+            # cv2.imwrite(image_name,change_image)
+            # 宽 高 
+            w = half_w*2
+            h = half_h*2
+            if h < 2*w :
+                continue
+            #TODO
+            # 人的移动(预训练模型的最大面积)和人的识别的长宽比不同   1.5 
+            results.append((change_image,half_w*2,half_h*2,x_center,y_center,name[i][0]))
+        # max_index = 0
+        # for i in range (len(name)):
+        #     if name[i][1] > confidence_max:
+        #             confidence_max = name[i][1]
+        #             max_index = i
+        # max_result = list()
+        # max_result.append(results[max_index])
+
+        # 创建面积和索引的配对
+        areas = [(result[1] * result[2], i) for i, result in enumerate(results)]
+        # areas现在是: [(8000, 0), (2000, 1), (10800, 2)]
+        # 按面积降序排序并获取排序后的索引
+        sorted_indices = [i for _, i in sorted(areas, reverse=True)]
+        # sorted_indices现在是: [2, 0, 1]
+        # 重新排序results和name
+        results = [results[i] for i in sorted_indices]
+
+        print(f"-----------------识别的结果是{len(results)}-------------")
+        return results
+    
+    def detect_yolo3(self,image, choice):
+
+        # print(image)
+        results = list()
+        # image = "/home/shanhe/test123/tests/02B4A7F99A6243C61ABC3D34E150A188.jpg" # 正面
+        # image = "/home/shanhe/test123/tests/DD0E93CEE01490071D266F79EFC85FBE.jpg" # 反面
+        # image = "/home/shanhe/test123/tests/IMG_20241029_193312.jpg" # 侧面
+        # image = cv2.imread(image)
+        nimg = image
+        # plot_skeleton_kpts(nimg, output[idx, 7:].T, 3)
+        if(choice == 1):
+            output = self.model_yuxunlian(image)
+        elif(choice == 2):
+            output = self.model_3people(image)
+        elif(choice == 3):
+            output = self.model_yuxunlian2(image)
+        name = list()
+        
+        # class_name_max = "nothing"
+        # name_max = ""
+        # class_id_max = 0
+        # 获取类别名称字典
+        for r in output:
+            # r.show()
+            names = r.names
+            boxes = r.boxes
+            for box in boxes:
+                # 获取类别索引
+                class_id = int(box.cls[0])
+                # 获取类别名称
+                class_name = names[class_id]
+                # 获取置信度
+                confidence = float(box.conf[0])
+                name.append((class_name, confidence))
+                print(f"-------------i see person {class_name}, confidence {confidence}-----------------")
+                # print(f"检测到: {class_name}, 置信度: {confidence:.2f}")
+            # 如果没有检测到任何对象
+            if len(r.boxes) == 0:
                 continue
         for i in range (len(name)):
             xywh = boxes.cpu().xywh.detach().numpy()
@@ -249,70 +348,104 @@ class Yolov8:
             half_w = int(xywh[i][2]/2)
             half_h = int(xywh[i][3]/2)
             change_image=nimg[y_center-half_h:y_center+half_h,x_center-half_w:x_center+half_w]#裁减之后的框
-            image_name = f"/home/lzh/{name[i]}.jpg"
-            cv2.imwrite(image_name,change_image)
-            results.append((change_image,half_w*2,half_h*2,x_center,y_center,name[i]))
-        return results
-    def rubbish_goal(self, mid_x, mid_y, name, depth):
-        GlobalVar.mediapipe_mutex.acquire()
-        x_center = int(mid_x)
-        y_center = int(mid_y)
-        #use kinect2 timely,change to realsense finally
-        if x_center > 960: x_center=959
-        if y_center > 540: y_center=539
-        average_depth = depth[y_center][x_center]
-        rubbish_pos = mediapipe.real_pose(x_center, y_center, average_depth)
-        rospy.loginfo(f"rubbish_pos is :{rubbish_pos[0]},{rubbish_pos[1]}")
-        #rubbish's position in robot axis
-        if rubbish_pos[2] < GlobalVar.eps:
-            return
-        robot_states = GlobalVar.get_map_pose_theta()
-        rospy.loginfo(f"this is robot position:{robot_states}")
-        rpy = GlobalVar.ori_to_rpy(0.0, 0.0, robot_states[2], robot_states[3])
-        dist = 0.55
-        z_second = rubbish_pos[2] - dist
-        x_second = rubbish_pos[0] + dist
-        x1, y1 = GlobalVar.get_map_pose(x_second, z_second)
-        rospy.loginfo(f"ultimate pos in the coordinate:{x1},{y1}")
-        goal = MoveBaseGoal()
-        goal.target_pose.header.frame_id = 'map'
-        goal.target_pose.pose.position.x = y1
-        goal.target_pose.pose.position.y = -x1
-        xyzw = GlobalVar.rpy2quaternion(0.0, 0.0, -pi)
-        goal.target_pose.pose.orientation.x = 0.0
-        goal.target_pose.pose.orientation.y = 0.0
-        goal.target_pose.pose.orientation.z = xyzw[2]
-        goal.target_pose.pose.orientation.w = xyzw[3]
-        goal.target_pose.header.stamp = rospy.Time.now()
-        GlobalVar.mediapipe_mutex.release()
-        print("---------i will sent a goal----------")
-        ac.send_goal(goal)
-        print("-----------i have sent a goal-----")
-        ac.wait_for_result()
-        return goal
+            # image_name = f"/home/lzh/{name[i]}.jpg"
+            # cv2.imwrite(image_name,change_image)
+            # 宽 高 
+            # w = half_w*2
+            # h = half_h*2
+            # if h < 3*w :
+            #     continue
+            results.append((change_image,half_w*2,half_h*2,x_center,y_center,name[i][0]))
+        
+        # 创建面积和索引的配对
+        areas = [(result[1] * result[2], i) for i, result in enumerate(results)]
+        # areas现在是: [(8000, 0), (2000, 1), (10800, 2)]
+        # 按面积降序排序并获取排序后的索引
+        sorted_indices = [i for _, i in sorted(areas, reverse=True)]
+        # sorted_indices现在是: [2, 0, 1]
+        # 重新排序results和name
+        results = [results[i] for i in sorted_indices]
+        name = [name[i] for i in sorted_indices]
 
-    def start_single_predict(self, yolo_model, img_path):
-        model = YOLO(yolo_model)
-        results = model(img_path)
-        confidence_max = -1
-        class_name_max = ""
-        class_name = list()
+        max_index = -1
+        # confidence_max = -1
+        threshold = 0.7
+        max_result = list()
+        # print(f"----------------name 长度：{len(name)}-----------------------")
+        for i in range (len(name)):
+            w = results[i][1]
+            h = results[i][2]
+            print(f"----------------名字: {results[i][5]},w={w},h={h}-----------------------")
+            if h < 2*w:
+                continue
+            if name[i][1] > threshold:
+                print(f"--------------i see person {name[i][0]}, confidence {name[i][1]}-----------------")
+                max_index = i
+                break
+        if not (max_index == -1):
+            max_result.append(results[max_index])
+        return max_result
+    
+    def detect_following(self,image, choice):
+        results = list()
+        nimg = image
+        # plot_skeleton_kpts(nimg, output[idx, 7:].T, 3)
+        if(choice == 1):
+            output = self.model_yuxunlian(image)
+        elif(choice == 2):
+            output = self.model_3people(image)
+        elif(choice == 3):
+            output = self.model_yuxunlian2(image)
+        name = list()
+        
+        # class_name_max = "nothing"
+        # name_max = ""
+        # class_id_max = 0
         # 获取类别名称字典
-        for r in results:
-            # 获取类别名称字典
+        for r in output:
             names = r.names
-            # 遍历每个检测到的对象
-            for box in r.boxes:
+            boxes = r.boxes
+            for box in boxes:
                 # 获取类别索引
                 class_id = int(box.cls[0])
                 # 获取类别名称
-                class_name.append = names[class_id]
+                class_name = names[class_id]
                 # 获取置信度
                 confidence = float(box.conf[0])
+                name.append((class_name, confidence))
+                # print(f"检测到: {class_name}, 置信度: {confidence:.2f}")
             # 如果没有检测到任何对象
             if len(r.boxes) == 0:
                 continue
-        return confidence, class_name
+        for i in range (len(name)):
+            xywh = boxes.cpu().xywh.detach().numpy()
+            x_center = int(xywh[i][0])
+            y_center = int(xywh[i][1])
+            half_w = int(xywh[i][2]/2)
+            half_h = int(xywh[i][3]/2)
+            change_image=nimg[y_center-half_h:y_center+half_h,x_center-half_w:x_center+half_w]#裁减之后的框
+            cv2.imwrite(f"/home/lzh/peopel_{i}.jpg", change_image)
+            # image_name = f"/home/lzh/{name[i]}.jpg"
+            # cv2.imwrite(image_name,change_image)
+            # 宽 高 
+            w = half_w*2
+            h = half_h*2
+            if h < 1.5*w :
+                continue
+            #TODO
+            # 人的移动(预训练模型的最大面积)和人的识别的长宽比不同   1.5 
+            results.append((change_image,half_w*2,half_h*2,x_center,y_center,name[i][0]))
+        max_index = -1
+        s_max = -1
+        for i in range (len(name)):
+            if results[i][1]*results[i][2] > s_max:
+                    s_max = results[i][1]*results[i][2]
+                    max_index = i
+        max_result = list()
+        if not (max_index == -1):
+            max_result.append(results[max_index])
+        print(f"-----------------识别的结果是{len(max_result)}-------------")
+        return max_result
     
 class Mediapipe:
     def __init__(self):
@@ -389,7 +522,7 @@ class Mediapipe:
         31 - 左脚尖
         32 - 右脚尖
         """
-        str_pose = "无"
+        str_pose = "NO PERSON"
         keypoints = np.array(keypoints)
 
         ### 角度
@@ -453,6 +586,16 @@ class Mediapipe:
         v1 = keypoints[12] - keypoints[14]
         v2 = keypoints[16] - keypoints[14]
         from_14_to_12_16 = mediapipe.get_angle(v1, v2)
+
+        # 肩膀
+        # 左
+        v1 = keypoints[11] - keypoints[13]
+        v2 = keypoints[11] - keypoints[23]
+        from_11_to_13_23 = mediapipe.get_angle(v1, v2)
+        # 右
+        v1 = keypoints[12] - keypoints[14]
+        v2 = keypoints[12] - keypoints[24]
+        from_12_to_14_24 = mediapipe.get_angle(v1, v2)
         
         ### 距离
         
@@ -471,50 +614,93 @@ class Mediapipe:
         # 右
         distance_20_8 = mediapipe.get_distance(keypoints[20],keypoints[8])
 
+        # 手肘和肩膀
+        # 左
+        distance_15_12 = mediapipe.get_distance(keypoints[15],keypoints[12])
+        # 右
+        distance_16_11 = mediapipe.get_distance(keypoints[16],keypoints[11])
+
         ### 姿态识别
 
         # 蹲起
-        if 20<abs(from_23_11_to_y)<60 and 20<abs(from_24_12_to_y)<60:
-            str_pose = "蹲起_1"
-            if 30<abs(from_25_to_23_27)<150 and 30<abs(from_26_to_24_28)<150:
+        # if 20<abs(from_23_11_to_y)<60 and 20<abs(from_24_12_to_y)<60:
+        #     str_pose = "蹲起_1"
+        #     if 30<abs(from_25_to_23_27)<150 and 30<abs(from_26_to_24_28)<150:
+        #         str_pose = "蹲起"
+        #         return str_pose
+        #     return str_pose
+
+        # 蹲起
+        if abs(from_23_11_to_y)<45 and abs(from_24_12_to_y)<45:
+            if abs(from_25_to_23_27)<90 or abs(from_26_to_24_28)<90:
                 str_pose = "蹲起"
                 return str_pose
-            return str_pose
+            if abs(from_23_to_11_25)<150 or abs(from_24_to_12_26)<150: 
+                if abs(from_25_to_23_27)<150 or abs(from_26_to_24_28)<150:
+                    str_pose = "蹲起"
+                    return str_pose
 
-        # 站立、走、躺、俯卧撑、吸烟、打电话
         if abs(from_23_11_to_y)<45 and abs(from_24_12_to_y)<45:
+            # 站立
             str_pose = "站立"
-            if distance_19_9<0.75*distance_11_12 or distance_20_10<0.75*distance_11_12 or distance_19_7<0.75*distance_11_12 or distance_20_8<0.75*distance_11_12:
-                distances = [distance_19_9,distance_20_10,distance_19_7,distance_20_8]
-                min_index, min_distance = min(enumerate(distances), key=lambda x: x[1])
-                if min_index==0 or min_index==1:
-                    str_pose = "吸烟"
-                    return str_pose
-                else:
-                    str_pose = "打电话"
-                    return str_pose
-            if abs(abs(from_23_to_11_25)-90)<45 or abs(abs(from_24_to_12_26)-90)<45:
-                str_pose = "坐"
+
+            # 双手交叉
+            if distance_15_12<0.75*distance_11_12 and distance_16_11<0.75*distance_11_12:
+                str_pose = "双手交叉"
                 return str_pose
+
+            # 吸烟、打电话
+            if abs(from_11_to_13_23)<120 and abs(from_12_to_14_24)<120:
+                if distance_19_9<0.75*distance_11_12 or distance_20_10<0.75*distance_11_12 or distance_19_7<0.75*distance_11_12 or distance_20_8<0.75*distance_11_12:
+                    distances = [distance_19_9,distance_20_10,distance_19_7,distance_20_8]
+                    min_index, min_distance = min(enumerate(distances), key=lambda x: x[1])
+                    if min_index==0 or min_index==1:
+                        str_pose = "打电话"
+                        return str_pose
+                    else:
+                        str_pose = "打电话"
+                        return str_pose
+                
+            # if abs(abs(from_23_to_11_25)-90)<45 or abs(abs(from_24_to_12_26)-90)<45:
+            #     str_pose = "坐"
+            #     return str_pose
+
+            # 举手、举双手
+            # if abs(from_11_23_to_13_15)>100:
+            #     str_pose = "举左手"
+            #     if abs(from_12_24_to_14_16)>100:
+            #         str_pose = "举双手"
+            #     return str_pose
+            # if abs(from_12_24_to_14_16)>100:
+            #     str_pose = "举右手"
+            #     if abs(from_11_23_to_13_15)>100:
+            #         str_pose = "举双手"
+            #     return str_pose
+            
+            # 举手、举双手
+            if abs(from_11_to_13_23)>90 and abs(from_12_to_14_24)>90:
+                str_pose = "举双手"
+                return str_pose
+            
+            if abs(from_11_to_13_23)>90:
+                str_pose = "举手"
+                return str_pose
+            
+            if abs(from_12_to_14_24)>90:
+                str_pose = "挥手"
+                return str_pose
+            
+            # 行走
             if abs(from_25_27_to_26_28)>20 or abs(from_23_25_to_24_26)>20:
                 str_pose = "行走"
                 return str_pose
-            if abs(from_11_23_to_13_15)>100:
-                str_pose = "举左手"
-                if abs(from_12_24_to_14_16)>100:
-                    str_pose = "举双手"
-                return str_pose
-            if abs(from_12_24_to_14_16)>100:
-                str_pose = "举右手"
-                if abs(from_11_23_to_13_15)>100:
-                    str_pose = "举双手"
-                return str_pose
             return str_pose
         else :
-            str_pose = "躺"
-            if 45<abs(from_11_23_to_13_15)<135 and 45<abs(from_12_24_to_14_16)<135:
-                str_pose = "俯卧撑"
-                return str_pose
+            # 平躺
+            str_pose = "平躺"
+            # if 45<abs(from_11_23_to_13_15)<135 and 45<abs(from_12_24_to_14_16)<135:
+            #     str_pose = "俯卧撑"
+            #     return str_pose
             return str_pose
         
     def process_frame(self, img):
@@ -546,8 +732,17 @@ class Mediapipe:
         # radius = [random.randint(8,15) for _ in range(33)]
         # for i in range(33):
         #     cx, cy = keypoints[i]
+            # if i in range(33):        # end_time = time.time()
+        # process_time = end_time - start_time            # 图片关键点预测时间
+        # fps = 1 / process_time                          # 帧率
+        # colors = [[random.randint(0,255) for _ in range(3)] for _ in range(33)]
+        # radius = [random.randint(8,15) for _ in range(33)]
+        # for i in range(33):
+        #     cx, cy = keypoints[i]
         #     #if i in range(33):
-        #     img = cv2.circle(img, (cx, cy), radius[i], colors[i], -1)
+            # img = cv2.circle(img, (cx, cy), radius[i], colors[i], -1)
+            # img = cv2.circle(img, (cx, cy), radius[i], colors[i], -1)
+        # print(keypoints)
         str_pose = self.get_pos(keypoints)            #获取姿态
         # cv2.putText(img, "POSE-{}".format(str_pose), (12, 100), cv2.FONT_HERSHEY_TRIPLEX,
         #             tl / 3, (255, 0, 0), thickness=tf)
@@ -567,12 +762,41 @@ class Mediapipe:
         goal = self.convert_machine_axis_to_world(results,width,height,mid_x,mid_y,name,depth)
         GlobalVar.mediapipe_mutex.release()
         print("---------i will sent a goal----------")
-        ac.send_goal(goal)
-        print("-----------i have sent a goal-----")
-        ac.wait_for_result()
+        # ac.send_goal(goal)
+        # print("-----------i have sent a goal-----")
+        # ac.wait_for_result()
         return goal
-    
-        
+    #确保人在视野的中心
+    def rotate(self, image, width, height, mid_x, mid_y, name, depth):
+        GlobalVar.rotate_mutex.acquire()
+        cmdvel = Twist()
+        results = self.pose.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+        if not results.pose_world_landmarks:
+            return None
+        sumx = 0
+        #print(len(results.pose_world_landmark))
+        for i in range(33):
+            sumx = sumx +int(results.pose_world_landmarks.landmark[i].x*width+ mid_x - 0.5 * width)
+        x_average = sumx / 33 + 480#以所有关键点的平均x坐标作为人在图中的位置
+        print(f"the x_average is {x_average}")
+        cmdvel.linear.x = 0
+        cmdvel.linear.y = 0
+        cmdvel.linear.z = 0
+        cmdvel.angular.x = 0
+        cmdvel.angular.y = 0
+        if x_average < width / 2 :
+            cmdvel.angular.z = 2
+        else:
+            cmdvel.angular.z = -2
+        vel_pub.publish(cmdvel)
+        rospy.sleep(0.2)#每次转0.5弧度试试
+        cmdvel.angular.z=0
+        vel_pub.publish(cmdvel)
+        rospy.sleep(0.5)
+        GlobalVar.rotate_mutex.release()
+        return None
+
+
     @staticmethod
     def get_alpha(results):
         z_left = results.pose_world_landmarks.landmark[11].z
@@ -584,7 +808,9 @@ class Mediapipe:
         alpha = pi + atan2(z_distance, x_distance)
         return alpha
     
-    # 返回物体在机器人坐标系下的真实距离
+    # 返回物体fps = 1 / process_time                          # 帧率
+        # colors = [[random.randint(0,255) for _ in range(3)] for _ in range(33)]
+        在机器人坐标系下的真实距离
     # 输入： 物体在图片中的像素位置u_img(x),v_img(y),d:深度，单位mm
     # 输出： 用米做单位的坐标，机器人坐标系
     @staticmethod
@@ -668,204 +894,203 @@ class Mediapipe:
         return pose_str
 
 image,depth = None, None
-yolo_model = "/home/lzh/test/src/vis/best.pt"
-#yolo_model = "yolov10n.pt"
-#flag=0
+
+pose_dict = {}
+pose_count = 0
+duration = 5  # 持续时间（秒）
+pose_start_time = time.time()
+is_first_time = True
+# pose_num = 1000  # 检测次数
+def mediapipe_pose(pose_str):
+    global pose_dict, pose_count, duration, pose_start_time, is_first_time
+    # while count < pose_num:
+    if is_first_time:
+        pose_start_time = time.time()
+        is_first_time = False
+        # print("---------------------------------time is begin-----------------------------")
+    elif time.time() - pose_start_time < duration:
+        # print("---------------------------------time is begin 2-----------------------------")
+
+        if pose_str != "NO PERSON":
+            if pose_str in pose_dict:
+                pose_dict[pose_str] += 1
+            else:
+                pose_dict[pose_str] = 1
+        pose_count += 1
+    else:
+        # print("---------------------------------time is begin3-----------------------------")
+
+        pose_start_time = time.time()
+        if len(pose_dict) == 0:
+            pose_str = 'NO PERSON'
+        else:
+            most_common_pose = max(pose_dict, key=pose_dict.get)
+            max_count = pose_dict[most_common_pose]
+            lie_count = pose_dict.get('躺', 0)  # 如果没有'躺'这个key，返回0
+            stand_count = pose_dict.get('站立', 0)  # 如果没有'站立'这个key，返回0
+            pose_str = most_common_pose
+            if lie_count > 0.1 * pose_count and stand_count > 0.1 * pose_count:
+                pose_str = '摔倒'
+        # pose_str = mediapipe.main1_mediapipe(image)
+        rospy.loginfo(f"任务3检测到{pose_str}")
+        pose_det_pub.publish(pose_str)
+        pose_dict = {}
+        pose_count = 0
+        is_first_time = True
+        GlobalVar.reaction_flag = -1
+        GlobalVar.frame = 1
+        # time.sleep(5)
+
+last_detection_time = 0
 
 def image_callback(image_rgb,image_depth):
-    #print("--------------i am in image-callback------------")
-    global image, depth, flag
+    # print("--------------i am in image-callback------------")
+    global image, depth, last_detection_time
     image = GlobalVar.bridge.imgmsg_to_cv2(
             image_rgb, desired_encoding='passthrough')
-    #image = np.rot90(image, -1)
     depth = GlobalVar.bridge.imgmsg_to_cv2(
             image_depth, desired_encoding='passthrough')
-    last_detection_time = 0
-    detection_interval = 10  # 每0.5秒执行一次检测
     
-    # TODO
-#改成只看第一帧
+    #改成只看第一帧
     if GlobalVar.frame == 0 :
         GlobalVar.cb_mutex.acquire()
-        print(f"-------------frame number is {GlobalVar.frame}---------------")
-        human_detect_result = yolov8.detect(image)
-        cv2.imwrite(f"/home/lzh/{GlobalVar.last_person}.jpg",image)
-        for person in human_detect_result:
-            #rospy.loginfo(f"person:{human_detect_result[i-1]}")
-            store_path=f"/home/lzh/{GlobalVar.last_person}.jpg"
 
-            if GlobalVar.reaction_flag == 0:
-                rospy.loginfo(f"Now the task is 0")
+        if GlobalVar.reaction_flag == 0:
+            rospy.loginfo(f"Now the task is 0")
+
+            # # 三人模型，置信度0.8才出
+            # detect_result = yolov8.detect_yolo3(image, 2)# 三人模型
+            # yes = 0
+            # for person in detect_result:
+            #     result = person[5]
+            #     if result == "person1" :
+            #         rospy.loginfo(f"find people zzy")
+            #         start_recognize_pub.publish("zzy")
+            #         GlobalVar.last_person += 1
+            #         GlobalVar.reaction_flag = -1
+            #         rospy.loginfo(f'GlobalVar.reaction_flag:{GlobalVar.reaction_flag}')
+            #         yes = 1
+            #         break
+            #     if result == "person2" :
+            #         rospy.loginfo(f"find people zkw")
+            #         start_recognize_pub.publish("zkw")
+            #         GlobalVar.last_person += 1
+            #         GlobalVar.reaction_flag = -1
+            #         rospy.loginfo(f'GlobalVar.reaction_flag:{GlobalVar.reaction_flag}')
+            #         yes = 1
+            #         break
+            #     if result == "person3" :
+            #         rospy.loginfo(f"find people wmy")
+            #         start_recognize_pub.publish("wmy")
+            #         GlobalVar.last_person += 1
+            #         GlobalVar.reaction_flag = -1
+            #         rospy.loginfo(f'GlobalVar.reaction_flag:{GlobalVar.reaction_flag}')
+            #         yes = 1
+            #         break
+            # if yes == 0:
+            #     rospy.loginfo("no people")
+            #     start_recognize_pub.publish("0")
+            #     # cv2.imwrite(store_path,image)
+            #     # GlobalVar.last_person += 1
+            #     GlobalVar.reaction_flag = -1
+            #     rospy.loginfo(f'GlobalVar.reaction_flag:{GlobalVar.reaction_flag}')
+            # GlobalVar.frame = 1
+
+            # 融合
+            detect_result = yolov8.detect(image, 1)# 预训练模型
+            yes = 0
+            for person in detect_result:
                 result = person[5]
-                num = 0
                 if result == "person":
-                    num += 1
-                if num > 0 and flag==1:
-                    rospy.loginfo("find people")
-                    start_recognize_pub.publish("1")
-                    flag=0
-                elif num==0 and flag ==1:
-                    rospy.loginfo("no people")
-                    start_recognize_pub.publish("0")
-                    flag=0
-                cv2.imwrite(store_path,image)
-                GlobalVar.last_person += 1
+                    results_face = face.recognition(person[0])
+                    rospy.loginfo(f"results_face={results_face}")
+                    for result in results_face:
+                        if result != "unknown":
+                            rospy.loginfo(f"find people {result}")
+                            start_recognize_pub.publish(result)
+                            # GlobalVar.last_person += 1
+                            GlobalVar.reaction_flag = -1
+                            rospy.loginfo(f'GlobalVar.reaction_flag:{GlobalVar.reaction_flag}')
+                            yes = 1
+                            break
+            if yes == 0:
+                rospy.loginfo("no people")
+                start_recognize_pub.publish("0")
+                # cv2.imwrite(store_path,image)
+                # GlobalVar.last_person += 1
                 GlobalVar.reaction_flag = -1
                 rospy.loginfo(f'GlobalVar.reaction_flag:{GlobalVar.reaction_flag}')
+            GlobalVar.frame = 1
 
-            elif GlobalVar.reaction_flag == 1:
-                rospy.loginfo(f"Now the task is 1")
-                if person[5] == 'person':
-                    goal = mediapipe.detect(person[0],person[1],person[2],person[3],person[4],person[5],depth)
-                    # pub_msg = goal
-                    # pub_thread = threading.Thread(target=GlobalVar.put_data_into_quene, args=(pub_msg,))
-                    # pub_thread.start()
-                    orient_angle_pub.publish(goal)
-                    cv2.imwrite(store_path,image)
-                    GlobalVar.reaction_flag == -1
-                else:
-                    GlobalVar.reaction_flag == -1
-                GlobalVar.last_person += 1
-            elif GlobalVar.reaction_flag == 2:
-                rospy.loginfo(f"Now the task is 2")
-                results = face.recognition(image)
-                rospy.loginfo(f"results={results}")
-                temp = "unknown"
-                for result in results:
-                    if result != "unknown":
-                        temp = result
-                        break
-                if flag == 1:
-                    rospy.loginfo(f"this people is {temp}")
-                    facial_det_pub.publish(temp)
-                    flag=0
-                GlobalVar.reaction_flag = -1
-                cv2.imwrite(store_path,image)
-                GlobalVar.last_person += 1
+        elif GlobalVar.reaction_flag == 1:
+            rospy.loginfo(f"Now the task is 1")
+            pose_str = mediapipe.main1_mediapipe(image)
+            mediapipe_pose(pose_str)
+                
+        if GlobalVar.followflag == 1:
+            rospy.loginfo("start follow")
+            if ((time.time() - last_detection_time) > 1):
+                last_detection_time = time.time()
+                rospy.loginfo(f"Now the task is follow")
+                detect_result = yolov8.detect_following(image, 2) # 三人模型
+                for person in detect_result:
+                    if (person[5] == "person1" or person[5] == "person2" or person[5] == "person3"):
+                        print("-------------------------检测到人了!----------------------------")
+                        if (not (abs(person[3] - 480)) < 98):
+                            print("--------------------------------开始旋转了！--------------------------------")
+                            mediapipe.rotate(image, 960,540,person[3],person[4],person[5],depth)
 
-            elif GlobalVar.reaction_flag == 3:
-                rospy.loginfo(f"Now the task is 3")
-                pose_str = mediapipe.main1_mediapipe(image)
-                rospy.loginfo(f"任务3检测到{pose_str}")
-                rospy.loginfo(f"flag:{flag}")
-                if flag==1:
-                    pose_det_pub.publish(pose_str)
-                    flag=0
-                GlobalVar.reaction_flag = -1
-                cv2.imwrite(store_path,image)
-                GlobalVar.last_person += 1
-
-            elif GlobalVar.reaction_flag == 4:
-                rospy.loginfo(f"Now the task is 4")
-                confidence, result = yolov8.start_single_predict(yolo_model, image)
-                if confidence > 0.5:
-                    rospy.loginfo("任务4检测到有垃圾")
-                    start_recognize_robbish_pub.publish("1")
-                else:
-                    rospy.loginfo("任务4检测到no垃圾")
-                    start_recognize_robbish_pub.publish("0")
-                GlobalVar.reaction_flag = -1
-                cv2.imwrite(store_path,image)
-                GlobalVar.last_person += 1
-
-            elif GlobalVar.reaction_flag == 5:
-                rospy.loginfo(f"Now the task is 5")
-                confidence, result = yolov8.start_single_predict(yolo_model, image)
-                rospy.loginfo(f"任务5检测到{result}")
-                collect_robbish_pub.publish(result)
-                GlobalVar.reaction_flag = -1
-                cv2.imwrite(store_path,image)
-                GlobalVar.last_person += 1
-            elif GlobalVar.reaction_flag == 6:
-                rospy.loginfo(f"Now the task is 6")
-                if person[5] != 'person':
-                    goal = yolov8.rubbish_goal(person[3],person[4],person[5],depth)
-                    # pub_msg = goal
-                    # pub_thread = threading.Thread(target=GlobalVar.put_data_into_quene, args=(pub_msg,))
-                    # pub_thread.start()
-                    robbish_pos_pub.publish(goal)
-                    cv2.imwrite(store_path,image)
-                    GlobalVar.reaction_flag == -1
-                else:
-                    GlobalVar.reaction_flag == -1
-                GlobalVar.last_person += 1
-        GlobalVar.frame = 1
-        print(GlobalVar.frame)
         GlobalVar.cb_mutex.release()
 
 
 def start_recognize_callback(msg:String):
-    global flag
     if msg.data == 'OK':
         GlobalVar.reaction_flag=0
-        flag = 1
-        rospy.loginfo(f"start_recognize_callback flag:{flag} GlobalVar.reaction_flag:{GlobalVar.reaction_flag}")
+        GlobalVar.frame = 0
 
-def orient_angle_callback(msg:String):
-    if msg.data == 'OK':
-        GlobalVar.reaction_flag=1
-
-def facial_det_callback(msg:String):
-    global flag
-    if msg.data == 'OK':
-        GlobalVar.reaction_flag=2
-        flag=1
-        rospy.loginfo(f"facial_det_callback flag:{flag}")
+# def facial_det_callback(msg:String):
+#     if msg.data == 'OK':
+#         GlobalVar.frame = 0
+#         GlobalVar.reaction_flag=1
 
 def pose_det_callback(msg:String):
-    global flag
     if msg.data == 'OK':
-        GlobalVar.reaction_flag=3
-        flag=1
-        rospy.loginfo(f"pose_det_callback flag:{flag}")
+        GlobalVar.frame = 0
+        GlobalVar.reaction_flag=1
 
-def start_recognize_robbish_callback(msg:String):
-    global flag
-    if msg.data == 'OK':
-        GlobalVar.reaction_flag=4
-        rospy.loginfo(f"start_recognize_robbish_callback flag:{flag}")
+def follow_people_callback(msg:String):
+    if msg.data == "1":
+        GlobalVar.followflag = 1
+        rospy.loginfo("follow_people_callback 1")
+        GlobalVar.frame = 0
+    if msg.data == "0":
+        GlobalVar.followflag = 0
+        rospy.loginfo("follow_people_callback 0")
+        GlobalVar.frame = 1
 
-def collect_robbish_callback(msg:String):
-    if msg.data == 'OK':
-        GlobalVar.reaction_flag=5
-        rospy.loginfo(f"collect_robbish_callback flag:{flag}")
-
-def rubbish_pos_callback(msg:String):
-    if msg.data == 'OK':
-        GlobalVar.reaction_flag=6
-        rospy.loginfo(f"rubbish_pos_callback flag:{flag}")
-flag=1
 if __name__ == '__main__':
-    # flag=0
-    GlobalVar.reaction_flag = 1
-    print("----------------i am in 0 ---------------")
+    GlobalVar.reaction_flag = -1
+    GlobalVar.followflag = 0
+
     face = FaceRecognition()
-    print("----------------i am in 1 ---------------")
     yolov8 = Yolov8()
-    print("----------------i am in 2 ---------------")
     mediapipe = Mediapipe()
-    print("----------------i am in 3 ---------------")
 
-    orient_angle_sub = rospy.Subscriber("orient_angle",String,orient_angle_callback)
+    follow_people_sub = rospy.Subscriber("follow_people",String,follow_people_callback)
     start_recognize_sub = rospy.Subscriber("start_recognize",String,start_recognize_callback)
-    facial_det_sub = rospy.Subscriber("facial_det",String,facial_det_callback)
+    # facial_det_sub = rospy.Subscriber("facial_det",String,facial_det_callback)
     pose_det = rospy.Subscriber("pose_det",String,pose_det_callback)
-    start_recognize_robbish = rospy.Subscriber("start_recognize_robbish",String,start_recognize_robbish_callback)
-    collect_robbish = rospy.Subscriber("collect_robbish",String,collect_robbish_callback)
-    robbish_pos = rospy.Subscriber("robbish_pos",String,rubbish_pos_callback)
 
-    orient_angle_pub = rospy.Publisher("orient_angle_reply",MoveBaseGoal,queue_size=10)
+    # orient_angle_pub = rospy.Publisher("orient_angle_reply",MoveBaseGoal,queue_size=10)
     start_recognize_pub = rospy.Publisher("start_recognize_reply", String, queue_size=10)
-    facial_det_pub = rospy.Publisher("facial_det_reply", String, queue_size=10)
+    # facial_det_pub = rospy.Publisher("facial_det_reply", String, queue_size=10)
     pose_det_pub = rospy.Publisher("pose_det_reply", String, queue_size=10)
-    start_recognize_robbish_pub = rospy.Publisher("start_recognize_robbish_reply", String, queue_size=10)
-    collect_robbish_pub = rospy.Publisher("collect_robbish_reply", String, queue_size=10)
-    robbish_pos_pub = rospy.Publisher("robbish_pos_reply",MoveBaseGoal,queue_size=10)
 
-    ac = actionlib.SimpleActionClient('move_base', MoveBaseAction)
-    ac.wait_for_server()
-    print("----------------i am in ac ---------------")
+    vel_pub=rospy.Publisher("/cmd_vel",Twist,queue_size=10)
 
+    # ac = actionlib.SimpleActionClient('move_base', MoveBaseAction)
+    # ac.wait_for_server()
+    #print("----------------i am in ac ---------------")
 
     rgb_sub = message_filters.Subscriber('/kinect2/qhd/image_color', Image)
     depth_sub = message_filters.Subscriber('/kinect2/qhd/image_depth_rect', Image)

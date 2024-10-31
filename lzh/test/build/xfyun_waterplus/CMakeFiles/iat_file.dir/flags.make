@@ -3,13 +3,13 @@
 
 # compile C with /usr/bin/cc
 # compile CXX with /usr/bin/c++
-C_FLAGS = -O3 -DNDEBUG  
+C_FLAGS =  
 
 C_DEFINES = -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\"xfyun_waterplus\"
 
 C_INCLUDES = -I/home/lzh/test/devel/include -I/opt/ros/noetic/include -I/opt/ros/noetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp -I/home/lzh/test/src/xfyun_waterplus/include 
 
-CXX_FLAGS = -O3 -DNDEBUG  
+CXX_FLAGS =  
 
 CXX_DEFINES = -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\"xfyun_waterplus\"
 

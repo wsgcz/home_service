@@ -124,6 +124,17 @@ edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
 
+# Special rule for the target test
+test:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running tests..."
+	/usr/bin/ctest --force-new-ctest-process $(ARGS)
+.PHONY : test
+
+# Special rule for the target test
+test/fast: test
+
+.PHONY : test/fast
+
 # The main all target
 all: cmake_check_build_system
 	cd /home/lzh/test/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/lzh/test/build/CMakeFiles /home/lzh/test/build/map_build/CMakeFiles/progress.marks
@@ -157,6 +168,36 @@ depend:
 .PHONY : depend
 
 # Convenience name for target.
+map_build/CMakeFiles/waypoint.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 map_build/CMakeFiles/waypoint.dir/rule
+.PHONY : map_build/CMakeFiles/waypoint.dir/rule
+
+# Convenience name for target.
+waypoint: map_build/CMakeFiles/waypoint.dir/rule
+
+.PHONY : waypoint
+
+# fast build rule for target.
+waypoint/fast:
+	cd /home/lzh/test/build && $(MAKE) -f map_build/CMakeFiles/waypoint.dir/build.make map_build/CMakeFiles/waypoint.dir/build
+.PHONY : waypoint/fast
+
+# Convenience name for target.
+map_build/CMakeFiles/lidar_distance.dir/rule:
+	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 map_build/CMakeFiles/lidar_distance.dir/rule
+.PHONY : map_build/CMakeFiles/lidar_distance.dir/rule
+
+# Convenience name for target.
+lidar_distance: map_build/CMakeFiles/lidar_distance.dir/rule
+
+.PHONY : lidar_distance
+
+# fast build rule for target.
+lidar_distance/fast:
+	cd /home/lzh/test/build && $(MAKE) -f map_build/CMakeFiles/lidar_distance.dir/build.make map_build/CMakeFiles/lidar_distance.dir/build
+.PHONY : lidar_distance/fast
+
+# Convenience name for target.
 map_build/CMakeFiles/velocity_control.dir/rule:
 	cd /home/lzh/test/build && $(MAKE) -f CMakeFiles/Makefile2 map_build/CMakeFiles/velocity_control.dir/rule
 .PHONY : map_build/CMakeFiles/velocity_control.dir/rule
@@ -170,6 +211,33 @@ velocity_control: map_build/CMakeFiles/velocity_control.dir/rule
 velocity_control/fast:
 	cd /home/lzh/test/build && $(MAKE) -f map_build/CMakeFiles/velocity_control.dir/build.make map_build/CMakeFiles/velocity_control.dir/build
 .PHONY : velocity_control/fast
+
+src/lidar_distance.o: src/lidar_distance.cpp.o
+
+.PHONY : src/lidar_distance.o
+
+# target to build an object file
+src/lidar_distance.cpp.o:
+	cd /home/lzh/test/build && $(MAKE) -f map_build/CMakeFiles/lidar_distance.dir/build.make map_build/CMakeFiles/lidar_distance.dir/src/lidar_distance.cpp.o
+.PHONY : src/lidar_distance.cpp.o
+
+src/lidar_distance.i: src/lidar_distance.cpp.i
+
+.PHONY : src/lidar_distance.i
+
+# target to preprocess a source file
+src/lidar_distance.cpp.i:
+	cd /home/lzh/test/build && $(MAKE) -f map_build/CMakeFiles/lidar_distance.dir/build.make map_build/CMakeFiles/lidar_distance.dir/src/lidar_distance.cpp.i
+.PHONY : src/lidar_distance.cpp.i
+
+src/lidar_distance.s: src/lidar_distance.cpp.s
+
+.PHONY : src/lidar_distance.s
+
+# target to generate assembly for a file
+src/lidar_distance.cpp.s:
+	cd /home/lzh/test/build && $(MAKE) -f map_build/CMakeFiles/lidar_distance.dir/build.make map_build/CMakeFiles/lidar_distance.dir/src/lidar_distance.cpp.s
+.PHONY : src/lidar_distance.cpp.s
 
 src/velocity_control.o: src/velocity_control.cpp.o
 
@@ -198,6 +266,33 @@ src/velocity_control.cpp.s:
 	cd /home/lzh/test/build && $(MAKE) -f map_build/CMakeFiles/velocity_control.dir/build.make map_build/CMakeFiles/velocity_control.dir/src/velocity_control.cpp.s
 .PHONY : src/velocity_control.cpp.s
 
+src/waypoint.o: src/waypoint.cpp.o
+
+.PHONY : src/waypoint.o
+
+# target to build an object file
+src/waypoint.cpp.o:
+	cd /home/lzh/test/build && $(MAKE) -f map_build/CMakeFiles/waypoint.dir/build.make map_build/CMakeFiles/waypoint.dir/src/waypoint.cpp.o
+.PHONY : src/waypoint.cpp.o
+
+src/waypoint.i: src/waypoint.cpp.i
+
+.PHONY : src/waypoint.i
+
+# target to preprocess a source file
+src/waypoint.cpp.i:
+	cd /home/lzh/test/build && $(MAKE) -f map_build/CMakeFiles/waypoint.dir/build.make map_build/CMakeFiles/waypoint.dir/src/waypoint.cpp.i
+.PHONY : src/waypoint.cpp.i
+
+src/waypoint.s: src/waypoint.cpp.s
+
+.PHONY : src/waypoint.s
+
+# target to generate assembly for a file
+src/waypoint.cpp.s:
+	cd /home/lzh/test/build && $(MAKE) -f map_build/CMakeFiles/waypoint.dir/build.make map_build/CMakeFiles/waypoint.dir/src/waypoint.cpp.s
+.PHONY : src/waypoint.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -210,10 +305,19 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
+	@echo "... test"
+	@echo "... waypoint"
+	@echo "... lidar_distance"
 	@echo "... velocity_control"
+	@echo "... src/lidar_distance.o"
+	@echo "... src/lidar_distance.i"
+	@echo "... src/lidar_distance.s"
 	@echo "... src/velocity_control.o"
 	@echo "... src/velocity_control.i"
 	@echo "... src/velocity_control.s"
+	@echo "... src/waypoint.o"
+	@echo "... src/waypoint.i"
+	@echo "... src/waypoint.s"
 .PHONY : help
 
 

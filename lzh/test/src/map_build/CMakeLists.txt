@@ -11,6 +11,9 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  tf
+  geometry_msgs
+  waterplus_map_tools
 )
 
 ## System dependencies are found with CMake's conventions
@@ -116,7 +119,7 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+ include
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -134,6 +137,8 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(velocity_control src/velocity_control.cpp)
+add_executable(lidar_distance src/lidar_distance.cpp)
+add_executable(waypoint src/waypoint.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -148,6 +153,14 @@ add_executable(velocity_control src/velocity_control.cpp)
 ## Specify libraries to link a library or executable target against
 target_link_libraries(velocity_control
   ${catkin_LIBRARIES}
+)
+
+target_link_libraries(lidar_distance
+${catkin_LIBRARIES}
+)
+
+target_link_libraries(waypoint
+${catkin_LIBRARIES}
 )
 
 #############

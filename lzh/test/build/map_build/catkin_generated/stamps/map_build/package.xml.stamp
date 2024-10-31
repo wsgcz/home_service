@@ -8,6 +8,8 @@
   <!-- Example:  -->
   <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
   <maintainer email="gcz@todo.todo">gcz</maintainer>
+  <build_depend>waterplus_map_tools</build_depend>
+  <build_export_depend>waterplus_map_tools</build_export_depend>
 
 
   <!-- One license tag required, multiple allowed, one license per tag -->
