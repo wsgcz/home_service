@@ -428,23 +428,41 @@ class Yolov8:
             # image_name = f"/home/lzh/{name[i]}.jpg"
             # cv2.imwrite(image_name,change_image)
             # 宽 高 
-            w = half_w*2
-            h = half_h*2
-            if h < 1.5*w :
-                continue
-            #TODO
+            # w = half_w*2
+            # h = half_h*2
+            # if h < 1.5*w :
+            #     continue
+            # #TODO
             # 人的移动(预训练模型的最大面积)和人的识别的长宽比不同   1.5 
             results.append((change_image,half_w*2,half_h*2,x_center,y_center,name[i][0]))
+
+        # 创建面积和索引的配对
+        areas = [(result[1] * result[2], i) for i, result in enumerate(results)]
+        # areas现在是: [(8000, 0), (2000, 1), (10800, 2)]
+        # 按面积降序排序并获取排序后的索引
+        sorted_indices = [i for _, i in sorted(areas, reverse=True)]
+        # sorted_indices现在是: [2, 0, 1]
+        # 重新排序results和name
+        results = [results[i] for i in sorted_indices]
+        name = [name[i] for i in sorted_indices]
+
         max_index = -1
-        s_max = -1
-        for i in range (len(name)):
-            if results[i][1]*results[i][2] > s_max:
-                    s_max = results[i][1]*results[i][2]
-                    max_index = i
         max_result = list()
-        if not (max_index == -1):
-            max_result.append(results[max_index])
-        print(f"-----------------识别的结果是{len(max_result)}-------------")
+        for i in range (len(name)):
+            w = results[i][1]
+            h = results[i][2]
+            # print(f"----------------名字: {results[i][5]},w={w},h={h}-----------------------")
+            if h < 1.5*w:
+                continue
+            if not (name[i][0] == "person"):
+                continue
+            print(f"----------------名字: {results[i][5]},w={w},h={h}-----------------------")
+            max_result.append(results[i])
+            max_index = 1
+            break
+        if (max_index == -1):
+            max_result = [(0,0,0,0,0,"no person")]
+        print(f"-----------------识别的结果是{max_result[0][5]}-------------")
         return max_result
     
 class Mediapipe:
@@ -789,7 +807,7 @@ class Mediapipe:
         else:
             cmdvel.angular.z = -2
         vel_pub.publish(cmdvel)
-        rospy.sleep(0.2)#每次转0.5弧度试试
+        rospy.sleep(0.5)#每次转1弧度试试
         cmdvel.angular.z=0
         vel_pub.publish(cmdvel)
         rospy.sleep(0.5)
@@ -1002,6 +1020,7 @@ def image_callback(image_rgb,image_depth):
             for person in detect_result:
                 result = person[5]
                 if result == "person":
+                    cv2.imwrite(f"/home/lzh/{person[5]}.jpg",person[0])
                     results_face = face.recognition(person[0])
                     rospy.loginfo(f"results_face={results_face}")
                     for result in results_face:
@@ -1032,9 +1051,9 @@ def image_callback(image_rgb,image_depth):
             if ((time.time() - last_detection_time) > 1):
                 last_detection_time = time.time()
                 rospy.loginfo(f"Now the task is follow")
-                detect_result = yolov8.detect_following(image, 2) # 三人模型
+                detect_result = yolov8.detect_following(image, 1) # yuxunxian
                 for person in detect_result:
-                    if (person[5] == "person1" or person[5] == "person2" or person[5] == "person3"):
+                    if (person[5] == "person"):
                         print("-------------------------检测到人了!----------------------------")
                         if (not (abs(person[3] - 480)) < 98):
                             print("--------------------------------开始旋转了！--------------------------------")

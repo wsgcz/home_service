@@ -90,6 +90,22 @@ int main(int argc, char* argv[])
                 vel_cmd.angular.z = -0.3;
                 vel_pub.publish(vel_cmd);
                 break;
+            case '5':
+                vel_cmd.linear.x = 0.06;
+                vel_pub.publish(vel_cmd);
+                break;
+            case '6':
+                vel_cmd.linear.x = -0.06;
+                vel_pub.publish(vel_cmd);
+                break;
+            case '7':
+                vel_cmd.angular.z= 0.10;
+                vel_pub.publish(vel_cmd);
+                break;
+            case '8':
+                vel_cmd.angular.z = -0.10;
+                vel_pub.publish(vel_cmd);
+                break;
             case 'c':
                 newWayPoint.name = std::to_string(waypoint_count);
                 newWayPoint.pose = get_mappose();

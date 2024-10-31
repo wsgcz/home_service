@@ -32,7 +32,7 @@ class GlobalVar:
     P_y = 269 
     f_x = 540.68603515625
     f_y = 540.68603515625
-    followflag = 0
+    followflag = -1
     machine_odom_now_x = 0
     machine_odom_now_y = 0
     machine_theta = 0
@@ -217,7 +217,7 @@ class Yolov8:
         else:
             cmdvel.angular.z = -1
         vel_pub.publish(cmdvel)
-        rospy.sleep(0.5)#每次转0.5弧度试试
+        rospy.sleep(0.3)#每次转0.5弧度试试
         cmdvel.angular.z=0
         vel_pub.publish(cmdvel)
         rospy.sleep(0.5)
@@ -242,7 +242,6 @@ def image_callback(image_rgb):
             collect_robbish_pub.publish(result[0][5])
             GlobalVar.reaction_flag = -1
             # cv2.imwrite(store_path,image)
-            GlobalVar.last_person += 1
             GlobalVar.frame = 1
 
         elif GlobalVar.reaction_flag == 1:
@@ -254,8 +253,6 @@ def image_callback(image_rgb):
                 cv2.imwrite("/home/lzh/rotate.jpg", image)
                 result = yolov8.detect(image, 2)
                 # cv2.imshow("jhh",image)
-                # cv2.waitKey(0)
-                # cv2.imwrite("/home/gcz/rotate.jpg", image)
                 for res in result:
                     if res[5] == 'bin':
                         GlobalVar.followflag = 1
@@ -268,19 +265,9 @@ def image_callback(image_rgb):
                             yolov8.rotate(image, 1280,720,res[3],res[4],res[5])
                         else:
                             GlobalVar.followflag = 0
-
-        if (GlobalVar.followflag == 0):
-            print("------------i am setting the followflag to 0----------")    
-            res_pub.publish("spin ok")        
-            GlobalVar.frame = 1
-            GlobalVar.reaction_flag = 0
-    # else :
-    #     GlobalVar.frame += 1
+                            GlobalVar.frame = 1
+                            res_pub.publish("spin ok")
     GlobalVar.cb_mutex.release()
-
-    GlobalVar.reaction_flag = 1
-    #cv2.imwrite(store_path,image)
-    GlobalVar.last_person += 1
 
 def spin_sub(msg:String):
     if msg.data == "spin":
@@ -306,11 +293,11 @@ if __name__ == "__main__":
 
     print("-------------i am in 2----------------")
 
-    res_sub = rospy.Subscriber("/home_sevice/robot_spin",String,spin_sub)
+    res_sub = rospy.Subscriber("robot_spin",String,spin_sub)
     #print("-------------i am in 6----------------")
 
     vel_pub = rospy.Publisher("/cmd_vel",Twist,queue_size=10)
-    res_pub = rospy.Publisher("/home_sevice/robot_spin_reply",String,queue_size=10)
+    res_pub = rospy.Publisher("robot_spin_reply",String,queue_size=10)
     #print("-------------i am in 7----------------")
     collect_robbish = rospy.Subscriber("collect_robbish",String,collect_robbish_callback)
 

@@ -148,6 +148,6 @@
 
     <param name= "controller_frequency" value="20" type="double"/>
   </node>
-
+  <!-- <node pkg="map_build" type="lidar_distance" name="lidar_distance" output="screen"/> -->
 
 </launch>

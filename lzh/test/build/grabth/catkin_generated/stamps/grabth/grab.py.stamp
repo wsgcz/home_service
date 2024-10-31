@@ -45,7 +45,7 @@ begin_close = 0
 #张开夹爪
 def grab(msg:String):
     global control_arm_data
-    if(msg == "1"):
+    if(msg.data == "1"):
         rospy.loginfo("Open!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         control_arm_data.position[0]=0.6
         control_arm_data.velocity[0]=0.5
@@ -58,7 +58,7 @@ def grab(msg:String):
         arm_action_pub.publish(control_arm_data)
         rospy.sleep(5)
         arm_state_pub.publish("1")
-    elif(msg == "0"): 
+    elif(msg.data == "0"): 
         control_arm_data.position[1]=0
         control_arm_data.velocity[1]=1
         arm_action_pub.publish(control_arm_data)
@@ -91,10 +91,12 @@ def grab(msg:String):
 #主体
 if __name__=="__main__":
     rospy.init_node("general_service_grab")
-    grab_sub=rospy.Subscriber("/home_service/move_robot_arm",String,grab,queue_size=10)
+    rospy.loginfo("-----i am grab------")
+    grab_sub=rospy.Subscriber("move_robot_arm",String,grab)
+    
     arm_action_pub=rospy.Publisher("/wpb_home/mani_ctrl",JointState,queue_size=30) #控制机器人机械臂
-    arm_state_pub = rospy.Publisher("/home_service/move_robot_arm_reply",String,queue_size=10)
-    get_state_pub=rospy.Publisher("/home_service/genenal_service_get_it",String,queue_size=10)#grab.py
+    arm_state_pub = rospy.Publisher("move_robot_arm_reply",String,queue_size=10)
+    get_state_pub=rospy.Publisher("genenal_service_get_it",String,queue_size=10)#grab.py
     #reset()
     time1 = time.time()
     rospy.spin()
