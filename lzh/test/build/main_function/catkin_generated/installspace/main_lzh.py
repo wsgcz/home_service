@@ -618,7 +618,7 @@ if __name__ =="__main__":
     Grab=grab()
     Put=put()
     Puber=pub()
-    Puber.over_speaking("started")
+    Puber.over_speaking("开始")
     Suber=sub()
     Client=client()
     Body_det=body_det()
@@ -684,7 +684,7 @@ if __name__ =="__main__":
             # Puber.over_speaking("Enter Collect!")
             # rospy.sleep(1)
             face_data=String()
-            face_data.data=f"this people is {Face_det.recog_msg}"
+            face_data.data=f"这个人是{Face_det.recog_msg}"
 
             if waypoints_index==3: #di san ge fangjian gensui
                 Puber.start_follow_people()
@@ -694,13 +694,13 @@ if __name__ =="__main__":
             Puber.over_speaking(face_data)
             rospy.sleep(1)
             next_data=String()
-            next_data.data="do your first pose now"
+            next_data.data="请开始做第一个姿势"
             Puber.over_speaking(next_data)
             rospy.sleep(3)
             Puber.pose_deting()
             rospy.sleep(10)
             pose_data=String()
-            pose_data.data=f"he is {Face_det.body_data}"
+            pose_data.data=f"识别到姿势：{Face_det.body_data}"
             rospy.loginfo(f"Body_det.recog_msg:{Face_det.body_data}")
             Puber.over_speaking(pose_data)
             rospy.sleep(2)
@@ -711,13 +711,13 @@ if __name__ =="__main__":
                 Puber.end_follow_people()
 
             next_data=String()
-            next_data.data="you can do your next pose"
+            next_data.data="你可以开始做下一个姿势"
             Puber.over_speaking(next_data)
             rospy.sleep(3)
             Puber.pose_deting()
             rospy.sleep(10)
             pose_data=String()
-            pose_data.data=f"he is {Face_det.body_data}"
+            pose_data.data=f"识别到姿势：{Face_det.body_data}"
             Puber.over_speaking(pose_data)
             rospy.loginfo(f"Body_det.recog_msg:{Face_det.body_data}")
             rospy.sleep(2)
@@ -746,7 +746,7 @@ if __name__ =="__main__":
             Puber.collect_robbishing()
             rospy.sleep(2)
             robbish_data=String()
-            robbish_data.data=f"this robbish is {Robbish_det.recog_msg}"
+            robbish_data.data=f"这个垃圾是：{Robbish_det.recog_msg}"
             Puber.over_speaking(robbish_data)
             rospy.sleep(2)
             aaa=Twist()
@@ -772,7 +772,7 @@ if __name__ =="__main__":
             Puber.vel_pubing(aaa)
             rospy.sleep(0.1)
             pose_data=String()
-            pose_data.data="give me the robbish please"
+            pose_data.data="请把垃圾递给我"
             Puber.over_speaking(pose_data)
             Puber.open_robot_arm()
             rospy.loginfo("start open_robot_arm")
@@ -810,12 +810,12 @@ if __name__ =="__main__":
 
         elif fsm==Status.Quit:
             rospy.loginfo("ALL FINISH!")
-            Puber.over_speaking("finish all work,we are the champion!")
+            Puber.over_speaking("我们是冠军！")
             rospy.sleep(5)
             break
 
         elif fsm==Status.ERRORSTATE:
-            Puber.over_speaking("error occer!check now!!!")
+            Puber.over_speaking("出现错误，请检查")
             rospy.loginfo("error occer!check now!!!")
             rospy.sleep(100)
 
