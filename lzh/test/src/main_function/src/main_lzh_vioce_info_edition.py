@@ -632,17 +632,25 @@ if __name__ =="__main__":
 
     Collect_index=0
     Collect_robbish_index=0
+#params
+    rot_times=3
+    room_sum=2
 
     rate=rospy.Rate(40.0)
     rospy.Rate(1).sleep()    
     rospy.loginfo("节点main_service启动")
     fsm=Status.Explore
 
+
+
+    # Puber.open_robot_arm()
+    # rospy.sleep(1000)
+
     while not rospy.is_shutdown():
         if fsm==Status.Explore:
             rospy.loginfo("EXPORE!")
-            # Puber.over_speaking("Explore!")
-            # rospy.sleep(1)
+            Puber.over_speaking("Explore!")
+            rospy.sleep(1)
             index=waypoints_index
             rospy.loginfo(f"waypoints_index:{waypoints_index}")
             success=Gotopoint(waypoints_name[index])
@@ -651,38 +659,39 @@ if __name__ =="__main__":
                 fsm=Status.Find
                 waypoints_index+=1
                 rospy.loginfo(f"go {waypoints_name[index]} successfully")
-                # Puber.over_speaking(f"go {waypoints_name[index]} successfully")
-                # rospy.sleep(3)
+                Puber.over_speaking(f"go {waypoints_name[index]} successfully")
+                rospy.sleep(3)
             else:
                 rospy.loginfo(f"Cannot goto {waypoints_name[index]}")
                 fsm=Status.ERRORSTATE
 
         elif fsm==Status.Find:
             rospy.loginfo("Find!")
-            # Puber.over_speaking("Find!")
+            Puber.over_speaking("Find!")
             # rospy.sleep(1)
-            rospy.loginfo("start_recognizing...")
             Puber.start_recognizing()
             rospy.sleep(3)
+            rospy.loginfo("start_recognizing...")
             rospy.loginfo(f'people_exist:{params.people_exist}')
-            if params.people_exist==1:
+            #rospy.loginfo("params.people_exist")
+            if params.people_exist==1:#exist people , exter Collect
+                # fsm=Status.Go_to_people
                 fsm=Status.Collect
                 params.people_exist=0
                 have_people=0
                 rospy.loginfo(f"Find people {Collect_index+1}")
-                # Puber.over_speaking(f"Find people {Collect_index+1}")
-                # rospy.sleep(3)
+                Puber.over_speaking(f"Find people {Collect_index+1}")
+                rospy.sleep(3)
                 Collect_index+=1
             else:
-                rospy.loginfo(f"no people here")
-                # Puber.over_speaking("no people here!")
-                # rospy.sleep(1)
+                Puber.over_speaking("no people here!")
+                rospy.sleep(1)
                 fsm=Status.Robbish_Explore
 
         elif fsm==Status.Collect:
             rospy.loginfo(" Enter Collect!")
-            # Puber.over_speaking("Enter Collect!")
-            # rospy.sleep(1)
+            Puber.over_speaking("Enter Collect!")
+            rospy.sleep(1)
             face_data=String()
             face_data.data=f"this people is {Face_det.recog_msg}"
 
@@ -726,8 +735,8 @@ if __name__ =="__main__":
 
         elif fsm==Status.Robbish_Explore:
             rospy.loginfo("Robbish_Explore!")
-            # Puber.over_speaking("Robbish Explore")
-            # rospy.sleep(1)
+            Puber.over_speaking("Robbish Explore")
+            rospy.sleep(1)
             rospy.loginfo(f"Robbish_waypoints_index:{Robbish_waypoints_index}")
             success=Gotopoint(waypoints_name[Robbish_waypoints_index])
             rospy.loginfo(f"going {waypoints_name[Robbish_waypoints_index]}")
@@ -735,14 +744,14 @@ if __name__ =="__main__":
                 fsm=Status.Collect_Robbish
                 Robbish_waypoints_index+=1
             else:
-                rospy.loginfo(f"Cannot goto {waypoints_name[Robbish_waypoints_index]}")
+                rospy.ERROR(f"Cannot goto {waypoints_name[Robbish_waypoints_index]}")
                 fsm=Status.ERRORSTATE
 
 
         elif fsm==Status.Collect_Robbish:
             rospy.loginfo("Collect_Robbish")
-            # Puber.over_speaking("Collect Robbish")
-            # rospy.sleep(2)
+            Puber.over_speaking("Collect Robbish")
+            rospy.sleep(2)
             Puber.collect_robbishing()
             rospy.sleep(2)
             robbish_data=String()
@@ -752,12 +761,7 @@ if __name__ =="__main__":
             aaa=Twist()
             aaa.linear.x=1
             Puber.vel_pubing(aaa)
-
-            if waypoints_index in [1,2,4]:
-                rospy.sleep(1.1)
-            else:
-                rospy.sleep(1)
-
+            rospy.sleep(0.8)
             aaa.linear.x=0
             Puber.vel_pubing(aaa)
             rospy.sleep(0.1)
@@ -775,24 +779,21 @@ if __name__ =="__main__":
             pose_data.data="give me the robbish please"
             Puber.over_speaking(pose_data)
             Puber.open_robot_arm()
-            rospy.loginfo("start open_robot_arm")
             params.finish=0
             while params.finish==0: pass
             params.finish=0
-            rospy.loginfo("finish open_robot_arm")
             rospy.loginfo("start close_robot_arming")
             rospy.sleep(5)
             Puber.close_robot_arming()
             params.finish=0
             while params.finish==0: pass
             params.finish=0
-            rospy.loginfo("finish close_robot_arming")
             fsm=Status.Send
 
         elif fsm==Status.Send:
             rospy.loginfo("enter send")
-            # Puber.over_speaking("send")
-            # rospy.sleep(1)
+            Puber.over_speaking("send")
+            rospy.sleep(1)
             success=Gotopoint(waypoints_name[robbish_can_index])
             rospy.loginfo(f"going {waypoints_name[robbish_can_index]}")
             Puber.drop()
@@ -800,8 +801,8 @@ if __name__ =="__main__":
             while params.finish==0: pass
             params.finish=0
             rospy.loginfo("successfully send robbish")
-            # Puber.over_speaking("successfully send robbish")
-            # rospy.sleep(1)
+            Puber.over_speaking("successfully send robbish")
+            rospy.sleep(1)
             if waypoints_index==4:
                 fsm=Status.Quit
             else :

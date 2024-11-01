@@ -1,6 +1,9 @@
 <launch>
-<arg name="model" default="$(find wpb_home_bringup)/urdf/wpb_home_mani.urdf"/>
-  <arg name="gui" default="false" />
+
+<arg name="model" default="$(find wpb_home_bringup)/urdf/wpb_home_mani.urdf"/>  <!-- 机器人模型 -->
+  <arg name="gui" default="true" />
+<!-- 这两个param在例程里面是直接在三个arg下面给出，没解释 -->
+
 
   <param name="robot_description" command="$(find xacro)/xacro $(arg model)" />
   <param name="use_gui" value="$(arg gui)"/>
@@ -33,7 +36,7 @@
   <!-- Map tools  -->
   <!-- <node pkg="waterplus_map_tools" type="wp_edit_node" name="wp_edit_node" output="screen"/> -->
   <node pkg="waterplus_map_tools" type="wp_manager" name="wp_manager" output="screen"/>
-  <param name="load" type="string" value="/home/gcz/waypoints.xml"/>
+  <param name="load" type="string" value="/home/lzh/waypoints.xml"/>
 
   <!-- Run wpb_home core -->
   <node pkg="wpb_home_bringup" type="wpb_home_core" name="wpb_home_core" output="screen">

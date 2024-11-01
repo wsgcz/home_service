@@ -13,7 +13,7 @@ import xxlimited
 # from pose_estimate.scripts.pose import task2
 import rospy
 import json
-from std_msgs.msg import String,Float32
+from std_msgs.msg import String
 from sensor_msgs.msg import JointState
 import math
 import message_filters
@@ -54,25 +54,23 @@ machine_speed=Twist()
 # have_left=0.56
 begin_throw = 0
 
-def start_spin(msg:String):
-    global begin_throw
-    rospy.loginfo(f"start_spin receive")
-    if (msg.data=="throw"):
-        start_spin_pub.publish("spin")
-        rospy.loginfo("ok I will face the trashbase")
-
-def start_forward(msg:String):
+def start_spin(msg):
     global begin_to_confirm_all_position_data,begin_throw
-    rospy.loginfo(f"start_forward")
-    if (msg.data=="spin ok"):
-        start_get_distance_pub.publish("true")
-        rospy.loginfo("ok I will get the diatance")
+    if (msg=="throw"):
+        begin_throw = 1
+        # start_spin_pub.publish("spin")
+        rospy.loginfo("------------------------------Throw------------------------")
 
-def go_ahead(msg:Float32):
+def start_forward(msg):
+    global begin_to_confirm_all_position_data,begin_throw
+    if (msg=="spin ok"):
+        start_get_distance_pub.publish("forward")
+    rospy.loginfo("ok I will get the diatance")
+
+def go_ahead(msg):
     global machine_speed,begin_throw,have_left
-    have_left = msg.data
-    print(f"i have received : {msg.data}")
-    machine_speed.linear.x=(have_left-0.55)/5 # 在机器人坐标中，x为面前的方向；在摄像头中为左右的方向
+    have_left = msg
+    machine_speed.linear.x=(have_left-0.65)/2 # 在机器人坐标中，x为面前的方向；在摄像头中为左右的方向
     machine_speed.linear.y=0
     machine_speed.linear.z=0
     machine_speed.angular.x=0
@@ -80,7 +78,7 @@ def go_ahead(msg:Float32):
     machine_speed.angular.z=0
     rospy.loginfo("continue move to the destination~")
     speed_of_pub.publish(machine_speed)
-    rospy.sleep(5)
+    rospy.sleep(2)
     rospy.loginfo("arrive!!!")
     reset_speed()
     time.sleep(0.5)
@@ -96,7 +94,7 @@ def throw_the_object():
     control_arm_data.position[1]=0.5
     control_arm_data.velocity[1]=1
     arm_action_pub.publish(control_arm_data)
-    rospy.sleep(15)
+    rospy.sleep(9)
     machine_speed.linear.x=-0.1 # 在机器人坐标中，x为面前的方向；在摄像头中为左右的方向
     machine_speed.linear.y=0
     machine_speed.linear.z=0
@@ -152,15 +150,15 @@ if __name__=="__main__":
     speed_of_pub=rospy.Publisher('cmd_vel',Twist,queue_size=10) #控制机器人线速度和角速度
     arm_action_pub=rospy.Publisher("/wpb_home/mani_ctrl",JointState,queue_size=30) #控制机器人机械臂
     
-    start_into_throw_sub=rospy.Subscriber("robot_state",String,start_spin,queue_size=10) #throw
-    start_spin_pub=rospy.Publisher("robot_spin",String,queue_size=10)#begin spin
+    start_into_throw_sub=rospy.Subscriber("/home_service/robot_state",String,start_spin,queue_size=10) #throw
+    start_spin_pub=rospy.Publisher("/home_service/robot_spin",String,queue_size=10)#begin spin
 
-    start_forward_sub=rospy.Subscriber("robot_spin_reply",String,start_forward,queue_size=10)#spin ok
+    start_forward_sub=rospy.Subscriber("/home_service/robot_spin_reply",String,start_forward,queue_size=10)#spin ok
     start_get_distance_pub=rospy.Publisher("/home_service/lidar_distance",String,queue_size=10) #begin to get distance
 
-    get_distance_sub=rospy.Subscriber("/home_service/robot_getdistance",Float32,go_ahead,queue_size=10)#get distance and move
+    get_distance_sub=rospy.Subscriber("/home_service/robot_getdistance",String,go_ahead,queue_size=10)#get distance and move
     
-    down_state_pub=rospy.Publisher("genenal_service_put_down_result",String,queue_size=10)#grab.py
+    down_state_pub=rospy.Publisher("/home_service/genenal_service_put_down_result",String,queue_size=10)#grab.py
     
     # tfBuffer = tf2_ros.Buffer()
     # tfSub = tf2_ros.TransformListener(tfBuffer)

@@ -217,6 +217,8 @@ class Yolov8:
         else:
             cmdvel.angular.z = -1
         vel_pub.publish(cmdvel)
+        #TODO
+        #
         rospy.sleep(0.3)#每次转0.5弧度试试
         cmdvel.angular.z=0
         vel_pub.publish(cmdvel)
@@ -284,14 +286,14 @@ def collect_robbish_callback(msg:String):
         rospy.loginfo(f"frame:{GlobalVar.frame}")
 
 if __name__ == "__main__":
-    print("---------i am realsense------------")
+    #print("---------i am realsense------------")
     # GlobalVar.reaction_flag = 1
     # GlobalVar.frame = 0
     yolov8 = Yolov8()
-    print("-------------i am in 1----------------")
+    #print("-------------i am in 1----------------")
     rgb_sub = rospy.Subscriber("/camera/color/image_raw",Image,image_callback)
 
-    print("-------------i am in 2----------------")
+    #print("-------------i am in 2----------------")
 
     res_sub = rospy.Subscriber("robot_spin",String,spin_sub)
     #print("-------------i am in 6----------------")

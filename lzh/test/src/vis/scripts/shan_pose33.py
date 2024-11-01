@@ -803,11 +803,11 @@ class Mediapipe:
         cmdvel.angular.x = 0
         cmdvel.angular.y = 0
         if x_average < width / 2 :
-            cmdvel.angular.z = 2
+            cmdvel.angular.z = 0.01 * (width/2 - x_average)
         else:
-            cmdvel.angular.z = -2
+            cmdvel.angular.z = -0.01 * (width/2 - x_average)
         vel_pub.publish(cmdvel)
-        rospy.sleep(0.5)#每次转1弧度试试
+        rospy.sleep(0.2)#每次转1弧度试试
         cmdvel.angular.z=0
         vel_pub.publish(cmdvel)
         rospy.sleep(0.5)

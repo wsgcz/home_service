@@ -1,27 +1,24 @@
 <launch>
 <!-- main node -->
-
-<arg name="model" default="$(find wpb_home_bringup)/urdf/wpb_home_mani.urdf"/>  <!-- 机器人模型 -->
-  <arg name="gui" default="true" />
-<!-- 这两个param在例程里面是直接在三个arg下面给出，没解释 -->
-
-
-  <param name="robot_description" command="$(find xacro)/xacro $(arg model)" />
-  <param name="use_gui" value="$(arg gui)"/>
-  <arg name="rvizconfig" default="$(find wpb_home_apps)/rviz/slam_mani.rviz" />
-
-  <!-- <arg name="rvizconfig" default="$(find wpb_home_tutorials)/rviz/slam_mani.rviz" /> -->
-  <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />
-  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
-
     <node pkg="main_function" name="main_function" type="main_lzh.py" output="screen"/>
 
   <arg name="map" default="maps"/>  <!-- 地图文件所在目录，需要提前建图在 maps 目录下保存 map.yaml 文件 -->
   <!-- 这三个是机器人描述文件，控制界面显示标记，rviz设置文件 -->
+  <arg name="model" default="$(find wpb_home_bringup)/urdf/wpb_home_mani.urdf"/>  <!-- 机器人模型 -->
+  <arg name="gui" default="true" />
+  <arg name="rvizconfig" default="$(find wpb_home_apps)/rviz/slam_mani.rviz" />
 <!-- 这两个param在例程里面是直接在三个arg下面给出，没解释 -->
+  <param name="robot_description" command="$(find xacro)/xacro $(arg model)" />
+  <param name="use_gui" value="$(arg gui)"/>
 <!-- 将关节值转换成tf数据，发布到/tf主题 -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 <!-- 从/tf读取数据，更新三为模型 -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />
 
+  <node pkg="wpb_home_behaviors" type="wpb_home_grab_server" name="wpb_home_grab_server">
+    <param name="start" type="bool" value="false"/>
+    <rosparam file="$(find wpb_home_bringup)/config/wpb_home.yaml" command="load" />
+  </node>
 <!-- 保存和加载二维地图 -->
 <node name="map_server" pkg="map_server" type="map_server" args="$(find main_function)/$(arg map)/map.yaml"/>
 <!-- amcl是蒙特卡洛自适应定位算法，用于确定机器人在地图的位置 -->
@@ -151,6 +148,6 @@
 
     <param name= "controller_frequency" value="20" type="double"/>
   </node>
-  <node pkg="map_build" type="lidar_distance" name="lidar_distance" output="screen"/>
+  <!-- <node pkg="map_build" type="lidar_distance" name="lidar_distance" output="screen"/> -->
 
 </launch>
