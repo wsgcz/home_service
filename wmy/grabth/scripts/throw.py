@@ -61,53 +61,51 @@ def start_spin(msg):
         # start_spin_pub.publish("spin")
         rospy.loginfo("------------------------------Throw------------------------")
 
-# def start_forward(msg):
-#     global begin_to_confirm_all_position_data,begin_throw
-#     if (msg=="spin ok"):
-#         start_get_distance_pub.publish("forward")
-#     rospy.loginfo("ok I will get the diatance")
+def start_forward(msg):
+    global begin_to_confirm_all_position_data,begin_throw
+    if (msg=="spin ok"):
+        start_get_distance_pub.publish("forward")
+    rospy.loginfo("ok I will get the distance")
 
-# def go_ahead(msg):
-#     global machine_speed,begin_throw,have_left
-#     have_left = msg
-#     machine_speed.linear.x=(have_left-0.65)/2 # 在机器人坐标中，x为面前的方向；在摄像头中为左右的方向
-#     machine_speed.linear.y=0
-#     machine_speed.linear.z=0
-#     machine_speed.angular.x=0
-#     machine_speed.angular.y=0
-#     machine_speed.angular.z=0
-#     rospy.loginfo("continue move to the destination~")
-#     speed_of_pub.publish(machine_speed)
-#     rospy.sleep(2)
-#     rospy.loginfo("arrive!!!")
-#     reset_speed()
-#     time.sleep(0.5)
-#     begin_throw = 1
-
-def throw_the_object():
-    global control_arm_data
-    # rospy.loginfo("this is final_y %f",final_position_y)
-    control_arm_data.position[0]=0.6
-    control_arm_data.velocity[1]=1
-    arm_action_pub.publish(control_arm_data)
-    rospy.sleep(9)
-    control_arm_data.position[1]=0.5
-    control_arm_data.velocity[1]=1
-    arm_action_pub.publish(control_arm_data)
-    rospy.sleep(9)
-    machine_speed.linear.x=-0.1 # 在机器人坐标中，x为面前的方向；在摄像头中为左右的方向
+def go_ahead(msg):
+    global machine_speed,begin_throw,have_left
+    have_left = msg
+    machine_speed.linear.x=(have_left-0.55)/2 # 在机器人坐标中，x为面前的方向；在摄像头中为左右的方向
     machine_speed.linear.y=0
     machine_speed.linear.z=0
     machine_speed.angular.x=0
     machine_speed.angular.y=0
     machine_speed.angular.z=0
+    rospy.loginfo("continue move to the destination~")
     speed_of_pub.publish(machine_speed)
-    rospy.sleep(5)
+    rospy.sleep(2)
+    rospy.loginfo("arrive!!!")
     reset_speed()
-    control_arm_data.position[0]= 0 #下降且闭合
+    time.sleep(0.5)
+    begin_throw = 1
+
+def throw_the_object():
+    global control_arm_data
     # rospy.loginfo("this is final_y %f",final_position_y)
-    control_arm_data.position[1]=0
+    control_arm_data.position[0]=0.58
     control_arm_data.velocity[1]=1
+    arm_action_pub.publish(control_arm_data)
+    rospy.sleep(4)
+    control_arm_data.position[1]=0.5
+    control_arm_data.velocity[1]=1
+    arm_action_pub.publish(control_arm_data)
+    rospy.sleep(4)
+    # machine_speed.linear.x=-0.1 # 在机器人坐标中，x为面前的方向；在摄像头中为左右的方向
+    # machine_speed.linear.y=0
+    # machine_speed.linear.z=0
+    # machine_speed.angular.x=0
+    # machine_speed.angular.y=0
+    # machine_speed.angular.z=0
+    # speed_of_pub.publish(machine_speed)
+    # rospy.sleep(5)
+    # reset_speed()
+    control_arm_data.position[0]= 0.5 #下降
+    # rospy.loginfo("this is final_y %f",final_position_y)
     control_arm_data.velocity[0]=1
     arm_action_pub.publish(control_arm_data)
     rospy.sleep(4)
@@ -151,12 +149,12 @@ if __name__=="__main__":
     arm_action_pub=rospy.Publisher("/wpb_home/mani_ctrl",JointState,queue_size=30) #控制机器人机械臂
     
     start_into_throw_sub=rospy.Subscriber("/home_service/robot_state",String,start_spin,queue_size=10) #throw
-    # start_spin_pub=rospy.Publisher("/home_service/robot_spin",String,queue_size=10)#begin spin
+    start_spin_pub=rospy.Publisher("/home_service/robot_spin",String,queue_size=10)#begin spin
 
-    # start_forward_sub=rospy.Subscriber("/home_service/robot_spin_reply",String,start_forward,queue_size=10)#spin ok
-    # start_get_distance_pub=rospy.Publisher("/home_service/lidar_distance",String,queue_size=10) #begin to get distance
+    start_forward_sub=rospy.Subscriber("/home_service/robot_spin_reply",String,start_forward,queue_size=10)#spin ok
+    start_get_distance_pub=rospy.Publisher("/home_service/lidar_distance",String,queue_size=10) #begin to get distance
 
-    # get_distance_sub=rospy.Subscriber("/home_service/robot_getdistance",String,go_ahead,queue_size=10)#get distance and move
+    get_distance_sub=rospy.Subscriber("/home_service/robot_getdistance",String,go_ahead,queue_size=10)#get distance and move
     
     down_state_pub=rospy.Publisher("/home_service/genenal_service_put_down_result",String,queue_size=10)#grab.py
     
