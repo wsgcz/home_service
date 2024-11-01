@@ -806,7 +806,7 @@ if __name__ =="__main__":
             # rospy.sleep(1)
             success=Gotopoint(waypoints_name[robbish_can_index])
             rospy.loginfo(f"going {waypoints_name[robbish_can_index]}")
-            Puber.drop()
+            Puber.robot_spining()
             params.finish=0
             while params.finish==0: pass
             params.finish=0
