@@ -30,18 +30,25 @@ void lidarCallback(const sensor_msgs::LaserScan::ConstPtr& scan)
     int count = 0;
     int number_start = (nNum / 2)  - (RANGE / 2);
     for (int i = 0; i < RANGE; i += 1){
-        if (!(scan->ranges[number_start + i] < 4 && scan->ranges[number_start + i] > 0)){
+        if (!(scan->ranges[number_start + i] < 2 && scan->ranges[number_start + i] > 0)){
             continue;
         }
         distance_sum += scan->ranges[number_start + i];
         count += 1;
         printf("-----distance %d is %f", number_start + i, scan->ranges[number_start + i]);
     }
-    distance_average = distance_sum / count;
-    ROS_INFO("-----------the average distance is %f------------", distance_average);
-    msg_distance.data = distance_average;
-    lidar_pub.publish(msg_distance);
+    if (count == 0) {
+        msg_distance.data = 55;
+        lidar_pub.publish(msg_distance);
+    }
+    else {
+        distance_average = distance_sum / count;
+        ROS_INFO("-----------the average distance is %f------------", distance_average);
+        msg_distance.data = distance_average;
+        lidar_pub.publish(msg_distance);
+    }
     frame = 1;
+    
 }
 
 int main(int argc, char** argv)

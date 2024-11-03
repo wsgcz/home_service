@@ -25,6 +25,7 @@ from move_base_msgs.msg import MoveBaseGoal
 from move_base_msgs.msg import MoveBaseAction
 from geometry_msgs.msg import Twist
 sys.path.insert(0,'/home/lzh/test/src/vis')
+spin_count = 0
 
 class GlobalVar:
     eps = 1e-2
@@ -90,10 +91,10 @@ class GlobalVar:
     
 
 # yolo_model = "/home/shanhe/demo/runs/detect/train2/weights/best.pt"
-yolo_model = "/home/lzh/111111models/best_4rubbish.pt"
+# yolo_model = "/home/lzh/111111models/best_4rubbish.pt"
 class Yolov8:
-    def __init__(self,model_path1="/home/lzh/test/src/main_function/models/best_4rubbish.pt",
-                 model_path2="/home/lzh/test/src/main_function/models/best_bin_1.pt"):
+    def __init__(self,model_path1="/home/lzh/test/src/main_function/models/models_all/best_more_all_rubbish.pt",
+                 model_path2="/home/lzh/test/src/main_function/models/models_all/best_bin.pt"):
         self.model1 = YOLO(model_path1)
         self.model2 = YOLO(model_path2)
 
@@ -230,16 +231,19 @@ class Yolov8:
 last_detection_time = 0    
 def image_callback(image_rgb):
     #print("---------- i am in the callback --------------")
-    global image, last_detection_time
+    global image, last_detection_time, spin_count
     image = GlobalVar.bridge.imgmsg_to_cv2(
             image_rgb, desired_encoding='passthrough')
-
+    r, b, g = cv2.split(image)
+    image = cv2.merge([g,b,r])
     #cv::Mat
     GlobalVar.cb_mutex.acquire()
     if GlobalVar.frame == 0 :
         if GlobalVar.reaction_flag == 5:
             rospy.loginfo(f"Now the task is 5")
             result = yolov8.detect(image, 1)
+            # cv2.imshow("hhh",image)
+            # cv2.waitKey(0)
             rospy.loginfo(f"任务5检测到{result[0][5]}")
             collect_robbish_pub.publish(result[0][5])
             GlobalVar.reaction_flag = -1
@@ -250,8 +254,6 @@ def image_callback(image_rgb):
             if (time.time() - last_detection_time > 2):
                 last_detection_time = time.time()
                 print(last_detection_time)
-                r, b, g = cv2.split(image)
-                image = cv2.merge([g,b,r])
                 cv2.imwrite("/home/lzh/rotate.jpg", image)
                 result = yolov8.detect(image, 2)
                 # cv2.imshow("jhh",image)
@@ -262,18 +264,22 @@ def image_callback(image_rgb):
                     #只有同时收到抓取的信息和识别到垃圾桶,才开始转
                     rospy.loginfo(f"Now the task is follow")
                     if (res[5]=="bin"):
-                        if (not(abs(res[3] - 640) < 50)):
+                        if (not(abs(res[3] - 640) < 86) and spin_count < 8):
                             cv2.imwrite("/home/lzh/rotate.jpg", image)
+                            spin_count += 1
                             yolov8.rotate(image, 1280,720,res[3],res[4],res[5])
                         else:
                             GlobalVar.followflag = 0
                             GlobalVar.frame = 1
+                            spin_count = 0
                             res_pub.publish("spin ok")
     GlobalVar.cb_mutex.release()
 
 def spin_sub(msg:String):
+    global spin_count
     if msg.data == "spin":
         GlobalVar.reaction_flag = 1
+        spin_count = 0
         GlobalVar.frame = 0 # after tiao shi delete this
         rospy.loginfo("---------received spin signal--------")
 

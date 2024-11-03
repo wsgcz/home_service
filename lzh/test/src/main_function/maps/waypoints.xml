@@ -9,18 +9,8 @@
         <Ori_z>-0.00699366</Ori_z>
         <Ori_w>0.999976</Ori_w>
     </Waypoint>
-    <Waypoint>
+        <Waypoint>
         <Name>people waypoint 2</Name>
-        <Pos_x>3.15285</Pos_x>
-        <Pos_y>-6.45646</Pos_y>
-        <Pos_z>0</Pos_z>
-        <Ori_x>0</Ori_x>
-        <Ori_y>0</Ori_y>
-        <Ori_z>-0.744571</Ori_z>
-        <Ori_w>0.667544</Ori_w>
-    </Waypoint>
-    <Waypoint>
-        <Name>people waypoint 3</Name>
         <Pos_x>7.865</Pos_x>
         <Pos_y>-5.34905</Pos_y>
         <Pos_z>0</Pos_z>
@@ -29,8 +19,10 @@
         <Ori_z>-0.701506</Ori_z>
         <Ori_w>0.712664</Ori_w>
     </Waypoint>
+
+
     <Waypoint>
-        <Name>people waypoint 4</Name>
+        <Name>people waypoint 3</Name>
         <Pos_x>7.13898</Pos_x>
         <Pos_y>-2.35728</Pos_y>
         <Pos_z>0</Pos_z>
@@ -38,6 +30,16 @@
         <Ori_y>-0</Ori_y>
         <Ori_z>0.746739</Ori_z>
         <Ori_w>0.665117</Ori_w>
+    </Waypoint>
+        <Waypoint>
+        <Name>people waypoint 4</Name>
+        <Pos_x>3.15285</Pos_x>
+        <Pos_y>-6.45646</Pos_y>
+        <Pos_z>0</Pos_z>
+        <Ori_x>0</Ori_x>
+        <Ori_y>0</Ori_y>
+        <Ori_z>-0.744571</Ori_z>
+        <Ori_w>0.667544</Ori_w>
     </Waypoint>
     <Waypoint>
         <Name>robbish waypoint 1</Name>
@@ -49,8 +51,30 @@
         <Ori_z>0.424576</Ori_z>
         <Ori_w>0.905392</Ori_w>
     </Waypoint>
-    <Waypoint>
+        <Waypoint>
         <Name>robbish waypoint 2</Name>
+        <Pos_x>7.67302</Pos_x>
+        <Pos_y>-5.32144</Pos_y>
+        <Pos_z>0</Pos_z>
+        <Ori_x>-0</Ori_x>
+        <Ori_y>-0</Ori_y>
+        <Ori_z>0.123528</Ori_z>
+        <Ori_w>0.992341</Ori_w>
+    </Waypoint>
+
+
+        <Waypoint>
+        <Name>robbish waypoint 3</Name>
+        <Pos_x>7.71118</Pos_x>
+        <Pos_y>0.317886</Pos_y>
+        <Pos_z>0</Pos_z>
+        <Ori_x>-0</Ori_x>
+        <Ori_y>-0</Ori_y>
+        <Ori_z>0.373021</Ori_z>
+        <Ori_w>0.927823</Ori_w>
+    </Waypoint> 
+        <Waypoint>
+        <Name>robbish waypoint 4</Name>
         <Pos_x>2.55772</Pos_x>
         <Pos_y>-7.61682</Pos_y>
         <Pos_z>0</Pos_z>
@@ -58,9 +82,21 @@
         <Ori_y>0</Ori_y>
         <Ori_z>0.876154</Ori_z>
         <Ori_w>0.482031</Ori_w>
-    </Waypoint>
+    </Waypoint> 
+
+<!-- send -->
     <Waypoint>
-        <Name>robbish waypoint 3</Name>
+        <Name>robbish waypoint 1</Name>
+        <Pos_x>1.10426</Pos_x>
+        <Pos_y>0.427879</Pos_y>
+        <Pos_z>0</Pos_z>
+        <Ori_x>0</Ori_x>
+        <Ori_y>0</Ori_y>
+        <Ori_z>0.424576</Ori_z>
+        <Ori_w>0.905392</Ori_w>
+    </Waypoint>
+        <Waypoint>
+        <Name>robbish waypoint 2</Name>
         <Pos_x>7.67302</Pos_x>
         <Pos_y>-5.32144</Pos_y>
         <Pos_z>0</Pos_z>
@@ -70,7 +106,7 @@
         <Ori_w>0.992341</Ori_w>
     </Waypoint>
         <Waypoint>
-        <Name>robbish waypoint 4</Name>
+        <Name>robbish waypoint 3</Name>
         <Pos_x>7.71118</Pos_x>
         <Pos_y>0.317886</Pos_y>
         <Pos_z>0</Pos_z>
@@ -78,7 +114,9 @@
         <Ori_y>-0</Ori_y>
         <Ori_z>0.373021</Ori_z>
         <Ori_w>0.927823</Ori_w>
-    </Waypoint>  
+    </Waypoint> 
+
+
         <Waypoint>
         <Name>robbish can</Name>
         <Pos_x>1.65187</Pos_x>

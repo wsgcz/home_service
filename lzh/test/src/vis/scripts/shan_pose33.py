@@ -465,6 +465,76 @@ class Yolov8:
         print(f"-----------------识别的结果是{max_result[0][5]}-------------")
         return max_result
     
+    def detect_mediapipe_cut(self,image, choice):
+        results = list()
+        nimg = image
+        # plot_skeleton_kpts(nimg, output[idx, 7:].T, 3)
+        if(choice == 1):
+            output = self.model_yuxunlian(image)
+        elif(choice == 2):
+            output = self.model_3people(image)
+        elif(choice == 3):
+            output = self.model_yuxunlian2(image)
+        name = list()
+        # confidence_max = -1
+        # class_name_max = "nothing"
+        # name_max = ""
+        # class_id_max = 0
+        # 获取类别名称字典
+        for r in output:
+            names = r.names
+            boxes = r.boxes
+            for box in boxes:
+                # 获取类别索引
+                class_id = int(box.cls[0])
+                # 获取类别名称
+                class_name = names[class_id]
+                # 获取置信度
+                confidence = float(box.conf[0])
+                name.append((class_name, confidence))
+                # print(f"检测到: {class_name}, 置信度: {confidence:.2f}")
+            # 如果没有检测到任何对象
+            if len(r.boxes) == 0:
+                continue
+        
+        for i in range (len(name)):
+            xywh = boxes.cpu().xywh.detach().numpy()
+            x_center = int(xywh[i][0])
+            y_center = int(xywh[i][1])
+            half_w = int(xywh[i][2]/2)
+            half_h = int(xywh[i][3]/2)
+            change_image=nimg[y_center-half_h:y_center+half_h,x_center-half_w:x_center+half_w]#裁减之后的框
+            cv2.imwrite(f"/home/lzh/peopel_{i}.jpg", change_image)
+            # image_name = f"/home/lzh/{name[i]}.jpg"
+            # cv2.imwrite(image_name,change_image)
+            # 宽 高 
+            # w = half_w*2
+            # h = half_h*2
+            # if h < 2*w :
+            #     continue
+            #TODO
+            # 人的移动(预训练模型的最大面积)和人的识别的长宽比不同   1.5 
+            results.append((change_image,half_w*2,half_h*2,x_center,y_center,name[i][0]))
+        # max_index = 0
+        # for i in range (len(name)):
+        #     if name[i][1] > confidence_max:
+        #             confidence_max = name[i][1]
+        #             max_index = i
+        # max_result = list()
+        # max_result.append(results[max_index])
+
+        # 创建面积和索引的配对
+        areas = [(result[1] * result[2], i) for i, result in enumerate(results)]
+        # areas现在是: [(8000, 0), (2000, 1), (10800, 2)]
+        # 按面积降序排序并获取排序后的索引
+        sorted_indices = [i for _, i in sorted(areas, reverse=True)]
+        # sorted_indices现在是: [2, 0, 1]
+        # 重新排序results和name
+        results = [results[i] for i in sorted_indices]
+
+        print(f"-----------------识别的结果是{len(results)}-------------")
+        return results
+
 class Mediapipe:
     def __init__(self):
         self.mp_pose = mp.solutions.pose
@@ -697,7 +767,7 @@ class Mediapipe:
             
             # 举手、举双手
             if abs(from_11_to_13_23)>90 and abs(from_12_to_14_24)>90:
-                str_pose = "举双手"
+                str_pose = "挥双手"
                 return str_pose
             
             if abs(from_11_to_13_23)>90:
@@ -807,7 +877,7 @@ class Mediapipe:
         else:
             cmdvel.angular.z = -0.01 * (width/2 - x_average)
         vel_pub.publish(cmdvel)
-        rospy.sleep(0.2)#每次转1弧度试试
+        rospy.sleep(1.2)#每次转1弧度试试
         cmdvel.angular.z=0
         vel_pub.publish(cmdvel)
         rospy.sleep(0.5)
@@ -941,10 +1011,12 @@ def mediapipe_pose(pose_str):
         pose_start_time = time.time()
         if len(pose_dict) == 0:
             pose_str = 'NO PERSON'
+            #TODO
+            #pose_str = '平躺'
         else:
             most_common_pose = max(pose_dict, key=pose_dict.get)
             max_count = pose_dict[most_common_pose]
-            lie_count = pose_dict.get('躺', 0)  # 如果没有'躺'这个key，返回0
+            lie_count = pose_dict.get('平躺', 0)  # 如果没有'躺'这个key，返回0
             stand_count = pose_dict.get('站立', 0)  # 如果没有'站立'这个key，返回0
             pose_str = most_common_pose
             if lie_count > 0.1 * pose_count and stand_count > 0.1 * pose_count:
@@ -1045,6 +1117,21 @@ def image_callback(image_rgb,image_depth):
             rospy.loginfo(f"Now the task is 1")
             pose_str = mediapipe.main1_mediapipe(image)
             mediapipe_pose(pose_str)
+
+            # rospy.loginfo(f"Now the task is 1")
+            # results = yolov8.detect_mediapipe_cut(image, 1)
+            # if results and len(results) > 0:
+            #     # 获取第一个结果的change_image
+            #     i = 0
+            #     name = results[0][5]
+            #     while not (name == "person") and i < len(results):
+            #         i = i + 1
+            #         name = results[i][5]
+            #     change_image = results[i][0]
+            # else:
+            #     change_image = image
+            # pose_str = mediapipe.main1_mediapipe(change_image)
+            # mediapipe_pose(pose_str)
                 
         if GlobalVar.followflag == 1:
             rospy.loginfo("start follow")

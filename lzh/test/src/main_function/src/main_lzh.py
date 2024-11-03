@@ -19,6 +19,7 @@ from nav_msgs.msg import Odometry
 import math
 import time
 from geometry_msgs.msg import Twist
+from playsound import playsound
 
 # from xf_voice.scripts.word import refresh_cb
 ###################################################################
@@ -93,7 +94,7 @@ class ahead:
 #################  
 class robbish_det:
     def __init__(self) -> None:
-        self.recog_msg="None"       #result for robbish recog
+        self.recog_msg="water"       #result for robbish recog
         self.pos=MoveBaseGoal()
 
 #################
@@ -114,7 +115,7 @@ class face_det:
         self.recog_msg="None"   #string recognize result
         self.recog_index=0     #useless
         self.is_done=[]     #useless
-        self.body_data="None 1"
+        self.body_data="平躺"
 
 
 #################
@@ -480,13 +481,15 @@ class sub:
         rospy.loginfo(f"start_recognize_reply_callback receive:{params.people_exist}")
 
     def facial_det_reply_callback(self,msg:String):
-        global Face_det
+        global Face_det,params
+        params.finish=1
         Face_det.recog_msg=msg.data
         rospy.loginfo(f"facial_det_reply_callback receive :{Face_det.recog_msg}")
 
     def pose_det_reply_callback(self,msg:String):
-        global Face_det
+        global Face_det,params
         Face_det.body_data=msg.data
+        params.finish=1
         rospy.loginfo(f"pose_det_reply_callback receive :{Face_det.body_data}")
 
     def start_recognize_robbish_reply_callback(self,msg:String): #error here
@@ -495,8 +498,9 @@ class sub:
         params.people_exist=int(msg.data)
 
     def collect_robbish_reply_callback(self,msg:String):
-        global Robbish_det
+        global Robbish_det,params
         Robbish_det.recog_msg=msg.data
+        params.finish=1
         rospy.loginfo(f"collect_robbish_reply_callback receive :{Robbish_det.recog_msg}")
 
     
@@ -628,7 +632,7 @@ if __name__ =="__main__":
 #start index in waypoints.xml
     waypoints_index=0
     Robbish_waypoints_index=4
-    robbish_can_index=8
+    robbish_can_index=11
 
     Collect_index=0
     Collect_robbish_index=0
@@ -637,6 +641,7 @@ if __name__ =="__main__":
     rospy.Rate(1).sleep()    
     rospy.loginfo("节点main_service启动")
     fsm=Status.Explore
+    rospy.sleep(18)
 
     while not rospy.is_shutdown():
         if fsm==Status.Explore:
@@ -686,18 +691,24 @@ if __name__ =="__main__":
             rospy.loginfo(" Enter Collect!")
             # Puber.over_speaking("Enter Collect!")
             # rospy.sleep(1)
+            if Face_det.recog_msg=="father":
+                Face_det.recog_msg = "Jack"
+            elif Face_det.recog_msg == "son":
+                Face_det.recog_msg = "Allen"
+            else:
+                Face_det.recog_msg = "Linda"
             face_data=String()
-            face_data.data=f"this people is {Face_det.recog_msg}"
+            face_data.data=f"这个人的名字是{Face_det.recog_msg}"
 
-            if waypoints_index==3: #di san ge fangjian gensui
-                Puber.start_follow_people()
-                rospy.sleep(10)
-                Puber.end_follow_people()
+            # if waypoints_index==3: #di san ge fangjian gensui
+            #     Puber.start_follow_people()
+            #     rospy.sleep(10)
+            #     Puber.end_follow_people()
 
             Puber.over_speaking(face_data)
             rospy.sleep(1)
             next_data=String()
-            next_data.data="do your first pose now"
+            next_data.data="你可以开始做第一个姿势"
             Puber.over_speaking(next_data)
             rospy.sleep(3)
             Puber.pose_deting()
@@ -705,18 +716,18 @@ if __name__ =="__main__":
             while params.finish==0: pass
             params.finish=0
             pose_data=String()
-            pose_data.data=f"he is {Face_det.body_data}"
+            pose_data.data=f"识别到姿势{Face_det.body_data}"
             rospy.loginfo(f"Body_det.recog_msg:{Face_det.body_data}")
             Puber.over_speaking(pose_data)
             rospy.sleep(2)
 
-            if waypoints_index==3:
-                Puber.start_follow_people()
-                rospy.sleep(10)
-                Puber.end_follow_people()
+            # if waypoints_index==3:
+            #     Puber.start_follow_people()
+            #     rospy.sleep(10)
+            #     Puber.end_follow_people()
 
             next_data=String()
-            next_data.data="you can do your next pose"
+            next_data.data="请开始下一个姿势"
             Puber.over_speaking(next_data)
             rospy.sleep(3)
             Puber.pose_deting()
@@ -724,7 +735,7 @@ if __name__ =="__main__":
             while params.finish==0: pass
             params.finish=0
             pose_data=String()
-            pose_data.data=f"he is {Face_det.body_data}"
+            pose_data.data=f"识别到姿势{Face_det.body_data}"
             Puber.over_speaking(pose_data)
             rospy.loginfo(f"Body_det.recog_msg:{Face_det.body_data}")
             rospy.sleep(2)
@@ -757,53 +768,59 @@ if __name__ =="__main__":
             while params.finish==0: pass
             params.finish=0
             robbish_data=String()
-            robbish_data.data=f"this robbish is {Robbish_det.recog_msg}"
+            robbish_data.data=f"识别到垃圾{Robbish_det.recog_msg}"
             Puber.over_speaking(robbish_data)
             rospy.sleep(2)
-            aaa=Twist()
-            aaa.linear.x=1
-            Puber.vel_pubing(aaa)
+            if Robbish_waypoints_index>=8:
+                aaa=Twist()
+                aaa.linear.x=1
+                Puber.vel_pubing(aaa)
 
-            if waypoints_index in [1,2,4]:
-                rospy.sleep(1.1+0.5)
+                if waypoints_index in [1,2,4]:
+                    rospy.sleep(1.1+0.5)
+                else:
+                    rospy.sleep(1+0.5)
+
+                aaa.linear.x=0
+                Puber.vel_pubing(aaa)
+                rospy.sleep(0.1)
+                Puber.vel_pubing(aaa)
+                rospy.sleep(0.1)
+                Puber.vel_pubing(aaa)
+                rospy.sleep(0.1)
+                Puber.vel_pubing(aaa)
+                rospy.sleep(0.1)
+                Puber.vel_pubing(aaa)
+                rospy.sleep(0.1)
+                Puber.vel_pubing(aaa)
+                rospy.sleep(0.1)
+                pose_data=String()
+                pose_data.data="请给我垃圾"
+                Puber.over_speaking(pose_data)
+                Puber.open_robot_arm()
+                rospy.loginfo("start open_robot_arm")
+                params.finish=0
+                while params.finish==0: pass
+                params.finish=0
+                rospy.loginfo("finish open_robot_arm")
+                rospy.loginfo("start close_robot_arming")
+                rospy.sleep(5)
+                Puber.close_robot_arming()
+                params.finish=0
+                while params.finish==0: pass
+                params.finish=0
+                rospy.loginfo("finish close_robot_arming")
+                fsm=Status.Send
             else:
-                rospy.sleep(1+0.5)
+                fsm=Status.Explore
 
-            aaa.linear.x=0
-            Puber.vel_pubing(aaa)
-            rospy.sleep(0.1)
-            Puber.vel_pubing(aaa)
-            rospy.sleep(0.1)
-            Puber.vel_pubing(aaa)
-            rospy.sleep(0.1)
-            Puber.vel_pubing(aaa)
-            rospy.sleep(0.1)
-            Puber.vel_pubing(aaa)
-            rospy.sleep(0.1)
-            Puber.vel_pubing(aaa)
-            rospy.sleep(0.1)
-            pose_data=String()
-            pose_data.data="give me the robbish please"
-            Puber.over_speaking(pose_data)
-            Puber.open_robot_arm()
-            rospy.loginfo("start open_robot_arm")
-            params.finish=0
-            while params.finish==0: pass
-            params.finish=0
-            rospy.loginfo("finish open_robot_arm")
-            rospy.loginfo("start close_robot_arming")
-            rospy.sleep(5)
-            Puber.close_robot_arming()
-            params.finish=0
-            while params.finish==0: pass
-            params.finish=0
-            rospy.loginfo("finish close_robot_arming")
-            fsm=Status.Send
-
+            if Robbish_waypoints_index== 11:
+                fsm=Status.Quit
         elif fsm==Status.Send:
             rospy.loginfo("enter send")
             # Puber.over_speaking("send")
-            # rospy.sleep(1)
+            if Robbish_waypoints_index== 11:
+                fsm=Status.Quit
             success=Gotopoint(waypoints_name[robbish_can_index])
             rospy.loginfo(f"going {waypoints_name[robbish_can_index]}")
             Puber.robot_spining()
@@ -813,20 +830,20 @@ if __name__ =="__main__":
             rospy.loginfo("successfully send robbish")
             # Puber.over_speaking("successfully send robbish")
             # rospy.sleep(1)
-            if waypoints_index==4:
+            if Robbish_waypoints_index== 11:
                 fsm=Status.Quit
-            else :
-                fsm=Status.Explore
+            else:
+                fsm=Status.Robbish_Explore
 
 
         elif fsm==Status.Quit:
             rospy.loginfo("ALL FINISH!")
-            Puber.over_speaking("finish all work,we are the champion!")
+            Puber.over_speaking("正在向全场奏响您的MVP凯歌!")
             rospy.sleep(5)
             break
 
         elif fsm==Status.ERRORSTATE:
-            Puber.over_speaking("error occer!check now!!!")
+            Puber.over_speaking("出现错误")
             rospy.loginfo("error occer!check now!!!")
             rospy.sleep(100)
 

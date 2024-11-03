@@ -33,7 +33,7 @@
   <!-- grab -->
 <include file="$(find main_function)/launch/grab.launch" />
 <!-- throw -->
-<!-- <include file="$(find main_function)/launch/throw.launch"/> -->
+<include file="$(find main_function)/launch/throw.launch"/>
   <node pkg="waterplus_map_tools" type="wp_manager" name="wp_manager" output="screen">
 
     <param name="load" type="string" value="$(find main_function)/$(arg map)/waypoints.xml"/>
