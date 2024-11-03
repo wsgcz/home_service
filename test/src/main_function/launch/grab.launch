@@ -1,0 +1,6 @@
+<launch> 
+
+    <node name="general_service_grab" pkg="grabth" type="grab.py" output="screen">
+    </node>
+
+</launch>

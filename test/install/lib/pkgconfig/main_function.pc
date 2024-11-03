@@ -1,0 +1,8 @@
+prefix=/home/lzh/test/install
+
+Name: main_function
+Description: Description of main_function
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: std_msgs roscpp rospy
