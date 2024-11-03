@@ -26,7 +26,6 @@
   </node>
 
 <!-- wpb_home_lidar_obstacle-->
-  <!-- <node name="wpb_home_lidar_obstacle" pkg="wpb_home_tutorials" type="wpb_home_lidar_obstacle"  output="screen"/> -->
   <node name="lidar_distance" pkg="map_build" type="lidar_distance"  output="screen"/>
 
 </launch>
