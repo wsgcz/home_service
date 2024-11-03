@@ -1,7 +1,8 @@
 # 2024RoboCup居家服务
 
 > 获得2024年居家服务机器人亚军
-[tropy.jpg](tropy.jpg)
+
+![trophy](trophy.jpg)
 
 > 联系方式：qq群`683244882`
 
