@@ -644,13 +644,13 @@ if __name__ =="__main__":
     rospy.sleep(18)
 
     while not rospy.is_shutdown():
-        if fsm==Status.Explore:
+        if fsm==Status.Explore: #走到人所在的航点
             rospy.loginfo("EXPORE!")
             # Puber.over_speaking("Explore!")
             # rospy.sleep(1)
             index=waypoints_index
             rospy.loginfo(f"waypoints_index:{waypoints_index}")
-            success=Gotopoint(waypoints_name[index])
+            success=Gotopoint(waypoints_name[index]) # 走到way_points.xml中存储的航点
             rospy.loginfo(f"going {waypoints_name[index]}")
             if success==True:
                 fsm=Status.Find
@@ -662,21 +662,21 @@ if __name__ =="__main__":
                 rospy.loginfo(f"Cannot goto {waypoints_name[index]}")
                 fsm=Status.ERRORSTATE
 
-        elif fsm==Status.Find:
+        elif fsm==Status.Find: # 查找这里有没有人
             rospy.loginfo("Find!")
             # Puber.over_speaking("Find!")
             # rospy.sleep(1)
             rospy.sleep(10)
             rospy.loginfo("start_recognizing...")
-            Puber.start_recognizing()
-            params.finish=0
+            Puber.start_recognizing() # 发布，开始查找这里有没有人，有人的话回调会把params.people_exist改成1
+            params.finish=0# 后面所有这个格式的都是阻塞，等待回调
             while params.finish==0: pass
             params.finish=0
             rospy.loginfo(f'people_exist:{params.people_exist}')
-            if params.people_exist==1:
-                fsm=Status.Collect
+            if params.people_exist==1:# 如果有人
+                fsm=Status.Collect  #查找人的信息
                 params.people_exist=0
-                have_people=0
+                have_people=0 #状态值清零
                 rospy.loginfo(f"Find people {Collect_index+1}")
                 # Puber.over_speaking(f"Find people {Collect_index+1}")
                 # rospy.sleep(3)
@@ -685,12 +685,13 @@ if __name__ =="__main__":
                 rospy.loginfo(f"no people here")
                 # Puber.over_speaking("no people here!")
                 # rospy.sleep(1)
-                fsm=Status.Robbish_Explore
+                fsm=Status.Robbish_Explore #找垃圾
 
-        elif fsm==Status.Collect:
+        elif fsm==Status.Collect: # 进行人信息识别
             rospy.loginfo(" Enter Collect!")
             # Puber.over_speaking("Enter Collect!")
             # rospy.sleep(1)
+            # 名称转换
             if Face_det.recog_msg=="father":
                 Face_det.recog_msg = "Jack"
             elif Face_det.recog_msg == "son":
@@ -711,7 +712,7 @@ if __name__ =="__main__":
             next_data.data="你可以开始做第一个姿势"
             Puber.over_speaking(next_data)
             rospy.sleep(3)
-            Puber.pose_deting()
+            Puber.pose_deting() #发布开始测试姿势
             params.finish=0
             while params.finish==0: pass
             params.finish=0
@@ -720,13 +721,6 @@ if __name__ =="__main__":
             rospy.loginfo(f"Body_det.recog_msg:{Face_det.body_data}")
             Puber.over_speaking(pose_data)
             rospy.sleep(2)
-
-            # if waypoints_index==3:
-            #     Puber.start_follow_people()
-            #     rospy.sleep(10)
-            #     Puber.end_follow_people()
-
-            next_data=String()
             next_data.data="请开始下一个姿势"
             Puber.over_speaking(next_data)
             rospy.sleep(3)
@@ -747,31 +741,31 @@ if __name__ =="__main__":
             # Puber.over_speaking("Robbish Explore")
             # rospy.sleep(1)
             rospy.loginfo(f"Robbish_waypoints_index:{Robbish_waypoints_index}")
-            success=Gotopoint(waypoints_name[Robbish_waypoints_index])
+            success=Gotopoint(waypoints_name[Robbish_waypoints_index]) #走到垃圾航点
             rospy.loginfo(f"going {waypoints_name[Robbish_waypoints_index]}")
             if success==True:
-                fsm=Status.Collect_Robbish
+                fsm=Status.Collect_Robbish # 查找垃圾信息
                 Robbish_waypoints_index+=1
             else:
                 rospy.loginfo(f"Cannot goto {waypoints_name[Robbish_waypoints_index]}")
                 fsm=Status.ERRORSTATE
 
 
-        elif fsm==Status.Collect_Robbish:
+        elif fsm==Status.Collect_Robbish: #识别垃圾信息
             rospy.loginfo("Collect_Robbish")
             # Puber.over_speaking("Collect Robbish")
             # rospy.sleep(2)
             # Puber.collect_robbishing()
             rospy.sleep(2)
             params.finish=0
-            Puber.collect_robbishing()
+            Puber.collect_robbishing() #发布检查该垃圾是什么
             while params.finish==0: pass
             params.finish=0
             robbish_data=String()
             robbish_data.data=f"识别到垃圾{Robbish_det.recog_msg}"
             Puber.over_speaking(robbish_data)
             rospy.sleep(2)
-            if Robbish_waypoints_index>=8:
+            if Robbish_waypoints_index>=8: #这个是为了识别全部完成后再次回去捡垃圾，是航点文件里决定的
                 aaa=Twist()
                 aaa.linear.x=1
                 Puber.vel_pubing(aaa)
@@ -816,7 +810,7 @@ if __name__ =="__main__":
 
             if Robbish_waypoints_index== 11:
                 fsm=Status.Quit
-        elif fsm==Status.Send:
+        elif fsm==Status.Send: # 丢弃垃圾到桶里
             rospy.loginfo("enter send")
             # Puber.over_speaking("send")
             if Robbish_waypoints_index== 11:
@@ -830,13 +824,13 @@ if __name__ =="__main__":
             rospy.loginfo("successfully send robbish")
             # Puber.over_speaking("successfully send robbish")
             # rospy.sleep(1)
-            if Robbish_waypoints_index== 11:
+            if Robbish_waypoints_index== 11: # 这个也是流程问题，由航点文件决定的
                 fsm=Status.Quit
             else:
                 fsm=Status.Robbish_Explore
 
 
-        elif fsm==Status.Quit:
+        elif fsm==Status.Quit: #流程结束
             rospy.loginfo("ALL FINISH!")
             Puber.over_speaking("正在向全场奏响您的MVP凯歌!")
             rospy.sleep(5)
