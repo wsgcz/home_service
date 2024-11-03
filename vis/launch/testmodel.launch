@@ -1,0 +1,4 @@
+ <launch>
+  <node pkg="vis" type="realsense_testmodel.py" name="realsense_testmodel" output="screen"/>
+  <include file="$(find main_function)/launch/rs_camera.launch" />
+</launch>

@@ -1,5 +1,9 @@
 # 2024RoboCup居家服务
 
+> 获得2024年居家服务机器人亚军
+
+> 联系方式：qq群`683244882`
+
 ## 成员分工
 
 ### 视觉识别
@@ -26,36 +30,35 @@
 
 ## 仓库架构
 
-### resource
+### grabth
+抓取功能包，实现抓取和丢垃圾
 
-往届以及别组的代码资源
+### iai_kinect2
+将kinect2相机获得的消息封装为ros消息
 
-#### grabb.py
+### main_function
+主函数
 
-the grab module file
+### realsense-ros
+将realsense相机获得的消息封装为ros消息
 
-#### pose3.py
+### rplidar_ros
+将雷达获得的消息封装为ros消息
 
-the vision module file
+### sound_play
+语言播报功能包
 
-#### shopping
+### vis
+视觉功能包，能够实现人脸识别，垃圾识别，姿态识别
 
-2023 RoboCup shopping service directory
+### voice
+语言功能包，能够实现语音播报的功能
 
-#### ServiceRobot-General
+### waterplus_map_tools
+航点功能包，能够实现航点的创建以及保存
 
-2023 RoboCup general service directory
+### wpb_home && wpb_home_apps
+六部工坊机器人控制功能包，可以通过ros向话题发布实现对机器人的控制
 
-### zzy
-
-work dir of zzy
-
-### lzh
-
-work dir of lzh
-
-### gcz
-
-work dir of gcz
-
-
+### xfyun_waterplus
+六部工坊封装的语音功能包
