@@ -40,43 +40,7 @@ class GlobalVar:
     face_mutex = threading.Lock()
     queue_mutex = threading.Lock()
     mediapipe_mutex = threading.Lock()
-    def ori_to_rpy(x, y, z, w):
-        (r, p, y) = transformations.euler_from_quaternion([x, y, z, w])
-        return [r, p, y]
 
-    def rpy2quaternion(roll, pitch, yaw):
-        x = sin(pitch/2)*sin(yaw/2)*cos(roll/2)+cos(pitch/2)*cos(yaw/2)*sin(roll/2)
-        y = sin(pitch/2)*cos(yaw/2)*cos(roll/2)+cos(pitch/2)*sin(yaw/2)*sin(roll/2)
-        z = cos(pitch/2)*sin(yaw/2)*cos(roll/2)-sin(pitch/2)*cos(yaw/2)*sin(roll/2)
-        w = cos(pitch/2)*cos(yaw/2)*cos(roll/2)-sin(pitch/2)*sin(yaw/2)*sin(roll/2)
-        return [x, y, z, w]
-
-    # 摄像头节点坐标系到map坐标系的转变角，返回四元数
-    def get_map_pose_theta():
-        ps = PoseStamped()
-        ps.header.frame_id = "base_footprint"
-        ps.pose.position.x = 0.0
-        ps.pose.position.y = 0.0
-        ps.pose.position.z = 0.0
-        ps.pose.orientation.w = 1.0
-        ps.pose.orientation.x = 0.0
-        ps.pose.orientation.y = 0.0
-        ps.pose.orientation.z = 0.0
-        ps.header.stamp = rospy.Time.now()
-        ps_new = GlobalVar.tfBuffer.transform(ps, "map", rospy.Duration(1))
-        return [ps_new.pose.position.x, ps_new.pose.position.y, ps_new.pose.orientation.z, ps_new.pose.orientation.w]
-
-    # 将摄像头坐标系的坐标转化为机器人坐标系
-    def get_map_pose(x, y):
-        rospy.loginfo(f"machine_odom_now_pos: {x},{y}")
-        ps = PointStamped()
-        ps.header.frame_id = "base_footprint"
-        ps.point.x = x
-        ps.point.y = y
-        ps.header.stamp = rospy.Time.now()
-        ps_new = GlobalVar.tfBuffer.transform(ps, "map", rospy.Duration(1))
-        return ps_new.point.x, ps_new.point.y
-    
 class Yolov8:
     def __init__(self,model_path1="/home/lzh/test/src/main_function/models/models_all/best_more_all_rubbish.pt",
                  model_path2="/home/lzh/test/src/main_function/models/models_all/best_bin.pt"):
@@ -170,7 +134,7 @@ def image_callback(image_rgb):
     r, b, g = cv2.split(image)
     image = cv2.merge([g,b,r])
     #cv::Mat
-    GlobalVar.cb_mutex.acquire()
+    GlobalVar.cb_mutex.acquire() #获得线程锁，防止在处理一帧时下一帧的信息已经到来
     if GlobalVar.frame == 0 :
         if GlobalVar.reaction_flag == 5:
             rospy.loginfo(f"Now the task is 5")
@@ -181,7 +145,7 @@ def image_callback(image_rgb):
             collect_robbish_pub.publish(result[0][5])
             GlobalVar.reaction_flag = -1
             # cv2.imwrite(store_path,image)
-            GlobalVar.frame = 1
+            GlobalVar.frame = 1 #将frame设置为1，防止重复处理
 
         elif GlobalVar.reaction_flag == 1:
             if (time.time() - last_detection_time > 2):
@@ -206,7 +170,7 @@ def image_callback(image_rgb):
                             GlobalVar.frame = 1
                             spin_count = 0
                             res_pub.publish("spin ok")
-    GlobalVar.cb_mutex.release()
+    GlobalVar.cb_mutex.release() #释放互斥锁
 
 def spin_sub(msg:String):
     global spin_count
