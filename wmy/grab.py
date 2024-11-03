@@ -32,22 +32,21 @@ from sensor_msgs.msg import LaserScan
 import asyncio
 
 #参数
-control_arm_data=JointState()
-arm_postion_init=[0,0]
-control_arm_data.name.append("lift")
-control_arm_data.name.append("gripper")
-control_arm_data.position.extend(arm_postion_init)
-control_arm_data.velocity.extend(arm_postion_init)
+#机械臂控制
+control_arm_data=JointState()#变量的类型
+arm_postion_init=[0,0]#初始化
+control_arm_data.name.append("lift")#[0]控制机械臂上下
+control_arm_data.name.append("gripper")#[1]控制爪夹开和
+control_arm_data.position.extend(arm_postion_init)#机械臂位置初始化
+control_arm_data.velocity.extend(arm_postion_init)#爪夹位置初始化
 
-begin_open = 0
-begin_close = 0
   
-#张开夹爪
-def grab(msg:String):
+#抓取部分
+def grab(msg:String)
     global control_arm_data
-    if(msg == "1"):
+    if(msg == "1"):#控制机械臂使上移
         rospy.loginfo("Open!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-        control_arm_data.position[0]=0.6
+        control_arm_data.position[0]=0.6 #机械臂上升至
         control_arm_data.velocity[0]=0.5
         control_arm_data.position[1]=0
         control_arm_data.velocity[1]=0

@@ -41,34 +41,38 @@ import asyncio
 #from std_msgs.msg import Float32
 
 #参数
-control_arm_data=JointState()
-arm_postion_init=[0,0]
-control_arm_data.name.append("lift")
-control_arm_data.name.append("gripper")
-control_arm_data.position.extend(arm_postion_init)
-control_arm_data.velocity.extend(arm_postion_init)
+""" 机械臂控制 """
+control_arm_data=JointState()#变量的类型
+arm_postion_init=[0,0]#初始化
+control_arm_data.name.append("lift")#[0]控制机械臂上下
+control_arm_data.name.append("gripper")#[1]控制爪夹开和
+control_arm_data.position.extend(arm_postion_init)#机械臂位置初始化
+control_arm_data.velocity.extend(arm_postion_init)#速度初始化
 
-machine_speed=Twist()
+machine_speed=Twist()#变量类型，控制机械臂速度
 
 #???huoqu
 # have_left=0.56
-begin_throw = 0
+begin_throw = 0 #控制丢垃圾行为的标志
 
+""" 发布开始旋转的消息 """
 def start_spin(msg):
-    global begin_to_confirm_all_position_data,begin_throw
+    global begin_throw
     if (msg=="throw"):
-        start_spin_pub.publish("spin")
+        start_spin_pub.publish("spin") #发布“spin”
     rospy.loginfo("ok I will face the trashbase")
 
+""" 发布消息获取节点数据 """
 def start_forward(msg):
-    global begin_to_confirm_all_position_data,begin_throw
+    global begin_throw
     if (msg=="spin ok"):
-        start_get_distance_pub.publish("forward")
+        start_get_distance_pub.publish("forward")#发布“forward”
     rospy.loginfo("ok I will get the diatance")
 
+""" 前进 """
 def go_ahead(msg):
     global machine_speed,begin_throw,have_left
-    have_left = msg
+    have_left = msg #受到雷达返回的距离
     machine_speed.linear.x=(have_left-0.55)/2 # 在机器人坐标中，x为面前的方向；在摄像头中为左右的方向
     machine_speed.linear.y=0
     machine_speed.linear.z=0
@@ -76,17 +80,18 @@ def go_ahead(msg):
     machine_speed.angular.y=0
     machine_speed.angular.z=0
     rospy.loginfo("continue move to the destination~")
-    speed_of_pub.publish(machine_speed)
-    rospy.sleep(2)
+    speed_of_pub.publish(machine_speed) #发布速度信息
+    rospy.sleep(2)#机器人移动时间为2秒
     rospy.loginfo("arrive!!!")
-    reset_speed()
+    reset_speed()#重置速度
     time.sleep(0.5)
-    begin_throw = 1
+    begin_throw = 1#丢垃圾标志置1
 
+""" 丢垃圾 """
 def throw_the_object():
     global control_arm_data
     # rospy.loginfo("this is final_y %f",final_position_y)
-    control_arm_data.position[0]=0.6
+    control_arm_data.position[0]=0.6 #机械
     control_arm_data.velocity[1]=1
     arm_action_pub.publish(control_arm_data)
     rospy.sleep(9)
