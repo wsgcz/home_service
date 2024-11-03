@@ -2,7 +2,6 @@
 import rospy
 from std_msgs.msg import String,Float32
 from sensor_msgs.msg import JointState
-import time
 from geometry_msgs.msg import Twist
 
 #参数
