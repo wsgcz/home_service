@@ -54,10 +54,10 @@ def throw_the_object():
     global control_arm_data
     # rospy.loginfo("this is final_y %f",final_position_y)
     control_arm_data.position[0]=0.58
-    control_arm_data.velocity[1]=1
+    control_arm_data.velocity[0]=1
     arm_action_pub.publish(control_arm_data)
     rospy.sleep(4)
-    control_arm_data.position[1]=0.3
+    control_arm_data.position[1]=0.5
     control_arm_data.velocity[1]=1
     arm_action_pub.publish(control_arm_data)
     rospy.sleep(4)

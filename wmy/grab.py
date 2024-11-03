@@ -47,29 +47,31 @@ def grab(msg:String):
     global control_arm_data
     if(msg == "1"):
         rospy.loginfo("Open!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-        control_arm_data.position[0]=0.6
+        control_arm_data.position[0]=0.58
         control_arm_data.velocity[0]=0.5
-        control_arm_data.position[1]=0
-        control_arm_data.velocity[1]=0
+        # control_arm_data.position[1]=0
+        # control_arm_data.velocity[1]=0
         arm_action_pub.publish(control_arm_data)
         rospy.sleep(5)
-        control_arm_data.position[1]=0.5
-        control_arm_data.velocity[1]=2
-        arm_action_pub.publish(control_arm_data)
-        rospy.sleep(5)
+        # control_arm_data.position[1]=0.5
+        # control_arm_data.velocity[1]=2
+        # arm_action_pub.publish(control_arm_data)
+        # rospy.sleep(5)
         arm_state_pub.publish("1")
-    elif(msg == "0"): 
+    elif(msg == "2"):   #????
         control_arm_data.position[1]=0
         control_arm_data.velocity[1]=1
         arm_action_pub.publish(control_arm_data)
-        rospy.sleep(7)
-        arm_state_pub.publish("1")
+        rospy.sleep(5)
+        # ????arm_state_pub.publish("1")
         rospy.loginfo("Close!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-        control_arm_data.position[0]=0
-        control_arm_data.velocity[0]=1
+        control_arm_data.position[0]=0.5
+        control_arm_data.velocity[0]=0.5
         arm_action_pub.publish(control_arm_data)
-        rospy.sleep(7)
-        get_state_pub.publish("0")
+        rospy.sleep(5)
+        #get_state_pub.publish("0")  #????none
+        arm_state_pub.publish("1")
+
         #rospy.set_param("params_finish", 1)
     
     
@@ -91,12 +93,13 @@ def grab(msg:String):
 #主体
 if __name__=="__main__":
     rospy.init_node("general_service_grab")
+    time1 = time.time()
     grab_sub=rospy.Subscriber("/home_service/move_robot_arm",String,grab,queue_size=10)
     arm_action_pub=rospy.Publisher("/wpb_home/mani_ctrl",JointState,queue_size=30) #控制机器人机械臂
     arm_state_pub = rospy.Publisher("/home_service/move_robot_arm_reply",String,queue_size=10)
     get_state_pub=rospy.Publisher("/home_service/genenal_service_get_it",String,queue_size=10)#grab.py
     #reset()
-    time1 = time.time()
+
     rospy.spin()
 
 
