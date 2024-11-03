@@ -1,8 +1,0 @@
-prefix=/home/lzh/test/install
-
-Name: grabth
-Description: Description of grabth
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

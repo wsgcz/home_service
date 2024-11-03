@@ -1,8 +1,0 @@
-<launch>   
-
-
-    <node name="general_service_throw" pkg="grabth" type="throw.py" output="screen">
-    </node>
-
-  
-</launch>

@@ -1,2 +1,0 @@
-main_control:rplidar_ros:vision/iai_kinect2/iai_kinect2:vision/iai_kinect2/kinect2_bridge:vision/iai_kinect2/kinect2_calibration:vision/iai_kinect2/kinect2_registration:vision/iai_kinect2/kinect2_viewer:vision/vision:voice:waterplus_map_tools:wpb_home/wpb_home_behaviors:wpb_home/wpb_home_bringup:wpb_home/wpb_home_python:wpb_home/wpb_home_python3:wpb_home/wpb_home_remote:wpb_home/wpb_home_tutorials:wpb_home/wpbh_local_planner
--DCATKIN_DEVEL_PREFIX=/home/zxy/shopping/devel -DCMAKE_INSTALL_PREFIX=/home/zxy/shopping/install -G Unix Makefiles

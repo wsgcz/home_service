@@ -1,3 +1,0 @@
-int32 angle
-float64 max_length
-int32 the_angle_of_max_length

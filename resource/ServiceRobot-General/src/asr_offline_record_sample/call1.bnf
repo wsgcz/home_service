@@ -1,6 +1,0 @@
-#BNF+IAT 1.0;
-!grammar call;
-!slot <name>;
-!start <commands>;
-<commands>:(找一下|打电话给) <name>;
-<name>: 张三|李四;

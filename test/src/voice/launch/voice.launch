@@ -1,3 +1,0 @@
-<launch>
-    <node pkg="voice" name="xf_tts" type="xf_tts" output="screen"/>
-</launch>

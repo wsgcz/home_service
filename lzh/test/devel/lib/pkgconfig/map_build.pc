@@ -1,8 +1,0 @@
-prefix=/home/lzh/test/devel
-
-Name: map_build
-Description: Description of map_build
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

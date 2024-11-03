@@ -1,7 +1,0 @@
-﻿#BNF+IAT 1.0 UTF-8;
-!grammar call;
-!slot <want>;
-
-!start <commands>;
-<commands>:<want>|是|否|停止;
-<want>:水|奥利奥|饼干|薯片|曲奇|乐事|洗手液|面包|可乐|雪碧|芬达|洗发水;/*change this to add or delete keyword*/

@@ -1,8 +1,0 @@
-prefix=/home/zxy/shopping/install
-
-Name: main_control
-Description: Description of main_control
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

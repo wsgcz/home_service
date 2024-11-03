@@ -1,8 +1,0 @@
-prefix=/home/zzy/vision/src/vis/build/devel
-
-Name: vis
-Description: Description of vis
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 
