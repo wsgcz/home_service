@@ -1,28 +1,16 @@
 #!/usr/bin/python3
-import os,cv2,sys,time,torch,rospy,tf2_ros,threading,insightface,message_filters
-import numpy as np
-import mediapipe as mp
-import actionlib
-import random
-import matplotlib.pyplot as plt
-from tqdm import tqdm
+import os,cv2,sys,time,torch,rospy,tf2_ros,threading
 import numpy as np
 from ultralytics import YOLO
 
-from sklearn import preprocessing
-from PIL import Image, ImageFont, ImageDraw
+from PIL import Image
 from math import atan2,pi,sqrt,sin,cos
 from queue import Queue
-from nav_msgs.msg import Odometry
-from sklearn import preprocessing
 from cv_bridge import CvBridge
-from torchvision import transforms
 from tf import transformations
 from tf2_geometry_msgs import PointStamped,PoseStamped
 from sensor_msgs.msg import Image
 from std_msgs.msg import String
-from move_base_msgs.msg import MoveBaseGoal
-from move_base_msgs.msg import MoveBaseAction
 from geometry_msgs.msg import Twist
 sys.path.insert(0,'/home/lzh/test/src/vis')
 spin_count = 0
@@ -89,9 +77,6 @@ class GlobalVar:
         ps_new = GlobalVar.tfBuffer.transform(ps, "map", rospy.Duration(1))
         return ps_new.point.x, ps_new.point.y
     
-
-# yolo_model = "/home/shanhe/demo/runs/detect/train2/weights/best.pt"
-# yolo_model = "/home/lzh/111111models/best_4rubbish.pt"
 class Yolov8:
     def __init__(self,model_path1="/home/lzh/test/src/main_function/models/models_all/best_more_all_rubbish.pt",
                  model_path2="/home/lzh/test/src/main_function/models/models_all/best_bin.pt"):
@@ -111,10 +96,6 @@ class Yolov8:
             output = self.model2(image)
         name = list()
         
-        # class_name_max = "nothing"
-        # name_max = ""
-        # class_id_max = 0
-        # 获取类别名称字典
         for r in output:
             names = r.names
             boxes = r.boxes
@@ -130,17 +111,6 @@ class Yolov8:
             # 如果没有检测到任何对象
             if len(r.boxes) == 0:
                 continue
-        # for o in output:
-        #     boxes = o.boxes
-        #     names = o.names
-        #     for box in boxes:
-        #         # 获取类别索引
-        #         class_id = int(box.cls[0])
-        #         # 获取类别名称
-        #         name.append(names[class_id])
-        #     # 如果没有检测到任何对象
-        #     if len(boxes) == 0:
-        #         continue
         for i in range (len(name)):
             xywh = boxes.cpu().xywh.detach().numpy()
             x_center = int(xywh[i][0])
@@ -165,42 +135,6 @@ class Yolov8:
             max_result.append(results[max_index])
         # print(max_result)
         return max_result
-
-
-# ###detect函数，对图像进行检测，并返回裁剪后的图像
-# ###输入：图片
-# ###输出：裁剪后的图片，框的宽度和高度，框的中心点，标签
-#     def detect(self,image,num):
-#         results = list()
-#         nimg = image
-#         # plot_skeleton_kpts(nimg, output[idx, 7:].T, 3)
-#         if num==1:
-#             output = self.model1(image)
-#         if num==2:
-#             output = self.model2(image)
-#         name = list()
-#         for o in output:
-#             boxes = o.boxes
-#             names = o.names
-#             for box in boxes:
-#                 # 获取类别索引
-#                 class_id = int(box.cls[0])
-#                 # 获取类别名称
-#                 name.append(names[class_id])
-#             # 如果没有检测到任何对象
-#             if len(boxes) == 0:
-#                 continue
-#         for i in range (len(name)):
-#             xywh = boxes.cpu().xywh.detach().numpy()
-#             x_center = int(xywh[i][0])
-#             y_center = int(xywh[i][1])
-#             half_w = int(xywh[i][2]/2)
-#             half_h = int(xywh[i][3]/2)
-#             change_image=nimg[y_center-half_h:y_center+half_h,x_center-half_w:x_center+half_w]#裁减之后的框
-#             image_name = f"/home/gcz/{name[i]}.jpg"
-#             # cv2.imwrite(image_name,change_image)
-#             results.append((change_image,half_w*2,half_h*2,x_center,y_center,name[i]))
-#         return results
   
     #确保人在视野的中心
     def rotate(self, image, width, height, mid_x, mid_y, name):
@@ -227,7 +161,6 @@ class Yolov8:
         GlobalVar.mediapipe_mutex.release()
         return None
     
-# yolo_model = "/home/shanhe/demo/runs/detect/train2/weights/best.pt"
 last_detection_time = 0    
 def image_callback(image_rgb):
     #print("---------- i am in the callback --------------")
@@ -292,21 +225,14 @@ def collect_robbish_callback(msg:String):
         rospy.loginfo(f"frame:{GlobalVar.frame}")
 
 if __name__ == "__main__":
-    #print("---------i am realsense------------")
-    # GlobalVar.reaction_flag = 1
-    # GlobalVar.frame = 0
     yolov8 = Yolov8()
-    #print("-------------i am in 1----------------")
     rgb_sub = rospy.Subscriber("/camera/color/image_raw",Image,image_callback)
 
-    #print("-------------i am in 2----------------")
 
     res_sub = rospy.Subscriber("robot_spin",String,spin_sub)
-    #print("-------------i am in 6----------------")
 
     vel_pub = rospy.Publisher("/cmd_vel",Twist,queue_size=10)
     res_pub = rospy.Publisher("robot_spin_reply",String,queue_size=10)
-    #print("-------------i am in 7----------------")
     collect_robbish = rospy.Subscriber("collect_robbish",String,collect_robbish_callback)
 
     collect_robbish_pub = rospy.Publisher("collect_robbish_reply", String, queue_size=10)

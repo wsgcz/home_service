@@ -699,16 +699,15 @@ def image_callback(image_rgb,image_depth):
 
         if GlobalVar.reaction_flag == 0: # 人脸识别
             rospy.loginfo(f"Now the task is 人脸识别")
-            detect_result = yolov8.detect(image, 1) # 预训练模型
+            detect_result = yolov8.detect(image, 1) # 通过yolo模型进行对人的检测，返回符合长宽比限制以及最大面积的人
             yes = 0 # 是否识别到人脸
             for person in detect_result: 
                 result = person[5] # 识别结果
                 if result == "person": # 如果识别结果是person
                     # cv2.imwrite(f"/home/lzh/{person[5]}.jpg",person[0])
-                    results_face = face.recognition(person[0]) # 人脸识别
+                    results_face = face.recognition(person[0]) # 使用insightface进行人脸识别
                     rospy.loginfo(f"results_face={results_face}") # 打印识别结果
                     for result in results_face: # 遍历识别结果
-                        if result != "unknown": # 如果识别结果不是unknown
                             rospy.loginfo(f"find people {result}") # 打印识别结果
                             start_recognize_pub.publish(result) # 发布识别结果
                             GlobalVar.reaction_flag = -1 # 重置当前任务
@@ -740,10 +739,12 @@ def image_callback(image_rgb,image_depth):
                             mediapipe.rotate(image, 960,540,person[3],person[4],person[5],depth) # 旋转
         GlobalVar.cb_mutex.release() # 释放线程锁
 
+
+
 def start_recognize_callback(msg:String): # 人脸识别的回调函数
     if msg.data == 'OK':
         GlobalVar.reaction_flag=0
-        GlobalVar.frame = 0
+        GlobalVar.frame = 0 #在回调函数中将frame设置为0，可以对下一帧图像进行处理。
 
 def pose_det_callback(msg:String): # 姿态识别的回调函数
     if msg.data == 'OK':
